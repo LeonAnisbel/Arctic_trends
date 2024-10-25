@@ -53,6 +53,10 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
             # print('Computing ' + var_na + ' trend', data_month.max().values)
                 variables_info[var_na][reg_na][decades_na[dec_na]]['data_aver_reg'] = data_month.mean(dim=('lat', 'lon'),
                                                                                                       skipna=True)
+#                if reg_na == 'Chukchi Sea' and var_na=='OMF_POL':
+ #                   print(reg_na, var_na, 'VALUES')
+  #                  print(variables_info[var_na][reg_na][decades_na[dec_na]]['data_aver_reg'])
+   #                 exit()
 
 
             if per_unit_sic:
@@ -87,9 +91,11 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
                 result = sm.OLS(np.array(Y), np.array(X), missing='drop').fit()
                 intercept = result.params[0]
                 slope = result.params[1]
-                pval = result.pvalues[0]
+                pval = result.pvalues[1]
                 if pval > 0.05:
                     pval = np.nan
+                    slope = np.nan
+                    intercept = np.nan
                 p_value = pval
             else:
                 slope = np.nan

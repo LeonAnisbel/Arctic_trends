@@ -6,13 +6,29 @@ import matplotlib.pyplot as plt
 
 season='JAS'
 # season='AMJ'
+#season = 'JJA'
 
 with open(f"TrendsDict_{season}.pkl", "rb") as myFile:
     variables_info_yr = pickle.load(myFile)
-# seaice = utils.get_seaice_vals(variables_info_yr, 'Sea_ice')
+seaice = utils.get_seaice_vals(variables_info_yr, 'Sea_ice')
+
 seaice_lin = variables_info_yr['AER_SIC_area_px']
-biomol = variables_info_yr['AER_F_LIP']#AER_LIP
-print(variables_info_yr.keys())
+biomol = variables_info_yr['AER_F_tot_yr']#AER_LIP #AER_F_tot_yr
+
+region = ['Chukchi Sea', 'Greenland & Norwegian Sea', 'East-Siberian Sea', 'Kara Sea']
+for reg in region:
+
+    sst = variables_info_yr['AER_SST'][reg]
+    wind =variables_info_yr['AER_U10'][reg]
+    decades = ['1990-2004', '2005-2019']
+
+    for idx, dec in enumerate(decades):
+        print(reg, dec, 'mean SST', sst[dec]['data_aver_reg'].mean().values,)
+        print(reg, dec, 'mean wind', wind[dec]['data_aver_reg'].mean().values,)                
+               
+
+
+
 with open(f"TrendsDict_per_ice_{season}.pkl", "rb") as myFile:
    variables_info_seaice = pickle.load(myFile)
 
@@ -26,22 +42,24 @@ axs = axes.flatten()
 decade= '1990-2019'
 reg= 'Arctic'
 
-
+colors = ['darkblue', 'darkred']
 leg = plots.plot_fit_trends(axs[0],
                       [seaice_lin[reg], biomol[reg]],
                       decade,
                       [reg, r'$\bf{(a)}$'],
                       ['Sea Ice Area \n (millions of km$^{2}$)', f'PMOA emission mass \n flux ({unit})'],
                       # ['Sea ice \n Concentration ($million km^{2})$', 'Total biomolecule \n concentration'],
+                      #[[6, 10.5], [0.1, 0.1]],
                       [[4.3, 7.5], [0.1, 0.1]],
-                      ['blue', 'red'],
+                      colors,
                       ['Sea ice', 'PMOA'],
                       #['Sea Ice', 'Biomolecules'],
                       f'{season}_Ocean_Flux_PL',
                       echam_data=True,
                       seaice=True,
                       multipanel=True)
-plt.legend(handles=[leg[0], leg[2], leg[1], leg[3]], ncol=2,
+
+plt.legend(handles=[leg[0], leg[2][0], leg[2][1], leg[1],  leg[3][0],leg[3][1]], ncol=2,
            bbox_to_anchor=(0.3, 1.), loc='lower left', fontsize=8)
 
 reg= 'Kara Sea'
@@ -51,40 +69,42 @@ leg = plots.plot_fit_trends(axs[1],
                       [reg, r'$\bf{(b)}$'],
                       ['Sea Ice Area \n (millions of km$^{2}$)', f'PMOA emission mass \n flux ({unit})'],
                       # ['Sea ice \n Concentration ($million km^{2})$', 'Total biomolecule \n concentration'],
+                      #[[0, 0.7], [0.1, 0.1]],
                       [[0., 0.6], [0.1, 0.1]],
-                      ['blue', 'red'],
+                      colors,
                       ['SIC Concentration', 'PMOA emission'],
                       #['Sea Ice', 'Biomolecules'],
                       f'{season}_Ocean_Flux_PL',
                       echam_data=True,
                       seaice=True,
                       multipanel=True)
-plt.legend(handles=[leg[2], leg[3]], ncol=len(axs[0].lines),
+print(leg[2][0], leg[2][1], leg[3][0], leg[3][1])
+plt.legend(handles=[leg[2][0], leg[2][1], leg[3][0], leg[3][1]], ncol=2,#ncol=len(axs[0].lines),
            bbox_to_anchor=(0.3, 1.), loc='lower left', fontsize=8)
 
-reg= 'Barents Sea'
+reg= 'Laptev Sea'
 leg = plots.plot_fit_trends(axs[2],
                       [seaice_lin[reg], biomol[reg]],
                       decade,
                       [reg, r'$\bf{(c)}$'],
                       ['Sea Ice Area \n (millions of km$^{2}$)', f'PMOA emission mass \n flux ({unit})'],
                       # ['Sea ice \n Concentration ($million km^{2})$', 'Total biomolecule \n concentration'],
+                      #[[0, 0.4], [0.1, 0.1]],
                       [[0, 0.23], [0.1, 0.1]],
-                      ['blue', 'red'],
+                      colors,
                       ['SIC Concentration', 'PMOA emission'],
                       #['Sea Ice', 'Biomolecules'],
                       f'{season}_Ocean_Flux_PL',
                       echam_data=True,
                       seaice=True,
                       multipanel=True)
-plt.legend(handles=[leg[2], leg[3]], ncol=len(axs[0].lines),
+plt.legend(handles=[leg[2][0], leg[2][1], leg[3][0], leg[3][1]], ncol=2,#ncol=len(axs[0].lines),
            bbox_to_anchor=(0.3, 1.), loc='lower left', fontsize=8)
 plt.tight_layout()
 
 plt.savefig(f'{season}_multipanel_time_series.png', dpi=200)
 
 print('Finish time series trend plot')
-exit()
 
 seaice_aer = utils.get_seaice_vals(variables_info_yr, 'AER_SIC')
 panel_names = ['AER_F_POL', 'AER_F_PRO', 'AER_F_LIP', 'AER_F_SS']
@@ -187,26 +207,26 @@ lon_aer = variables_info_yr[panel_names[0]]['lon']
 # #
 
 
-# panel_names = ['AER_U10', 'AER_SST']
-# fig_titles = [['Wind10', r'$\bf{(a)}$'], ['Surface temperature', r'$\bf{(b)}$']],
-# panel_var_trend, panel_var_pval, panel_lim, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr, trends=True)
-# panel_var_trend_signif = []
-# for i,pval in enumerate(panel_var_pval):
-#     panel_var_trend_signif.append(np.ma.masked_where(np.isnan(pval), panel_var_trend[i]))
+panel_names = ['AER_U10', 'AER_SST']
+fig_titles = [['Wind10', r'$\bf{(a)}$'], ['Surface temperature', r'$\bf{(b)}$']],
+panel_var_trend, panel_var_pval, panel_lim, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr, trends=True)
+panel_var_trend_signif = []
+for i,pval in enumerate(panel_var_pval):
+    panel_var_trend_signif.append(np.ma.masked_where(np.isnan(pval), panel_var_trend[i]))
 #
-# plots.plot_2_pannel_trend(panel_var_trend_signif,
-#                           seaice,
-#                           panel_var_pval,
-#                           lat_aer,
-#                           lon_aer,
-#                           [0.07, 0.1],
-#                           panel_unit,
-#                           fig_titles,
-#                           'wind_sst_Arctic',
-#                           not_aerosol=False,
-#                           percent_increase=True,
-#                           )
-#
+plots.plot_2_pannel_trend(panel_var_trend,#panel_var_trend_signif
+                          seaice,
+                          panel_var_pval,
+                          lat_aer,
+                          lon_aer,
+                          [0.07, 0.1],
+                          panel_unit,
+                          fig_titles,
+                          'wind_sst_Arctic',
+                          not_aerosol=False,
+#                          percent_increase=True,
+                          )
+
 
 
 print('')
@@ -234,7 +254,9 @@ for i,pval in enumerate(panel_var_pval_new[1:]):
     panel_var_trend_new_signif.append(np.ma.masked_where(np.isnan(pval), panel_var_trend_new[i+1]))
 
 vlims = utils.find_max_lim(panel_var_trend_new)
-plots.plot_6_2_pannel_trend(panel_var_trend_new_signif,
+
+#### UNCOMENt
+plots.plot_6_2_pannel_trend(panel_var_trend_new, #panel_var_trend_new_signif
                           seaice,
                           panel_var_pval_new,
                           lat_aer,
@@ -244,7 +266,7 @@ plots.plot_6_2_pannel_trend(panel_var_trend_new_signif,
                           fig_titles,
                           f'{season}_SeaIce_Emission_flux_trends_and_per_ice',
                           not_aerosol=False,
-                          percent_increase=True,
+                ##          percent_increase=True,
                           seaice_conc=True)
 
 print('finish now with OMF and biom')
@@ -285,40 +307,70 @@ fig_titles = [[['PCHO$_{sw}$', r'$\bf{(a)}$'],
 #                           not_aerosol=False,
 #                           percent_increase=False)
 
-panel_var_trend, panel_var_pval, panel_lim, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr, trends=True)
+        # panel_var_trend, panel_var_pval, panel_lim, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr, trends=True)
+        # vlims = utils.find_max_lim(panel_var_trend)
+        # plots.plot_4_pannel_trend(panel_var_trend,
+        #                           seaice,
+        #                           panel_var_pval,
+        #                           lat,
+        #                           lon,
+        #                           [0.04, 0.008, 0.05, 0.25],#[0.05, 0.005, 0.05, 0.2],
+        #                           panel_unit,
+        #                           fig_titles,
+        #                           f'{season}_Biom_OMF_trends_with_ice',
+        #                           not_aerosol=True,
+        #                           percent_increase=False)
+
+
+panel_names = ['PCHO', 'DCAA', 'PL', 'OMF_POL', 'OMF_PRO', 'OMF_LIP']
+fig_titles = [['PCHO$_{sw}$', r'$\bf{(a)}$'], ['DCAA$_{sw}$', r'$\bf{(b)}$'], ['PL$_{sw}$', r'$\bf{(c)}$'],
+              ['PCHO$_{aer}$ OMF', r'$\bf{(d)}$'], ['DCAA$_{aer}$ OMF', r'$\bf{(e)}$'],
+              ['PL$_{aer}$ OMF', r'$\bf{(f)}$']],
+panel_var_trend, panel_var_pval, panel_lim, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr)
 vlims = utils.find_max_lim(panel_var_trend)
-plots.plot_4_pannel_trend(panel_var_trend,
+
+#plots.plot_6_pannel_trend(panel_var_trend,
+ #                         seaice,
+  #                        panel_var_pval,
+   ##                       lat,
+     #                     lon,
+      #                    [0.04, 0.01, 0.008, 0.002, 0.008, 0.2],  #[0.05, 0.01, 0.005, 0.002, 0.008, 0.2],
+       #                   panel_unit,
+        ##                  fig_titles,
+          #                f'_{season}_',
+           #               not_aerosol=True,
+            #              percent_increase=False,
+             #             )
+
+
+panel_names = ['PCHO', 'OMF_POL', 'PL', 'OMF_LIP','Sea_ice', 'NPP' ]
+lat = variables_info_yr[panel_names[0]]['lat']
+lon = variables_info_yr[panel_names[0]]['lon']
+fig_titles = [[['PCHO$_{sw}$', r'$\bf{(a)}$'],
+               ['PCHO$_{aer}$ OMF', r'$\bf{(b)}$'],
+               ['PL$_{sw}$', r'$\bf{(c)}$'],
+               ['PL$_{aer}$ OMF', r'$\bf{(d)}$'],
+               ['SIC', r'$\bf{(e)}$'],
+               ['NPP', r'$\bf{(f)}$']]]
+vlims =  [0.04, 0.002, 0.008, 0.25, 3, 1.]
+panel_var_trend, panel_var_pval, panel_lim, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,trends=True)
+
+plots.plot_6_2_pannel_trend(panel_var_trend,
                           seaice,
                           panel_var_pval,
                           lat,
                           lon,
-                          [0.04, 0.008, 0.05, 0.25],#[0.05, 0.005, 0.05, 0.2],
+                          vlims,
                           panel_unit,
                           fig_titles,
-                          f'{season}_Biom_OMF_trends_with_ice',
+                          f'{season}_Biom_OMF_SIC_NPP_trends',
                           not_aerosol=True,
-                          percent_increase=False)
+                          percent_increase=False,
+                          )
 
 
-# panel_names = ['PCHO', 'DCAA', 'PL', 'OMF_POL', 'OMF_PRO', 'OMF_LIP']
-# fig_titles = [['PCHO$_{sw}$', r'$\bf{(a)}$'], ['DCAA$_{sw}$', r'$\bf{(b)}$'], ['PL$_{sw}$', r'$\bf{(c)}$'],
-#               ['PCHO$_{aer}$ OMF', r'$\bf{(d)}$'], ['DCAA$_{aer}$ OMF', r'$\bf{(e)}$'],
-#               ['PL$_{aer}$ OMF', r'$\bf{(f)}$']],
-# panel_var_trend, panel_var_pval, panel_lim, panel_unit = utils.alloc_metadata(panel_names, variables_info_seaice)
-# vlims = utils.find_max_lim(panel_var_trend)
-#
-# plots.plot_6_pannel_trend(panel_var_trend,
-#                           seaice,
-#                           panel_var_pval,
-#                           lat,
-#                           lon,
-#                           vlims,#[0.05, 0.01, 0.05, 0.002, 0.008, 1],  #[0.05, 0.01, 0.005, 0.002, 0.008, 0.2],
-#                           panel_unit,
-#                           fig_titles,
-#                           '_JJA_no_icemask_per_ice_',
-#                           not_aerosol=False,
-#                           percent_increase=False)
-# print('finish now with OMF and biom')
+
+print('finish now with OMF and biom')
 #
 #
 #
@@ -339,17 +391,17 @@ plots.plot_4_pannel_trend(panel_var_trend,
 panel_names = ['Biom_tot', 'OMF_tot']
 fig_titles = [['Total concentration$_{sw}$', r'$\bf{(a)}$'], ['Total OMF', r'$\bf{(b)}$']],
 panel_var_trend, panel_var_pval, panel_lim, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr, trends=True)
-plots.plot_2_pannel_trend(panel_var_trend,
-                          seaice,
-                          panel_var_pval,
-                          lat,
-                          lon,
-                          [0.05, 0.25],
-                          panel_unit,
-                          fig_titles,
-                          f'{season}_total_ocean_omf_Arctic',
-                          not_aerosol=True,
-                          percent_increase=False,)
+#plots.plot_2_pannel_trend(panel_var_trend,
+ #                         seaice,
+  ##                        panel_var_pval,
+    #                      lat,
+     #                     lon,
+      #                    [0.05, 0.25],
+       #                   panel_unit,
+        ##                  fig_titles,
+          #                f'{season}_total_ocean_omf_Arctic',
+           #               not_aerosol=True,
+ #                         percent_increase=False,)
 #
 ####-------------------------------------------------------------------------------------------------------------------
 print('Start now with other ocean variables')

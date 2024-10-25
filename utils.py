@@ -80,9 +80,10 @@ def find_max_lim(panel_var):
 def get_seaice_vals(variables_info, var_na):
     v_season = variables_info[var_na]['data_season_reg'].compute()
     seaice_min = get_min_seaice(variables_info, var_na)
-    seaice_min = seaice_min.where(seaice_min > 10, drop=True)
+    seaice_min_10 = seaice_min.where(seaice_min > 10, drop=True)
+    
     seaice_mean = v_season.mean('time')
-    return [seaice_min, seaice_mean]
+    return [seaice_min_10, seaice_mean, seaice_min]
 
 def get_min_seaice(variables_info, var_na):
     v_1month = variables_info[f'{var_na}_1m']['data_season_reg'].compute()

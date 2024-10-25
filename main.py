@@ -13,9 +13,13 @@ if __name__ == '__main__':
     season='JAS'
     one_month = [9]
 
-    months = [4, 5, 6]
-    season='AMJ'
-    one_month = [6]
+    #months = [6, 7, 8]
+    #season='JJA'
+    #one_month = [8]
+    
+    # months = [4, 5, 6]
+    # season='AMJ'
+    # one_month = [6]
 
     # months = [1, 2, 3]
     # season='JFM'
@@ -45,10 +49,10 @@ if __name__ == '__main__':
         'AER_SIC': {'lim': 4, 'unit': '%'},
         'AER_SIC_area_px': {'lim': 4, 'unit': '%'},
         'AER_SIC_1m': {'lim': 4, 'unit': '%'},
-        'AER_POL': {'lim': 0.01, 'unit': 'ng ${m^{-3}}$ '},
-        'AER_PRO': {'lim': 0.1, 'unit': 'ng ${m^{-3}}$ '},
-        'AER_LIP': {'lim': 2, 'unit': 'ng ${m^{-3}}$ '},
-        'AER_SS': {'lim': 4, 'unit': 'ng ${m^{-3}}$ '},
+        #'AER_POL': {'lim': 0.01, 'unit': 'ng ${m^{-3}}$ '},
+        #'AER_PRO': {'lim': 0.1, 'unit': 'ng ${m^{-3}}$ '},
+        #'AER_LIP': {'lim': 2, 'unit': 'ng ${m^{-3}}$ '},
+        #'AER_SS': {'lim': 4, 'unit': 'ng ${m^{-3}}$ '},
         'OMF_POL': {'lim': 0.003, 'unit': '% '},
         'OMF_PRO': {'lim': 0.02, 'unit': '% '},
         'OMF_LIP': {'lim': 0.5, 'unit': '% '},
@@ -60,10 +64,11 @@ if __name__ == '__main__':
     }
 
     # C_pol, C_pro, C_lip, C_ss = read_data.read_aerosol_data(months)
-    C_ss = read_data.read_each_aerosol_data(months, 'SS_AS', 'SS_AS_t63', 1e12)
-    C_pol = read_data.read_each_aerosol_data(months, 'POL_AS', 'POL_AS_t63', 1e12)
-    C_pro = read_data.read_each_aerosol_data(months, 'PRO_AS', 'PRO_AS_t63', 1e12)
-    C_lip = read_data.read_each_aerosol_data(months, 'LIP_AS', 'LIP_AS_t63', 1e12)
+    
+    #C_ss = read_data.read_each_aerosol_data(months, 'SS_AS', 'SS_AS_t63', 1e12)
+    #C_pol = read_data.read_each_aerosol_data(months, 'POL_AS', 'POL_AS_t63', 1e12)
+    #C_pro = read_data.read_each_aerosol_data(months, 'PRO_AS', 'PRO_AS_t63', 1e12)
+    #C_lip = read_data.read_each_aerosol_data(months, 'LIP_AS', 'LIP_AS_t63', 1e12)
 
     C_ss_emi = read_data.read_each_aerosol_data(months, 'emi_SS', 'emi', 1e12, two_dim=True)
     C_pol_emi = read_data.read_each_aerosol_data(months, 'emi_POL', 'emi', 1e12, two_dim=True)
@@ -74,9 +79,10 @@ if __name__ == '__main__':
     gbox_area = read_data.read_each_aerosol_data(months, 'gboxarea', 'emi', 1, two_dim=True)
 
     fac_sec_to_yr = 31557600
-    fac_ng_to_tg = 1e-21
-    unit_factor = gbox_area * fac_ng_to_tg * fac_sec_to_yr # Tg/yr
+    fac_ng_to_tg = 1e-12 #to Kg, 1e-21 to Tg
+    unit_factor = gbox_area * fac_ng_to_tg #kg/yr  
     #(ng/s) * fac_ng_to_tg #(Tg/s) * fac_sec_to_yr # Tg/yr
+
     C_ss_emi_yr = C_ss_emi*unit_factor
     C_pol_emi_yr = C_pol_emi*unit_factor
     C_pro_emi_yr = C_pro_emi*unit_factor
@@ -112,12 +118,12 @@ if __name__ == '__main__':
         C_temp, C_NPP,
         C_DIN,
         C_pol_emi, C_pro_emi,
-        C_lip_emi, 
+        C_lip_emi,
         C_tot_emi, C_ss_emi,
         C_pol_emi_yr, C_pro_emi_yr, C_lip_emi_yr, C_tot_emi_yr, C_ss_emi_yr,
         u10, sst_aer,
         seaice_aer * 100, C_ice_aer_area_px , seaice_aer * 100,
-        C_pol, C_pro, C_lip, C_ss,
+        #C_pol, C_pro, C_lip, C_ss,
         data_omf['OMF_POL'],
         data_omf['OMF_PRO'],
         data_omf['OMF_LIP'],

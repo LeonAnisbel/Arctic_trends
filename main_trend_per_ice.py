@@ -8,15 +8,17 @@ import plots
 
 ftype = np.float64
 if __name__ == '__main__':
-    # months = [7, 8, 9]
-    # season='JAS'
-    # one_month = [9]
+    months = [7, 8, 9]
+    season='JAS'
+    one_month = [9]
 
-    months = [4, 5, 6]
-    season='AMJ'
-    one_month = [6]
+    #months = [4, 5, 6]
+    #season='AMJ'
+    #one_month = [6]
 
-
+    #months = [6, 7, 8]
+    #season='JJA'
+    #one_month = [8]
 
     variables_info = {
         # 'Sea_ice': {'lim': 1.5, 'unit': '% '},
@@ -34,10 +36,11 @@ if __name__ == '__main__':
         # 'AER_SST': {'lim': 4, 'unit': '$^{o}C$'},
         # 'AER_SIC': {'lim': 4, 'unit': '%'},
         # 'AER_SIC_1m': {'lim': 4, 'unit': '%'},
-        'AER_POL': {'lim': 0.01, 'unit': 'ng ${m^{-3}}$ '},
-        'AER_PRO': {'lim': 0.1, 'unit': 'ng ${m^{-3}}$ '},
-        'AER_LIP': {'lim': 2, 'unit': 'ng ${m^{-3}}$ '},
-        'AER_SS': {'lim': 4, 'unit': 'ng ${m^{-3}}$ '},
+        
+        #'AER_POL': {'lim': 0.01, 'unit': 'ng ${m^{-3}}$ '},
+        #'AER_PRO': {'lim': 0.1, 'unit': 'ng ${m^{-3}}$ '},
+        #'AER_LIP': {'lim': 2, 'unit': 'ng ${m^{-3}}$ '},
+        #'AER_SS': {'lim': 4, 'unit': 'ng ${m^{-3}}$ '},
         'OMF_POL': {'lim': 0.003, 'unit': '% '},
         'OMF_PRO': {'lim': 0.02, 'unit': '% '},
         'OMF_LIP': {'lim': 0.5, 'unit': '% '},
@@ -50,10 +53,10 @@ if __name__ == '__main__':
 
     # C_pol, C_pro, C_lip, C_ss = read_data.read_aerosol_data(months)
 
-    C_ss = read_data.read_each_aerosol_data(months, 'SS_AS', 'SS_AS_t63', 1e12)
-    C_pol = read_data.read_each_aerosol_data(months, 'POL_AS', 'POL_AS_t63', 1e12)
-    C_pro = read_data.read_each_aerosol_data(months, 'PRO_AS', 'PRO_AS_t63', 1e12)
-    C_lip = read_data.read_each_aerosol_data(months, 'LIP_AS', 'LIP_AS_t63', 1e12)
+    #C_ss = read_data.read_each_aerosol_data(months, 'SS_AS', 'SS_AS_t63', 1e12)
+    #C_pol = read_data.read_each_aerosol_data(months, 'POL_AS', 'POL_AS_t63', 1e12)
+    #C_pro = read_data.read_each_aerosol_data(months, 'PRO_AS', 'PRO_AS_t63', 1e12)
+    #C_lip = read_data.read_each_aerosol_data(months, 'LIP_AS', 'LIP_AS_t63', 1e12)
 
     C_ss_emi = read_data.read_each_aerosol_data(months, 'emi_SS', 'emi', 1e12, two_dim=True)
     C_pol_emi = read_data.read_each_aerosol_data(months, 'emi_POL', 'emi', 1e12, two_dim=True)
@@ -84,7 +87,7 @@ if __name__ == '__main__':
         C_pol_emi,
         C_pro_emi, C_lip_emi, C_ss_emi,
         # u10, sst_aer, seaice_aer, seaice_aer,
-        C_pol, C_pro, C_lip, C_ss,
+     #   C_pol, C_pro, C_lip, C_ss,
         data_omf['OMF_POL'],
         data_omf['OMF_PRO'],
         data_omf['OMF_LIP'],
@@ -177,7 +180,13 @@ if __name__ == '__main__':
         variables_info[var_na]['pval'] = p_value
         variables_info[var_na]['intercept'] = intercept
 
-#        Trend_all_arctic.trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_reg, var_na[:3], per_unit_sic=True)
+        # # Trend_all_arctic.trend_aver_per_reg(variables_info,
+        #                                     var_na,
+        #                                     data_month_reg,
+        #                                     data_month_ice_reg,
+        #                                     var_na[:3],
+        #                                     per_unit_sic=True)
+
 
     with open(f"TrendsDict_per_ice_{season}.pkl", "wb") as myFile:
         pickle.dump(variables_info, myFile)

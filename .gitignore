@@ -1,0 +1,6 @@
+.idea/
+*.png
+__pycache__
+emi_regions
+plots
+*.pkl

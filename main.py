@@ -69,27 +69,16 @@ if __name__ == '__main__':
     # C_pro = read_data.read_each_aerosol_data(months, 'PRO_AS', 'PRO_AS_t63', 1e12)
     # C_lip = read_data.read_each_aerosol_data(months, 'LIP_AS', 'LIP_AS_t63', 1e12)
 
-    C_ss_emi = read_data.read_each_aerosol_data(months,
-                                                'emi_SS',
-                                                'emi',
-                                                1e12,
-                                                two_dim=True)
-    C_pol_emi = read_data.read_each_aerosol_data(months,
-                                                 'emi_POL',
-                                                 'emi',
-                                                 1e12,
-                                                 two_dim=True)
-    C_pro_emi = read_data.read_each_aerosol_data(months,
-                                                 'emi_PRO',
-                                                 'emi',
-                                                 1e12,
-                                                 two_dim=True)
-    C_lip_emi = read_data.read_each_aerosol_data(months,
-                                                 'emi_LIP',
-                                                 'emi',
-                                                 1e12,
-                                                 two_dim=True)
-    C_tot_emi = C_pol_emi + C_pro_emi + C_lip_emi
+    C_emi = []
+    var_ids = ['emi_POL', 'emi_PRO', 'emi_LIP', 'emi_SS']
+    for c_elem in range(len(C_emi)):
+        C_emi.append(read_data.read_each_aerosol_data(months,
+                                                      var_ids[c_elem],
+                                                      'emi',
+                                                      1e12,
+                                                      two_dim=True))
+
+    C_tot_emi = C_emi[0] + C_emi[1] + C_emi[2]
 
     gbox_area = read_data.read_each_aerosol_data(months,
                                                  'gboxarea',
@@ -102,11 +91,11 @@ if __name__ == '__main__':
     unit_factor = gbox_area * fac_ng_to_tg  # kg/yr
     # (ng/s) * fac_ng_to_tg #(Tg/s) * fac_sec_to_yr # Tg/yr
 
-    C_ss_emi_yr = C_ss_emi * unit_factor
-    C_pol_emi_yr = C_pol_emi * unit_factor
-    C_pro_emi_yr = C_pro_emi * unit_factor
-    C_lip_emi_yr = C_lip_emi * unit_factor
+    C_pol_emi_yr = C_emi[0] * unit_factor
+    C_pro_emi_yr = C_emi[1] * unit_factor
+    C_lip_emi_yr = C_emi[2] * unit_factor
     C_tot_emi_yr = C_tot_emi * unit_factor
+    C_ss_emi_yr = C_emi[3] * unit_factor
 
     print('Finished reading aerosol emission data')
 
@@ -148,9 +137,8 @@ if __name__ == '__main__':
         C_ice_area_px,  # C_ice_area_px,
         C_temp, C_NPP,
         C_DIN,
-        C_pol_emi, C_pro_emi,
-        C_lip_emi,
-        C_tot_emi, C_ss_emi,
+        C_emi[0] + C_emi[1] + C_emi[2],
+        C_tot_emi, C_emi[3],
         C_pol_emi_yr, C_pro_emi_yr, C_lip_emi_yr, C_tot_emi_yr, C_ss_emi_yr,
         u10, sst_aer,
         seaice_aer * 100, C_ice_aer_area_px, seaice_aer * 100,
@@ -229,4 +217,3 @@ if __name__ == '__main__':
 
     with open(f"TrendsDict_{season}.pkl", "wb") as myFile:
         pickle.dump(variables_info, myFile)
-

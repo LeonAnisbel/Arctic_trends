@@ -33,7 +33,7 @@ with open(f"TrendsDict_per_ice_{season}.pkl", "rb") as myFile:
    variables_info_seaice = pickle.load(myFile)
 
 # variables_info = variables_info_seaice
-unit = biomol['unit']
+unit = '(Tg ${yr^{-1}}$)'
 
 fig, axes = plt.subplots(3, 1,
                        figsize=(8, 6), )
@@ -47,7 +47,7 @@ leg = plots.plot_fit_trends(axs[0],
                       [seaice_lin[reg], biomol[reg]],
                       decade,
                       [reg, r'$\bf{(a)}$'],
-                      ['Sea Ice Area \n (millions of km$^{2}$)', f'PMOA emission mass \n flux ({unit})'],
+                      ['Sea Ice Area \n (millions of km$^{2}$)', f'PMOA emission mass \n flux {unit}'],
                       # ['Sea ice \n Concentration ($million km^{2})$', 'Total biomolecule \n concentration'],
                       #[[6, 10.5], [0.1, 0.1]],
                       [[4.3, 7.5], [0.1, 0.1]],
@@ -67,7 +67,7 @@ leg = plots.plot_fit_trends(axs[1],
                       [seaice_lin[reg], biomol[reg]],
                       decade,
                       [reg, r'$\bf{(b)}$'],
-                      ['Sea Ice Area \n (millions of km$^{2}$)', f'PMOA emission mass \n flux ({unit})'],
+                      ['Sea Ice Area \n (millions of km$^{2}$)', f'PMOA emission mass \n flux {unit}'],
                       # ['Sea ice \n Concentration ($million km^{2})$', 'Total biomolecule \n concentration'],
                       #[[0, 0.7], [0.1, 0.1]],
                       [[0., 0.6], [0.1, 0.1]],
@@ -87,7 +87,7 @@ leg = plots.plot_fit_trends(axs[2],
                       [seaice_lin[reg], biomol[reg]],
                       decade,
                       [reg, r'$\bf{(c)}$'],
-                      ['Sea Ice Area \n (millions of km$^{2}$)', f'PMOA emission mass \n flux ({unit})'],
+                      ['Sea Ice Area \n (millions of km$^{2}$)', f'PMOA emission mass \n flux {unit}'],
                       # ['Sea ice \n Concentration ($million km^{2})$', 'Total biomolecule \n concentration'],
                       #[[0, 0.4], [0.1, 0.1]],
                       [[0, 0.23], [0.1, 0.1]],

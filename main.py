@@ -87,8 +87,8 @@ if __name__ == '__main__':
                                                  two_dim=True)
 
     fac_sec_to_yr = 31557600
-    fac_ng_to_tg = 1e-12  # to Kg, 1e-21 to Tg
-    unit_factor = gbox_area * fac_ng_to_tg  # kg/yr
+    fac_ng_to_tg = 1e-21 # ng to Tg #1e-12  to Kg,
+    unit_factor = gbox_area * fac_ng_to_tg * fac_sec_to_yr  # Tg/yr
     # (ng/s) * fac_ng_to_tg #(Tg/s) * fac_sec_to_yr # Tg/yr
 
     C_pol_emi_yr = C_emi[0] * unit_factor

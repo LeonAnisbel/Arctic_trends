@@ -296,49 +296,6 @@ if __name__ == '__main__':
     columns_sst = cols_df(variables_info_yr, ['AER_SST'], [''], decade)
     columns_u10 = cols_df(variables_info_yr, ['AER_U10'], [''], decade)
 
-    # col_name_emi = ' Emission mass flux \n (ng ${m^{-2}}$ ${s^{-1}}$ ${yr^{-1}}$)'
-    # df_vals_piv_emi = create_df_plot_heatmap(columns1, col_name_emi)
-    # plot_heatmap(df_vals_piv_emi, col_name_emi, 'Aerosol_fluxes_')
-    # col_name_emi_sic = ' Emission mass flux \n (ng ${m^{-2}}$ ${s^{-1}}$ per unit SIC)'
-    # df_vals_piv_emi_sic = create_df_plot_heatmap(columns2, col_name_emi_sic)
-    # plot_heatmap(df_vals_piv_emi_sic, col_name_emi_sic, 'Aerosol_fluxes_per unit_SIC_')
-    # col_name_sic = ''
-    # df_vals_piv_sic = create_df_plot_heatmap(columns3, col_name_sic)
-    # plot_heatmap(df_vals_piv_sic, col_name_sic, 'SIC_')
-    # #
-    # #
-    # fig, ax = plt.subplots(1, 2, figsize=(14, 4))
-    # ax.flatten()
-    # # plot_each_heatmap(ax[0], df_vals_piv_sic, col_name_sic)
-    # # ax[0].set_title(r'$\bf{(a)}$', loc='left')
-    # plot_each_heatmap(ax[0], df_vals_piv_emi, col_name_emi)
-    # ax[0].set_title(r'$\bf{(a)}$', loc='left')
-    # plot_each_heatmap(ax[1], df_vals_piv_emi_sic, col_name_emi_sic)
-    # ax[1].set_title(r'$\bf{(b)}$', loc='left')
-    # plt.tight_layout()
-    # plt.savefig('Heatmap_EmiFlux_SIC.png')
-    # plt.close()
-
-    # fig, ax = plt.subplots(1, 3, figsize=(14, 4))
-    # ax.flatten()
-    # col_name_sic = 'SIC (% ${yr^{-1}}$)'
-    # df_vals_piv_sic = create_df_plot_heatmap(columns3, col_name_sic)
-    # plot_each_heatmap(ax[0], df_vals_piv_sic, col_name_sic)
-    # ax[0].set_title(r'$\bf{(a)}$', loc='left')
-    #
-    # col_name_sst = 'SST (C$^{o}$ ${yr^{-1}}$)'
-    # df_vals_piv_sst = create_df_plot_heatmap(columns4, col_name_sst)
-    # plot_each_heatmap(ax[1], df_vals_piv_sst, col_name_sst)
-    # ax[1].set_title(r'$\bf{(b)}$', loc='left')
-    #
-    # col_name_wind = 'Wind (m $s^{-1}$ ${yr^{-1}}$)'
-    # df_vals_piv_wind = create_df_plot_heatmap(columns5, col_name_wind)
-    # plot_each_heatmap(ax[2], df_vals_piv_wind, col_name_wind)
-    # ax[2].set_title(r'$\bf{(c)}$', loc='left')
-    # plt.tight_layout()
-    # plt.savefig('Heatmap_SIC_SST_Wind.png')
-    # plt.close()
-
     ###############################
     decades = ['1990-2019', '1990-2004', '2005-2019']
 
@@ -346,11 +303,11 @@ if __name__ == '__main__':
     var_na_aer = [['SIC'], ['SST'], ['SS$_{aer}$'], ['PCHO$_{aer}$'], ['DCAA$_{aer}$'], ['PL$_{aer}$']]
     right_label_show = [True, True, True, False, False, True]
     no_ylabel_show = [False, True, True, False, True, True]
-    col_emi_name_sl = 4 * [' Emission (ng ${m^{-2}}$ ${s^{-1}}$ ${yr^{-1}}$)']
+    col_emi_name_sl = 4 * [' Emission \n (Tg ${yr^{-1}}$ ${yr^{-1}}$)']
     col_name_sl = ['\n SIC \n (% ${yr^{-1}}$)',
                 '\n SST \n (C$^{o}$ ${yr^{-1}}$)']
 
-    col_emi_name_ic = 4 * [' Emission (% ${yr^{-1}}$)']
+    col_emi_name_ic = 4 * [' Emission \n (% ${yr^{-1}}$)']
     col_name_ic = ['\n SIC \n (% ${yr^{-1}}$)',
                 '\n SST \n (% ${yr^{-1}}$)']
 

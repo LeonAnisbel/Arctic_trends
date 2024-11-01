@@ -242,15 +242,16 @@ def cols_df(variables_info_yr, panel_names, var_na_title, decade):
     return columns
 
 
-def plot_heatmap_multipanel(panel_names, var_na_aer, right_label_show, no_ylabel_show, col_name, decade, type):
-    fig, axs = plt.subplots(2, 3, figsize=(8, 8))
+def plot_heatmap_multipanel(variables_info, panel_names, var_na_aer, right_label_show, no_ylabel_show, col_name,
+                            decade, type, panel):
+    fig, axs = plt.subplots(panel[0], panel[1], figsize=(8, 8))
     ax = axs.flatten()
     for idx in range(len(panel_names)):
-        columns = cols_df(variables_info_yr,
+        columns = cols_df(variables_info,
                           panel_names[idx],
                           var_na_aer[idx],
                           decade)
-        if type == 'slope':
+        if type[:5] == 'slope':
             columns_for_heatmap = columns[0]
         else:
             columns_for_heatmap = [columns[0][0], columns[0][1], columns[0][-1]]
@@ -317,10 +318,12 @@ if __name__ == '__main__':
 
     for dec in decades:
         type = 'slope'
-        plot_heatmap_multipanel(panel_names, var_na_aer, right_label_show, no_ylabel_show, col_name_sl, dec, type)
+        plot_heatmap_multipanel(variables_info_yr, panel_names, var_na_aer, right_label_show, no_ylabel_show,
+                                col_name_sl, dec, type, [2, 3])
 
         type = 'percent'
-        plot_heatmap_multipanel(panel_names, var_na_aer, right_label_show, no_ylabel_show, col_name_ic, dec, type)
+        plot_heatmap_multipanel(variables_info_yr, panel_names, var_na_aer, right_label_show, no_ylabel_show,
+                                col_name_ic, dec, type, [2, 3])
 
 
     ###############################

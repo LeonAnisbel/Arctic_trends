@@ -112,7 +112,7 @@ def plot_fit_trends(ax, C, decade, title, axis_label, vm, colors, leg, fig_name,
     if multipanel:
         pass
     else:
-        plt.savefig(f'{fig_name}.png', dpi=200)
+        plt.savefig(f'./plots/{fig_name}.png', dpi=200)
 
     return [p1,p2, f1_list, f2_list]
 
@@ -299,7 +299,7 @@ def iterate_subfig(fig, subfigs, fig_name, trend_vars, ice_var, pval_vars, lat, 
 
     if not_aerosol:
         add_ice_colorbar(fig, ic[0], ic[1])
-    plt.savefig(fig_name, dpi=200, bbox_inches="tight")
+    plt.savefig(f'./plots/{fig_name}', dpi=200, bbox_inches="tight")
 
     #     fig.tight_layout()
 

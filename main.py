@@ -71,7 +71,7 @@ if __name__ == '__main__':
 
     C_emi = []
     var_ids = ['emi_POL', 'emi_PRO', 'emi_LIP', 'emi_SS']
-    for c_elem in range(len(C_emi)):
+    for c_elem in range(len(var_ids)):
         C_emi.append(read_data.read_each_aerosol_data(months,
                                                       var_ids[c_elem],
                                                       'emi',
@@ -137,7 +137,7 @@ if __name__ == '__main__':
         C_ice_area_px,  # C_ice_area_px,
         C_temp, C_NPP,
         C_DIN,
-        C_emi[0] + C_emi[1] + C_emi[2],
+        C_emi[0], C_emi[1], C_emi[2],
         C_tot_emi, C_emi[3],
         C_pol_emi_yr, C_pro_emi_yr, C_lip_emi_yr, C_tot_emi_yr, C_ss_emi_yr,
         u10, sst_aer,

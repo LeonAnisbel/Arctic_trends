@@ -7,7 +7,7 @@ from matplotlib import ticker as mticker
 import matplotlib.path as mpath
 import matplotlib.colors as mcolors
 from pyparsing import alphas
-
+from sklearn.linear_model import LinearRegression
 
 def plot_fit(ax, t_ax, p_fit, eq, color, a):
     return ax.plot(t_ax, p_fit, color, linestyle='dashed', label=eq, linewidth=1, alpha=a)
@@ -43,6 +43,7 @@ def plot_fit_trends(ax, C, decade, title, axis_label, vm, colors, leg, fig_name,
     decades = ['1990-1999', '2000-2009', '2010-2019']
     decades = ['1990-2004', '2005-2019']
 
+    model = LinearRegression()
 
     a = [0.5, 1]
     f1_list, f2_list = [], []
@@ -53,12 +54,23 @@ def plot_fit_trends(ax, C, decade, title, axis_label, vm, colors, leg, fig_name,
         print(dec, 'min PMOA', C[1][dec]['data_aver_reg'].min().values, 
                 'max PMOA', C[1][dec]['data_aver_reg'].max().values, 
                 'mean PMOA', C[1][dec]['data_aver_reg'].mean().values, '\n')
-        sl = [C[0][dec]['slope_aver_reg'], C[1][dec]['slope_aver_reg']]
-        itc = [C[0][dec]['intercept_aver_reg'], C[1][dec]['intercept_aver_reg']]
-        pval = [C[0][dec]['pval_aver_reg'], C[1][dec]['pval_aver_reg']]
+        # sl = [C[0][dec]['slope_aver_reg'], C[1][dec]['slope_aver_reg']]
+        # itc = [C[0][dec]['intercept_aver_reg'], C[1][dec]['intercept_aver_reg']]
+        # pval = [C[0][dec]['pval_aver_reg'], C[1][dec]['pval_aver_reg']]
 
         t_ax = C[0][dec]['data_aver_reg'].time.values
 
+        x = t_ax.reshape((-1, 1))
+        y = C[0][dec]['data_aver_reg'].values
+        model_sic = model.fit(x, y)
+        print(f"coefficient of determination SIC: {model.score(x, y)}")
+
+        y = C[1][dec]['data_aver_reg'].values
+        model_emi = model.fit(x, y)
+        print(f"coefficient of determination EMI: {model.score(x, y)}")
+
+        sl = [model_sic.coef_[0], model_emi.coef_[0]]
+        itc = [model_sic.intercept_, model_emi.intercept_]
         #if pval[0]<0.05:
             # # Fitting ice data
         p_fit = [p * sl[0] + itc[0] for p in t_ax]

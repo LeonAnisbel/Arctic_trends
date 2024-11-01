@@ -83,7 +83,7 @@ print(leg[2][0], leg[2][1], leg[3][0], leg[3][1])
 plt.legend(handles=[leg[2][0], leg[2][1], leg[3][0], leg[3][1]], ncol=2,  # ncol=len(axs[0].lines),
            bbox_to_anchor=(0.3, 1.), loc='lower left', fontsize=8)
 
-reg = 'Laptev Sea'
+reg = 'Barents Sea'
 leg = plots.plot_fit_trends(axs[2],
                             [seaice_lin[reg], biomol[reg]],
                             decade,
@@ -179,13 +179,11 @@ plots.plot_6_2_pannel_trend(panel_var_trend_new,  # panel_var_trend_new_signif
                             panel_var_pval_new,
                             lat_aer,
                             lon_aer,
-                            [0.0002, 0.005, 0.001, 0.05, 0.03, 0.8],  # [100,  1.5,  0.02, 0.8, 0.3, 10],
+                            [0.00015, 0.003, 0.0007, 0.03, 0.03, 0.8],  # [100,  1.5,  0.02, 0.8, 0.3, 10],
                             panel_unit_new,
                             fig_titles,
                             f'{season}_all_Emission_flux_trends_and_per_ice',
-                            not_aerosol=False,
-                            ##          percent_increase=True,
-                            seaice_conc=False)
+                            not_aerosol=False,)
 
 #######################
 print('Plot 10 m wind and SSt trend')

@@ -46,7 +46,6 @@ reg = 'Arctic'
 colors = ['darkblue', 'darkred']
 leg = plots.plot_fit_trends(axs[0],
                             [seaice_lin[reg], biomol[reg]],
-                            decade,
                             [reg, r'$\bf{(a)}$'],
                             ['Sea Ice Area \n (millions of km$^{2}$)', f'PMOA emission mass \n flux {unit}'],
                             # ['Sea ice \n Concentration ($million km^{2})$', 'Total biomolecule \n concentration'],
@@ -66,7 +65,6 @@ plt.legend(handles=[leg[0], leg[2][0], leg[2][1], leg[1], leg[3][0], leg[3][1]],
 reg = 'Kara Sea'
 leg = plots.plot_fit_trends(axs[1],
                             [seaice_lin[reg], biomol[reg]],
-                            decade,
                             [reg, r'$\bf{(b)}$'],
                             ['Sea Ice Area \n (millions of km$^{2}$)', f'PMOA emission mass \n flux {unit}'],
                             # ['Sea ice \n Concentration ($million km^{2})$', 'Total biomolecule \n concentration'],
@@ -86,7 +84,6 @@ plt.legend(handles=[leg[2][0], leg[2][1], leg[3][0], leg[3][1]], ncol=2,  # ncol
 reg = 'Barents Sea'
 leg = plots.plot_fit_trends(axs[2],
                             [seaice_lin[reg], biomol[reg]],
-                            decade,
                             [reg, r'$\bf{(c)}$'],
                             ['Sea Ice Area \n (millions of km$^{2}$)', f'PMOA emission mass \n flux {unit}'],
                             # ['Sea ice \n Concentration ($million km^{2})$', 'Total biomolecule \n concentration'],
@@ -151,7 +148,8 @@ lon_aer = variables_info_yr[panel_names[0]]['lon']
 
 print('Plot all PMOA emission trend and emission per SIC')
 panel_names = ['AER_F_POL', 'AER_F_PRO', 'AER_F_LIP']
-panel_var_trend, panel_var_pval, panel_lim, panel_unit = utils.alloc_metadata(panel_names, variables_info_seaice)
+panel_var_trend, panel_var_pval, panel_lim, panel_unit = utils.alloc_metadata(panel_names,
+                                                                              variables_info_seaice)
 panel_var_trend_tr, panel_var_pval_tr, panel_lim_tr, panel_unit_tr = utils.alloc_metadata(panel_names,
                                                                                           variables_info_yr,
                                                                                           trends=True)

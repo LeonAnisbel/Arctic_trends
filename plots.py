@@ -9,51 +9,46 @@ import matplotlib.colors as mcolors
 from pyparsing import alphas
 from sklearn.linear_model import LinearRegression
 
+
 def plot_fit(ax, t_ax, p_fit, eq, color, a):
     return ax.plot(t_ax, p_fit, color, linestyle='dashed', label=eq, linewidth=1, alpha=a)
 
 
-def plot_fit_trends(ax, C, decade, title, axis_label, vm, colors, leg, fig_name,
+def plot_fit_trends(ax, C, title, axis_label, vm, colors, leg, fig_name,
                     echam_data=True, seaice=False, multipanel=False):
-
-    if multipanel:# ,limits):
+    if multipanel:  # ,limits):
         pass
     else:
         fig, ax = plt.subplots(1, 1,
                                figsize=(8, 3), )
 
-
-
     C_ice, C_biom = C[0]['1990-2019']['data_aver_reg'], C[1]['1990-2019']['data_aver_reg']
     t_ax = C_ice.time.values
-
 
     ax2 = ax.twinx()
     new_line_color = colors[0]
     if seaice:
         new_line_color = 'lightblue'
-        ax.fill_between(t_ax, 0, C_ice, alpha=0.2, color=new_line_color)#C_ice.min() - C_ice.min()/10
+        ax.fill_between(t_ax, 0, C_ice, alpha=0.2, color=new_line_color)  # C_ice.min() - C_ice.min()/10
     #         ax.fill_between(t_ax[:16],C_ice_doc[:16]-0.4,C_ice_doc[:16], alpha=0.5,color=new_line_color)
     p1, = ax.plot(t_ax, C_ice, new_line_color, label=leg[0], linewidth=1.)
     ax.scatter(t_ax, C_ice, s=15, c=new_line_color)
     p2, = ax2.plot(t_ax, C_biom, colors[1], label=leg[1], linewidth=1.)
     ax2.scatter(t_ax, C_biom, s=15, c=colors[1])
 
-
     decades = ['1990-1999', '2000-2009', '2010-2019']
     decades = ['1990-2004', '2005-2019']
-
-    model = LinearRegression()
 
     a = [0.5, 1]
     f1_list, f2_list = [], []
     for idx, dec in enumerate(decades):
-        print(dec, 'min SIC', C[0][dec]['data_aver_reg'].min().values, 
-                'max SIC', C[0][dec]['data_aver_reg'].max().values, 
-                'mean SIC',  C[0][dec]['data_aver_reg'].mean().values)
-        print(dec, 'min PMOA', C[1][dec]['data_aver_reg'].min().values, 
-                'max PMOA', C[1][dec]['data_aver_reg'].max().values, 
-                'mean PMOA', C[1][dec]['data_aver_reg'].mean().values, '\n')
+        # print(dec, 'min SIC', C[0][dec]['data_aver_reg'].min().values,
+        #         'max SIC', C[0][dec]['data_aver_reg'].max().values,
+        #         'mean SIC',  C[0][dec]['data_aver_reg'].mean().values)
+        # print(dec, 'min PMOA', C[1][dec]['data_aver_reg'].min().values,
+        #         'max PMOA', C[1][dec]['data_aver_reg'].max().values,
+        #         'mean PMOA', C[1][dec]['data_aver_reg'].mean().values, '\n')
+
         # sl = [C[0][dec]['slope_aver_reg'], C[1][dec]['slope_aver_reg']]
         # itc = [C[0][dec]['intercept_aver_reg'], C[1][dec]['intercept_aver_reg']]
         # pval = [C[0][dec]['pval_aver_reg'], C[1][dec]['pval_aver_reg']]
@@ -62,31 +57,28 @@ def plot_fit_trends(ax, C, decade, title, axis_label, vm, colors, leg, fig_name,
 
         x = t_ax.reshape((-1, 1))
         y = C[0][dec]['data_aver_reg'].values
+        print(x, y)
+        model = LinearRegression()
         model_sic = model.fit(x, y)
         print(f"coefficient of determination SIC: {model.score(x, y)}")
 
         y = C[1][dec]['data_aver_reg'].values
-        model_emi = model.fit(x, y)
-        print(f"coefficient of determination EMI: {model.score(x, y)}")
+        model1 = LinearRegression()
+        model_emi = model1.fit(x, y)
+        print(f"coefficient of determination EMI: {model1.score(x, y)}")
 
         sl = [model_sic.coef_[0], model_emi.coef_[0]]
         itc = [model_sic.intercept_, model_emi.intercept_]
-        #if pval[0]<0.05:
-            # # Fitting ice data
+
         p_fit = [p * sl[0] + itc[0] for p in t_ax]
-        eq = f'${sl[0]:.3f}x + {itc[0]:.2f}$'
+        eq = f'{sl[0]:.1e}x + {itc[0]:.1e}'
         f1, = plot_fit(ax, t_ax, p_fit, eq, colors[0], a[idx])
         f1_list.append(f1)
 
-            #     ax.plot(t_ax[:16], C_ice_doc[:16],new_line_color, alpha=0.5,label = leg[0],linewidth = 2)
-            #     ax.scatter(t_ax[:16], C_ice_doc[:16],c = new_line_color, alpha=0.5,linewidths = 2)
-#        if pval[1] < 0.05:
         p_fit = [p * sl[1] + itc[1] for p in t_ax]
-        eq = f'${sl[1]:.3f}x + {itc[1]:.2f}$'
+        eq = f'{sl[1]:.1e}x + {itc[1]:.1e}'
         f2, = plot_fit(ax2, t_ax, p_fit, eq, colors[1], a[idx])
         f2_list.append(f2)
-
-    
 
     ax.set_ylabel(axis_label[0], fontsize=8)
     ax.tick_params(axis='x')
@@ -98,7 +90,7 @@ def plot_fit_trends(ax, C, decade, title, axis_label, vm, colors, leg, fig_name,
     ax2.tick_params(axis='y', colors=colors[1])
     ax2.yaxis.label.set_color(colors[1])
 
-    ax.set_title(title[0], loc='right', fontsize=10)
+    ax.set_title(title[0] + '\n', loc='right', fontsize=10)
     ax.set_title(title[1], loc='left', fontsize=10)
 
     # ax.legend(loc='lower left', fontsize=8)
@@ -112,6 +104,7 @@ def plot_fit_trends(ax, C, decade, title, axis_label, vm, colors, leg, fig_name,
     ax.tick_params(axis='y', colors=colors[0])
     ax.yaxis.label.set_color(colors[0])
 
+    ax2.ticklabel_format(axis="y", useMathText=True, useLocale=True)
 
     if echam_data:
         def format_func(value, tick_number):
@@ -120,16 +113,16 @@ def plot_fit_trends(ax, C, decade, title, axis_label, vm, colors, leg, fig_name,
 
         ax.xaxis.set_major_formatter(plt.FuncFormatter(format_func))
 
-
     if multipanel:
         pass
     else:
         plt.savefig(f'./plots/{fig_name}.png', dpi=200)
 
-    return [p1,p2, f1_list, f2_list]
+    return [p1, p2, f1_list, f2_list]
+
 
 def add_ice_colorbar(fig, ic, ic2):
-    cbar_ax = fig.add_axes([0.37, -0.05, 0.25, 0.01]) #  (left, bottom, width, height)
+    cbar_ax = fig.add_axes([0.37, -0.05, 0.25, 0.01])  # (left, bottom, width, height)
     ic_bar = fig.colorbar(ic, extendfrac='auto', shrink=0.005,
                           cax=cbar_ax, orientation='horizontal', )
     ic_bar.set_label('Sea ice concentration (%)', fontsize='12')
@@ -137,9 +130,10 @@ def add_ice_colorbar(fig, ic, ic2):
 
     handles2, _ = ic2.legend_elements()
     plt.legend(handles2,
-              ["sic 10%"],
-              # loc='lower right',
-              bbox_to_anchor=(0.75, 6))  # x,y
+               ["sic 10%"],
+               # loc='lower right',
+               bbox_to_anchor=(0.75, 6))  # x,y
+
 
 def plot_trend(subfig, trend, ice, pval, lat, lon, titles, vlim, unit, cm, vlim0,
                not_aerosol=True, percent_increase=False, seaice_conc=False):
@@ -154,8 +148,6 @@ def plot_trend(subfig, trend, ice, pval, lat, lon, titles, vlim, unit, cm, vlim0
                   ccrs.PlateCarree())
     ax.set_title(titles[0], loc='right', fontsize=12)
     ax.set_title(titles[1], loc='left', fontsize=12)
-
-
 
     cmap = plt.get_cmap(cm, 15)
     cb = ax.pcolormesh(lon,
@@ -189,8 +181,8 @@ def plot_trend(subfig, trend, ice, pval, lat, lon, titles, vlim, unit, cm, vlim0
                         fraction=0.05,
                         pad=0.07)
     cbar.set_label(label=unit,
-                   fontsize=12,)
-                   # weight='bold')
+                   fontsize=12, )
+    # weight='bold')
 
     # # compute circle
     theta = np.linspace(0, 2 * np.pi, 100)
@@ -208,7 +200,7 @@ def plot_trend(subfig, trend, ice, pval, lat, lon, titles, vlim, unit, cm, vlim0
     gl.ylocator = mticker.FixedLocator([65, 75, 85])
     gl.yformatter = LATITUDE_FORMATTER
 
-    if not_aerosol :
+    if not_aerosol:
         orig_cmap = plt.get_cmap('Greys_r')
         colors = orig_cmap(np.linspace(0.1, 1, 4))
         cmap = mcolors.LinearSegmentedColormap.from_list("mycmap", colors)
@@ -266,9 +258,9 @@ def iterate_subfig(fig, subfigs, fig_name, trend_vars, ice_var, pval_vars, lat, 
                         not_aerosol=not_aerosol,
                         seaice_conc=seaice_conc)
         for idx, subf in enumerate(subfigs[1:]):
-            idx = idx+1
+            idx = idx + 1
             cm, vlim0 = 'coolwarm', -vlim_vars[idx]
-            print('fig2-',idx, title_vars[0])
+            print('fig2-', idx, title_vars[0])
             ic = plot_trend(subf,
                             trend_vars[idx],
                             ice_var,
@@ -286,26 +278,28 @@ def iterate_subfig(fig, subfigs, fig_name, trend_vars, ice_var, pval_vars, lat, 
 
         for idx, subf in enumerate(subfigs):
             if not_aerosol:
-                if title_vars[0][idx][0]=='SIC' :
+                if title_vars[0][idx][0] == 'SIC':
                     not_aerosol_new = False
-                else: not_aerosol_new = not_aerosol
-            else: not_aerosol_new = not_aerosol
+                else:
+                    not_aerosol_new = not_aerosol
+            else:
+                not_aerosol_new = not_aerosol
 
             cm, vlim0 = 'coolwarm', -vlim_vars[idx]
             ic_bar = plot_trend(subf,
-                            trend_vars[idx],
-                            ice_var,
-                            pval_vars[idx],
-                            lat,
-                            lon,
-                            title_vars[0][idx],
-                            vlim_vars[idx],
-                            unit_vars[idx],
-                            cm, vlim0,
-                            percent_increase=percent_increase,
-                            not_aerosol=not_aerosol_new,
-                            seaice_conc=seaice_conc)
-            
+                                trend_vars[idx],
+                                ice_var,
+                                pval_vars[idx],
+                                lat,
+                                lon,
+                                title_vars[0][idx],
+                                vlim_vars[idx],
+                                unit_vars[idx],
+                                cm, vlim0,
+                                percent_increase=percent_increase,
+                                not_aerosol=not_aerosol_new,
+                                seaice_conc=seaice_conc)
+
             if not_aerosol_new:
                 ic = ic_bar
 
@@ -327,38 +321,42 @@ def plot_6_pannel_trend(trend_vars, seaice, pval_vars, lat, lon, vlim_vars, unit
                    not_aerosol=not_aerosol, percent_increase=percent_increase)
 
 
-def plot_2_pannel_trend(trend_vars, seaice, pval_vars, lat, lon, vlim_vars, unit_vars, title_vars, fig_name, not_aerosol=True,
-percent_increase=False):
+def plot_2_pannel_trend(trend_vars, seaice, pval_vars, lat, lon, vlim_vars, unit_vars, title_vars, fig_name,
+                        not_aerosol=True,
+                        percent_increase=False):
     fig = plt.figure(constrained_layout=True, figsize=(7, 4))
 
     (subfig1, subfig2) = fig.subfigures(nrows=1, ncols=2)
     subfigs = [subfig1, subfig2]
 
     fig_name = f'two_panel_{fig_name}_trends.png'
-    iterate_subfig(fig, subfigs, fig_name, trend_vars, seaice, pval_vars, lat, lon, vlim_vars, unit_vars, title_vars,not_aerosol=not_aerosol,
-percent_increase=percent_increase)
+    iterate_subfig(fig, subfigs, fig_name, trend_vars, seaice, pval_vars, lat, lon, vlim_vars, unit_vars, title_vars,
+                   not_aerosol=not_aerosol,
+                   percent_increase=percent_increase)
 
 
 def plot_3_pannel_trend(trend_vars, seaice, pval_vars, lat, lon, vlim_vars, unit_vars, title_vars, fig_name,
-                          not_aerosol=True):
+                        not_aerosol=True):
     fig = plt.figure(constrained_layout=True, figsize=(10, 4))
 
     (subfig1, subfig2, subfig3) = fig.subfigures(nrows=1, ncols=3)
     subfigs = [subfig1, subfig2, subfig3]
 
     fig_name = f'three_panel_ocean{fig_name}_vars_trends.png'
-    iterate_subfig(fig, subfigs, fig_name, trend_vars, seaice, pval_vars, lat, lon, vlim_vars, unit_vars, title_vars, not_aerosol=not_aerosol)
+    iterate_subfig(fig, subfigs, fig_name, trend_vars, seaice, pval_vars, lat, lon, vlim_vars, unit_vars, title_vars,
+                   not_aerosol=not_aerosol)
 
 
-def plot_4_pannel_trend(trend_vars, seaice, pval_vars, lat, lon, vlim_vars, unit_vars, title_vars, fig_name, not_aerosol=True,
-                   percent_increase=False, seaice_conc=False):
+def plot_4_pannel_trend(trend_vars, seaice, pval_vars, lat, lon, vlim_vars, unit_vars, title_vars, fig_name,
+                        not_aerosol=True,
+                        percent_increase=False, seaice_conc=False):
     fig = plt.figure(constrained_layout=True, figsize=(7, 7))
 
     (subfig1, subfig2), (subfig3, subfig4) = fig.subfigures(nrows=2, ncols=2)
 
     fig_name = f'four_panel_{fig_name}.png'
     print(title_vars[0][0])
-    
+
     subfigs = [subfig1, subfig2, subfig3, subfig4]
     iterate_subfig(fig, subfigs, fig_name, trend_vars, seaice, pval_vars, lat, lon, vlim_vars,
                    unit_vars, title_vars,
@@ -367,7 +365,7 @@ def plot_4_pannel_trend(trend_vars, seaice, pval_vars, lat, lon, vlim_vars, unit
 
 
 def plot_6_2_pannel_trend(trend_vars, seaice, pval_vars, lat, lon, vlim_vars, unit_vars, title_vars, fig_name,
-                        not_aerosol=True, percent_increase=False, seaice_conc=False):
+                          not_aerosol=True, percent_increase=False, seaice_conc=False):
     fig = plt.figure(constrained_layout=True, figsize=(7, 10))
 
     (subfig1, subfig2), (subfig3, subfig4), (subfig5, subfig6) = fig.subfigures(nrows=3, ncols=2)
@@ -375,6 +373,5 @@ def plot_6_2_pannel_trend(trend_vars, seaice, pval_vars, lat, lon, vlim_vars, un
     fig_name = f'Six_panel_ocean_omf{fig_name}_Arctic_trends.png'
     iterate_subfig(fig, subfigs, fig_name, trend_vars, seaice, pval_vars, lat, lon, vlim_vars, unit_vars, title_vars,
                    not_aerosol=not_aerosol, percent_increase=percent_increase, seaice_conc=seaice_conc)
-
 
     return None

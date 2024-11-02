@@ -243,8 +243,9 @@ def cols_df(variables_info_yr, panel_names, var_na_title, decade):
 
 
 def plot_heatmap_multipanel(variables_info, panel_names, var_na_aer, right_label_show, no_ylabel_show, col_name,
-                            decade, type, panel):
-    fig, axs = plt.subplots(panel[0], panel[1], figsize=(8, 8))
+                            decade, type, label_loc, panel, settitle=False):
+    fig, axs = plt.subplots(panel[0][0], panel[0][1],
+                            figsize=(panel[1][0], panel[1][1]))
     ax = axs.flatten()
     for idx in range(len(panel_names)):
         columns = cols_df(variables_info,
@@ -266,13 +267,15 @@ def plot_heatmap_multipanel(variables_info, panel_names, var_na_aer, right_label
                           no_ylabel=no_ylabel_show[idx],
                           right_label=right_label_show[idx])
 
-        ax[0].set_title(r'$\bf{(a)}$ ' + '\n ', loc='left')
-        ax[1].set_title(r'$\bf{(b)}$' + '\n ', loc='left')
-        ax[2].set_title(r'$\bf{(c)}$' + '\n ', loc='left')
-        ax[3].set_title(r'$\bf{(d)}$', loc='left')
+        for l in range(len(label_loc[0])):
+            ax[label_loc[0][l]].set_title(label_loc[1][l], loc='left')
+
+    if settitle:
+        ax[-3].set_title(col_name[0])
     plt.tight_layout()
-    plt.savefig(f'{season}_Heatmap_Emission_SIC_SST_Wind_{type}_{decade}.png')
+    plt.savefig(f'{season}_Heatmap_Emission_SIC_SST_Wind_{type}_{decade}.png', dpi=300)
     plt.close()
+
 
 if __name__ == '__main__':
 
@@ -306,26 +309,52 @@ if __name__ == '__main__':
     no_ylabel_show = [False, True, True, False, True, True]
     col_emi_name_sl = 4 * [' Emission \n (Tg ${yr^{-1}}$ ${yr^{-1}}$)']
     col_name_sl = ['\n SIC \n (% ${yr^{-1}}$)',
-                '\n SST \n (C$^{o}$ ${yr^{-1}}$)']
+                   '\n SST \n (C$^{o}$ ${yr^{-1}}$)']
 
     col_emi_name_ic = 4 * [' Emission \n (% ${yr^{-1}}$)']
     col_name_ic = ['\n SIC \n (% ${yr^{-1}}$)',
-                '\n SST \n (% ${yr^{-1}}$)']
+                   '\n SST \n (% ${yr^{-1}}$)']
 
     for c, cc in zip(col_emi_name_sl, col_emi_name_ic):
         col_name_sl.append(c)
         col_name_ic.append(cc)
-
+    label_loc = [[0, 1, 2, 3],
+                 [r'$\bf{(a)}$' + '\n ',
+                  r'$\bf{(b)}$' + '\n ',
+                  r'$\bf{(c)}$' + '\n ',
+                  r'$\bf{(d)}$']]
     for dec in decades:
         type = 'slope'
         plot_heatmap_multipanel(variables_info_yr, panel_names, var_na_aer, right_label_show, no_ylabel_show,
-                                col_name_sl, dec, type, [2, 3])
+                                col_name_sl, dec, type, label_loc, [[2, 3], [8, 8]])
 
         type = 'percent'
         plot_heatmap_multipanel(variables_info_yr, panel_names, var_na_aer, right_label_show, no_ylabel_show,
-                                col_name_ic, dec, type, [2, 3])
+                                col_name_ic, dec, type, label_loc, [[2, 3], [8, 8]])
 
+    ###############################
 
+    panel_names = [['AER_SIC'], ['AER_F_POL_yr'], ['AER_F_PRO_yr'], ['AER_F_LIP_yr'], ['AER_F_SS_yr']]
+    var_na_aer = [['SIC'], ['PCHO$_{aer}$'], ['DCAA$_{aer}$'], ['PL$_{aer}$'], ['SS$_{aer}$']]
+    right_label_show = [False, False, False, False, False]
+    no_ylabel_show = [False, True, True, True, True]
+    col_name_sl = 5 * [' Emission (Tg ${yr^{-1}}$ ${yr^{-1}}$)' + '\n ']
+    col_name_ic = 5 * [' Percent of increase per year' + '\n ']
+    label_loc = [[0, 1, 2, 3, 4],
+                 [r'$\bf{(a)}$',
+                  r'$\bf{(b)}$',
+                  r'$\bf{(c)}$',
+                  r'$\bf{(d)}$',
+                  r'$\bf{(e)}$']]
+
+    for dec in decades:
+        type = 'slope_emi_only'
+        plot_heatmap_multipanel(variables_info_yr, panel_names, var_na_aer, right_label_show, no_ylabel_show,
+                                col_name_sl, dec, type, label_loc, [[1, 5], [10, 4]], settitle=True)
+
+        type = 'percent_emiss_only'
+        plot_heatmap_multipanel(variables_info_yr, panel_names, var_na_aer, right_label_show, no_ylabel_show,
+                                col_name_ic, dec, type, label_loc, [[1, 5], [10, 4]], settitle=True)
     ###############################
 
     # fig, ax = plt.subplots(1, 1, figsize=(6, 4))

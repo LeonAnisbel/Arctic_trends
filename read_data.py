@@ -18,25 +18,25 @@ def read_ocean_data():
     C_ice_msk = read_files_data(ocean_dir + "mask_a_ice*")['VAR']
 
     C_ice = read_files_data(ocean_dir + "a_ice*")['VAR']
-    C_temp = read_files_data(ocean_dir + "temperature/sst*.nc")['sst'] -273.16#* C_ice_msk-273.16
+    C_temp = read_files_data(ocean_dir + "temperature/sst*.nc")['sst'] - 273.16  # * C_ice_msk-273.16
 
-    C_tep = read_files_data(ocean_dir + "TEP_files/TEP_regular_grid*.nc")['VAR']# * C_ice_msk
+    C_tep = read_files_data(ocean_dir + "TEP_files/TEP_regular_grid*.nc")['VAR']  # * C_ice_msk
 
-    C_nppd = read_files_data(ocean_dir + 'NPPd*')['VAR'] #* C_ice_msk
-    C_nppn = read_files_data(ocean_dir + 'NPPn*')['VAR'] #* C_ice_msk
-    C_din = read_files_data(ocean_dir + 'DIN*')['VAR'] #* C_ice_msk
+    C_nppd = read_files_data(ocean_dir + 'NPPd*')['VAR']  # * C_ice_msk
+    C_nppn = read_files_data(ocean_dir + 'NPPn*')['VAR']  # * C_ice_msk
+    C_din = read_files_data(ocean_dir + 'DIN*')['VAR']  # * C_ice_msk
 
-    C_pcho = read_files_data(ocean_dir + 'PCHO_var*')['PCHO'] #* C_ice_msk
-    C_dcaa = read_files_data(ocean_dir + 'DAA_var*')['DAA'] #* C_ice_msk
-    C_pl = read_files_data(ocean_dir + "Lipids_var*")['LIPIDS'] #* C_ice_msk
+    C_pcho = read_files_data(ocean_dir + 'PCHO_var*')['PCHO']  # * C_ice_msk
+    C_dcaa = read_files_data(ocean_dir + 'DAA_var*')['DAA']  # * C_ice_msk
+    C_pl = read_files_data(ocean_dir + "Lipids_var*")['LIPIDS']  # * C_ice_msk
     C_conc_tot = C_pcho + C_dcaa + C_pl
 
-    return C_pcho, C_dcaa, C_pl, C_ice, C_temp, C_nppd+C_nppn, C_din
+    return C_pcho, C_dcaa, C_pl, C_ice, C_temp, C_nppd + C_nppn, C_din
 
 
 def read_omf_data():
     omf_dir = global_vars.omf_dir_path
-    omf = read_files_data(omf_dir) # omf in %
+    omf = read_files_data(omf_dir)  # omf in %
     return omf
 
 
@@ -64,10 +64,10 @@ def read_aerosol_data(months):
 
         v_yr = []
         for yr in np.arange(1990, 2020):
-            #print(mo_str)
+            # print(mo_str)
             files = f'{aer_dir}_{yr}{mo_str}.01_tracer.nc'
             # file_ro = f'{data_dir}{exp}_{yr}{mo_str}.01_vphysc.nc'
-            #print(files)
+            # print(files)
             v_yr.append(read_files_data(files).isel(lev=46).mean(dim='time'))
 
             # data_ro = read_model_spec_data(file_ro)
@@ -85,7 +85,7 @@ def read_aerosol_data(months):
         v_month_pro.append(v_yr_m['PRO_AS'].compute())
         v_month_ss.append(v_yr_m['SS_AS'].compute())
 
-    C_lip = utils.tri_month_mean(v_month_lip, months) 
+    C_lip = utils.tri_month_mean(v_month_lip, months)
     C_pol = utils.tri_month_mean(v_month_pol, months)
     C_pro = utils.tri_month_mean(v_month_pro, months)
     C_ss = utils.tri_month_mean(v_month_ss, months)
@@ -93,11 +93,18 @@ def read_aerosol_data(months):
     return C_pol, C_pro, C_lip, C_ss
 
 
+def concat_months_selvar(v_yr, unit_factor, var_id, v_month):
+    v_yr_m = xr.concat(v_yr, dim='time') * unit_factor
+    v_month.append(v_yr_m[f'{var_id}'].compute())
+    return v_month
 
-def read_each_aerosol_data(months, var_id, file_type, unit_factor, two_dim=False):
+
+def read_each_aerosol_data(months, var_id, file_type, unit_factor, per_month=False, two_dim=False):
     aer_dir = global_vars.aer_dir_path
-
+    C_m = []
     v_month = []
+    v_m_month = []
+
     for mo in months:
         if mo < 10:
             mo_str = f'0{mo}'
@@ -105,18 +112,30 @@ def read_each_aerosol_data(months, var_id, file_type, unit_factor, two_dim=False
             mo_str = f'{mo}'
 
         v_yr = []
+        v_m_yr = []
+
         for yr in np.arange(1990, 2020):
             files = f'{aer_dir}_{yr}{mo_str}.01_{file_type}.nc'
-            #print(files)
 
             if two_dim:
-                v_yr.append(read_files_data(files).mean(dim='time'))
+                if per_month:
+                    ds = read_files_data(files)
+                    ds_gboxarea = ds.rename({'gboxarea': f'area_{var_id}'})
+                    ds_emi = ds.rename({var_id: f'area_{var_id}'})
+                    ds_emi_gboxarea = ds_gboxarea * ds_emi
+                    var_id_new = f'area_{var_id}'
+                    v_m_yr.append(ds_emi_gboxarea.sum(dim='time', skipna=True))
+                else:
+                    v_yr.append(read_files_data(files).mean(dim='time', skipna=True))
             else:
-                v_yr.append(read_files_data(files).isel(lev=0).mean(dim='time'))
+                v_yr.append(read_files_data(files).isel(lev=0).mean(dim='time', skipna=True))
 
-        v_yr_m = xr.concat(v_yr, dim='time') * unit_factor
-        v_month.append(v_yr_m[f'{var_id}'].compute())
+        v_month = concat_months_selvar(v_yr, unit_factor, var_id, v_month)
+        if two_dim:
+            v_m_month = concat_months_selvar(v_m_yr, 1e-9 * 86400, var_id_new, v_m_month)
 
-    C = utils.tri_month_mean(v_month, months)
+    if two_dim:
+        C = utils.tri_month_mean(v_month, months)
+        C_m = utils.tri_month_mean(v_m_month, months)
 
-    return C
+    return C, C_m

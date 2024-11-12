@@ -37,12 +37,11 @@ if __name__ == '__main__':
         'AER_F_LIP': {'lim': 2, 'unit': 'ng ${m^{-2}}$ ${s^{-1}}$'},
         'AER_F_tot': {'lim': 2, 'unit': 'ng ${m^{-2}}$ ${s^{-1}}$'},
         'AER_F_SS': {'lim': 4, 'unit': 'ng ${m^{-2}}$ ${s^{-1}}$'},
-        'AER_F_POL_yr': {'lim': 0.01, 'unit': 'ng ${m^{-2}}$ ${s^{-1}}$'},
-        'AER_F_PRO_yr': {'lim': 0.1, 'unit': 'ng ${m^{-2}}$ ${s^{-1}}$'},
-        'AER_F_LIP_yr': {'lim': 2, 'unit': 'ng ${m^{-2}}$ ${s^{-1}}$'},
-        'AER_F_tot_yr': {'lim': 2, 'unit': 'ng ${m^{-2}}$ ${s^{-1}}$'},
-        'AER_F_SS_yr': {'lim': 4, 'unit': 'ng ${m^{-2}}$ ${s^{-1}}$'},
-
+        'AER_F_POL_m': {'lim': 0.01, 'unit': 'Tg\ month$^{-1}$'},
+        'AER_F_PRO_m': {'lim': 0.1, 'unit': 'Tg\ month$^{-1}$'},
+        'AER_F_LIP_m': {'lim': 2, 'unit': 'Tg\ month$^{-1}$'},
+        'AER_F_tot_m': {'lim': 2, 'unit': 'Tg\ month$^{-1}$'},
+        'AER_F_SS_m': {'lim': 4, 'unit': 'Tg\ month$^{-1}$'},
         'AER_U10': {'lim': 4, 'unit': 'm ${s^{-1}}$'},
         'AER_SST': {'lim': 4, 'unit': '$^{o}C$'},
         'AER_SIC': {'lim': 4, 'unit': '%'},
@@ -70,32 +69,20 @@ if __name__ == '__main__':
     # C_lip = read_data.read_each_aerosol_data(months, 'LIP_AS', 'LIP_AS_t63', 1e12)
 
     C_emi = []
+    C_emi_m = []
     var_ids = ['emi_POL', 'emi_PRO', 'emi_LIP', 'emi_SS']
     for c_elem in range(len(var_ids)):
-        C_emi.append(read_data.read_each_aerosol_data(months,
+        emi, emi_m = read_data.read_each_aerosol_data(months,
                                                       var_ids[c_elem],
                                                       'emi',
                                                       1e12,
-                                                      two_dim=True))
+                                                      per_month=True,
+                                                      two_dim=True)
+        C_emi.append(emi)
+        C_emi_m.append(emi_m)
 
     C_tot_emi = C_emi[0] + C_emi[1] + C_emi[2]
-
-    gbox_area = read_data.read_each_aerosol_data(months,
-                                                 'gboxarea',
-                                                 'emi',
-                                                 1,
-                                                 two_dim=True)
-
-    fac_sec_to_yr = 31557600
-    fac_ng_to_tg = 1e-21 # ng to Tg #1e-12  to Kg,
-    unit_factor = gbox_area * fac_ng_to_tg * fac_sec_to_yr  # Tg/yr
-    # (ng/s) * fac_ng_to_tg #(Tg/s) * fac_sec_to_yr # Tg/yr
-
-    C_pol_emi_yr = C_emi[0] * unit_factor
-    C_pro_emi_yr = C_emi[1] * unit_factor
-    C_lip_emi_yr = C_emi[2] * unit_factor
-    C_tot_emi_yr = C_tot_emi * unit_factor
-    C_ss_emi_yr = C_emi[3] * unit_factor
+    C_tot_emi_m = C_emi_m[0] + C_emi_m[1] + C_emi_m[2]
 
     print('Finished reading aerosol emission data')
 
@@ -114,8 +101,11 @@ if __name__ == '__main__':
                                                   'echam',
                                                   1,
                                                   two_dim=True)
-
-    # seaice_aer = read_data.read_each_aerosol_data(months, 'seaice', 'echam_regular_grid', 1, two_dim=True)
+    gbox_area = read_data.read_each_aerosol_data(months,
+                                                 'gboxarea',
+                                                 'emi',
+                                                 1,
+                                                 two_dim=True)
     C_ice_aer_area_px = seaice_aer * gbox_area * 1.e-6  # from m2 to km2
 
     print('Finished reading SST, SIC and  wind data', C_ice_aer_area_px.max().values, C_ice_aer_area_px.mean().values)
@@ -137,9 +127,8 @@ if __name__ == '__main__':
         C_ice_area_px,  # C_ice_area_px,
         C_temp, C_NPP,
         C_DIN,
-        C_emi[0], C_emi[1], C_emi[2],
-        C_tot_emi, C_emi[3],
-        C_pol_emi_yr, C_pro_emi_yr, C_lip_emi_yr, C_tot_emi_yr, C_ss_emi_yr,
+        C_emi[0], C_emi[1], C_emi[2], C_tot_emi, C_emi[3],
+        C_emi_m[0], C_emi_m[1], C_emi_m[2], C_tot_emi_m, C_emi_m[3],
         u10, sst_aer,
         seaice_aer * 100, C_ice_aer_area_px, seaice_aer * 100,
         # C_pol, C_pro, C_lip, C_ss,

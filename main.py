@@ -94,7 +94,7 @@ if __name__ == '__main__':
                                                   'tsw',
                                                   'echam',
                                                   1,
-                                                  two_dim=True) - 273.16
+                                                  two_dim=True)
     u10, _ = read_data.read_each_aerosol_data(months,
                                               'velo10m',
                                               'vphysc',
@@ -133,7 +133,7 @@ if __name__ == '__main__':
         C_DIN,
         C_emi[0], C_emi[1], C_emi[2], C_tot_emi, C_emi[3],
         C_emi_m[0], C_emi_m[1], C_emi_m[2], C_tot_emi_m, C_emi_m[3],
-        u10, sst_aer,
+        u10, sst_aer- 273.16,
         seaice_aer * 100, C_ice_aer_area_px, seaice_aer * 100,
         C_conc[0], C_conc[1], C_conc[2], C_tot_conc, C_conc[3],
         data_omf['OMF_POL'],

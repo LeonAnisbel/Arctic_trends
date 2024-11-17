@@ -118,24 +118,30 @@ def read_each_aerosol_data(months, var_id, file_type, unit_factor, per_month=Fal
             files = f'{aer_dir}_{yr}{mo_str}.01_{file_type}.nc'
 
             if two_dim:
-                if per_month:
-                    ds = read_files_data(files)
-                    ds_gboxarea = ds.rename({'gboxarea': f'area_{var_id}'})
-                    ds_emi = ds.rename({var_id: f'area_{var_id}'})
+                # calculate values per season without conversion from year to month
+                ds = read_files_data(files)
+                v_yr.append(ds.mean(dim='time', skipna=True))
+                if file_type == 'emi':
+                    # calculate values as a conversion from yr to month
+                    ds_gboxarea = ds.rename({'gboxarea': f'{var_id}'})
+                    ds_emi = ds.rename({var_id: f'{var_id}'})
                     ds_emi_gboxarea = ds_gboxarea * ds_emi
-                    var_id_new = f'area_{var_id}'
+                    var_id_new = f'{var_id}'
                     v_m_yr.append(ds_emi_gboxarea.sum(dim='time', skipna=True))
-                else:
-                    v_yr.append(read_files_data(files).mean(dim='time', skipna=True))
             else:
-                v_yr.append(read_files_data(files).isel(lev=0).mean(dim='time', skipna=True))
+                files_dens = f'{aer_dir}_{yr}{mo_str}.01_vphysc.nc'
+                ds_dens = read_files_data(files_dens).isel(lev=46).rename({'rhoam1': f'{var_id}'})
+                ds_conc = read_files_data(files).isel(lev=46)
+                ds_conc_ng_m3 = ds_dens*ds_conc
+                v_yr.append(ds_conc_ng_m3.mean(dim='time', skipna=True))
 
         v_month = concat_months_selvar(v_yr, unit_factor, var_id, v_month)
-        if two_dim:
+        if two_dim and file_type == 'emi':
             v_m_month = concat_months_selvar(v_m_yr, 1e-9 * 86400, var_id_new, v_m_month)
 
-    if two_dim:
-        C = utils.tri_month_mean(v_month, months)
+    if two_dim and file_type == 'emi':
         C_m = utils.tri_month_mean(v_m_month, months)
+
+    C = utils.tri_month_mean(v_month, months)
 
     return C, C_m

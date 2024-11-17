@@ -47,10 +47,11 @@ if __name__ == '__main__':
         'AER_SIC': {'lim': 4, 'unit': '%'},
         'AER_SIC_area_px': {'lim': 4, 'unit': '%'},
         'AER_SIC_1m': {'lim': 4, 'unit': '%'},
-        # 'AER_POL': {'lim': 0.01, 'unit': 'ng ${m^{-3}}$ '},
-        # 'AER_PRO': {'lim': 0.1, 'unit': 'ng ${m^{-3}}$ '},
-        # 'AER_LIP': {'lim': 2, 'unit': 'ng ${m^{-3}}$ '},
-        # 'AER_SS': {'lim': 4, 'unit': 'ng ${m^{-3}}$ '},
+        'AER_POL': {'lim': 0.01, 'unit': 'ng ${m^{-3}}$ '},
+        'AER_PRO': {'lim': 0.1, 'unit': 'ng ${m^{-3}}$ '},
+        'AER_LIP': {'lim': 2, 'unit': 'ng ${m^{-3}}$ '},
+        'AER_tot': {'lim': 2, 'unit': 'ng ${m^{-3}}$ '},
+        'AER_SS': {'lim': 4, 'unit': 'ng ${m^{-3}}$ '},
         'OMF_POL': {'lim': 0.003, 'unit': '% '},
         'OMF_PRO': {'lim': 0.02, 'unit': '% '},
         'OMF_LIP': {'lim': 0.5, 'unit': '% '},
@@ -61,12 +62,16 @@ if __name__ == '__main__':
         'Biom_tot': {'lim': 0.1, 'unit': '$mmol\ C$ ${m^{-3}}$ '}
     }
 
-    # C_pol, C_pro, C_lip, C_ss = read_data.read_aerosol_data(months)
-
-    # C_ss = read_data.read_each_aerosol_data(months, 'SS_AS', 'SS_AS_t63', 1e12)
-    # C_pol = read_data.read_each_aerosol_data(months, 'POL_AS', 'POL_AS_t63', 1e12)
-    # C_pro = read_data.read_each_aerosol_data(months, 'PRO_AS', 'PRO_AS_t63', 1e12)
-    # C_lip = read_data.read_each_aerosol_data(months, 'LIP_AS', 'LIP_AS_t63', 1e12)
+    C_conc = []
+    var_ids = ['POL_AS', 'PRO_AS', 'LIP_AS', 'SS_AS']
+    for c_elem in range(len(var_ids)):
+        conc, _ = read_data.read_each_aerosol_data(months,
+                                                   var_ids[c_elem],
+                                                   'tracer',
+                                                   1e12,
+                                                   two_dim=False)
+        C_conc.append(conc)
+    C_tot_conc = C_conc[0] + C_conc[1] + C_conc[2]
 
     C_emi = []
     C_emi_m = []
@@ -76,7 +81,6 @@ if __name__ == '__main__':
                                                       var_ids[c_elem],
                                                       'emi',
                                                       1e12,
-                                                      per_month=True,
                                                       two_dim=True)
         C_emi.append(emi)
         C_emi_m.append(emi_m)
@@ -86,26 +90,26 @@ if __name__ == '__main__':
 
     print('Finished reading aerosol emission data')
 
-    sst_aer = read_data.read_each_aerosol_data(months,
-                                               'tsw',
-                                               'echam',
-                                               1,
-                                               two_dim=True) - 273.16
-    u10 = read_data.read_each_aerosol_data(months,
-                                           'velo10m',
-                                           'vphysc',
-                                           1,
-                                           two_dim=True)
-    seaice_aer = read_data.read_each_aerosol_data(months,
-                                                  'seaice',
+    sst_aer, _ = read_data.read_each_aerosol_data(months,
+                                                  'tsw',
                                                   'echam',
                                                   1,
-                                                  two_dim=True)
-    gbox_area = read_data.read_each_aerosol_data(months,
-                                                 'gboxarea',
-                                                 'emi',
-                                                 1,
-                                                 two_dim=True)
+                                                  two_dim=True) - 273.16
+    u10, _ = read_data.read_each_aerosol_data(months,
+                                              'velo10m',
+                                              'vphysc',
+                                              1,
+                                              two_dim=True)
+    seaice_aer, _ = read_data.read_each_aerosol_data(months,
+                                                     'seaice',
+                                                     'echam',
+                                                     1,
+                                                     two_dim=True)
+    gbox_area, _ = read_data.read_each_aerosol_data(months,
+                                                    'gboxarea',
+                                                    'emi',
+                                                    1,
+                                                    two_dim=True)
     C_ice_aer_area_px = seaice_aer * gbox_area * 1.e-6  # from m2 to km2
 
     print('Finished reading SST, SIC and  wind data', C_ice_aer_area_px.max().values, C_ice_aer_area_px.mean().values)
@@ -131,7 +135,7 @@ if __name__ == '__main__':
         C_emi_m[0], C_emi_m[1], C_emi_m[2], C_tot_emi_m, C_emi_m[3],
         u10, sst_aer,
         seaice_aer * 100, C_ice_aer_area_px, seaice_aer * 100,
-        # C_pol, C_pro, C_lip, C_ss,
+        C_conc[0], C_conc[1], C_conc[2], C_tot_conc, C_conc[3],
         data_omf['OMF_POL'],
         data_omf['OMF_PRO'],
         data_omf['OMF_LIP'],

@@ -123,10 +123,10 @@ def read_each_aerosol_data(months, var_id, file_type, unit_factor, per_month=Fal
                 v_yr.append(ds.mean(dim='time', skipna=True))
                 if file_type == 'emi':
                     # calculate values as a conversion from yr to month
-                    ds_gboxarea = ds.rename({'gboxarea': f'{var_id}'})
-                    ds_emi = ds.rename({var_id: f'{var_id}'})
+                    ds_gboxarea = ds.rename({'gboxarea': f'area_{var_id}'})
+                    ds_emi = ds.rename({var_id: f'area_{var_id}'})
                     ds_emi_gboxarea = ds_gboxarea * ds_emi
-                    var_id_new = f'{var_id}'
+                    var_id_new = f'area_{var_id}'
                     v_m_yr.append(ds_emi_gboxarea.sum(dim='time', skipna=True))
             else:
                 files_dens = f'{aer_dir}_{yr}{mo_str}.01_vphysc.nc'

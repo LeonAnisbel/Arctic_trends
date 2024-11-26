@@ -8,6 +8,7 @@ import matplotlib.path as mpath
 import matplotlib.colors as mcolors
 from pyparsing import alphas
 from sklearn.linear_model import LinearRegression
+from decimal import Decimal
 
 
 def plot_fit(ax, t_ax, p_fit, eq, color, a):
@@ -71,7 +72,12 @@ def plot_fit_trends(ax, C, title, axis_label, vm, colors, leg, fig_name,
         itc = [model_sic.intercept_, model_emi.intercept_]
 
         p_fit = [p * sl[0] + itc[0] for p in t_ax]
+        m = "{:.2E}".format(Decimal(float(sl[0])))
+        b = "{:.2E}".format(Decimal(float(itc[0])))
+        eq = m+' x + '+b
+
         eq = f'{sl[0]:.1e}x + {itc[0]:.1e}'
+
         f1, = plot_fit(ax, t_ax, p_fit, eq, colors[0], a[idx])
         f1_list.append(f1)
 

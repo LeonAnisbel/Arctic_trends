@@ -8,6 +8,36 @@ def fill_with_nan(panel_var_trend):
     panel_var_tren = panel_var_trend.filled(np.nan)
     return panel_var_tren
 
+
+def percent_icrease(variables_info_yr, vv, decade):
+    pval = variables_info_yr[vv]['pval']
+    #if pval < 0.05:
+    interc = variables_info_yr[vv]['intercept']
+    slope = variables_info_yr[vv]['slope']
+
+    #interc_sign = np.ma.masked_where(pval>0.05, interc)
+    #slope_sign = np.ma.masked_where(pval>0.05, slope)
+    print(vv, vv[-3:])
+    if vv[-3:] == 'POL': l = 0.0001
+    if vv[-3:] == 'PRO': l = 0.001
+    if vv[-3:] == 'LIP': l = 0.01
+    interc_sign = np.ma.masked_where(interc<l, interc)
+    slope_sign = np.ma.masked_where(slope==0, slope)
+
+    vals = variables_info_yr[vv]['data']
+    last_val = slope_sign * 30 + interc_sign
+    perc_inc = (last_val / interc_sign - 1) * 100 / 30
+    perc_inc = (slope_sign/interc_sign )*30 * 100 / 30
+
+#print(slope, perc_inc, interc, pval)
+    #else:
+     #   perc_inc = np.nan
+    print(perc_inc.max())
+    return perc_inc
+
+
+
+
 season = 'JAS'
 # season='AMJ'
 # season = 'JJA'
@@ -17,7 +47,7 @@ with open(f"TrendsDict_{season}.pkl", "rb") as myFile:
 seaice = utils.get_seaice_vals(variables_info_yr, 'Sea_ice')
 
 seaice_lin = variables_info_yr['AER_SIC_area_px']
-biomol = variables_info_yr['AER_F_tot_yr']  # AER_LIP #AER_F_tot_yr
+biomol = variables_info_yr['AER_F_tot_m']  # AER_LIP #AER_F_tot_yr
 
 region = ['Chukchi Sea', 'Greenland & Norwegian Sea', 'East-Siberian Sea', 'Kara Sea']
 for reg in region:
@@ -34,7 +64,7 @@ with open(f"TrendsDict_per_ice_{season}.pkl", "rb") as myFile:
     variables_info_seaice = pickle.load(myFile)
 
 # variables_info = variables_info_seaice
-unit = '(Tg ${yr^{-1}}$)'
+unit = '(Tg ${month^{-1}}$)'
 
 fig, axes = plt.subplots(3, 1,
                          figsize=(8, 6), )
@@ -59,7 +89,7 @@ leg = plots.plot_fit_trends(axs[0],
                             seaice=True,
                             multipanel=True)
 
-plt.legend(handles=[leg[0], leg[2][0], leg[2][1], leg[1], leg[3][0], leg[3][1]], ncol=2,
+plt.legend(handles=[leg[0], leg[2][0], leg[3][0], leg[1], leg[2][1], leg[3][1]], ncol=2,
            bbox_to_anchor=(0.3, 1.), loc='lower left', fontsize=8)
 
 reg = 'Kara Sea'
@@ -78,7 +108,7 @@ leg = plots.plot_fit_trends(axs[1],
                             seaice=True,
                             multipanel=True)
 print(leg[2][0], leg[2][1], leg[3][0], leg[3][1])
-plt.legend(handles=[leg[2][0], leg[2][1], leg[3][0], leg[3][1]], ncol=2,  # ncol=len(axs[0].lines),
+plt.legend(handles=[leg[2][0], leg[3][0], leg[2][1], leg[3][1]], ncol=2,  # ncol=len(axs[0].lines),
            bbox_to_anchor=(0.3, 1.), loc='lower left', fontsize=8)
 
 reg = 'Barents Sea'
@@ -96,7 +126,7 @@ leg = plots.plot_fit_trends(axs[2],
                             echam_data=True,
                             seaice=True,
                             multipanel=True)
-plt.legend(handles=[leg[2][0], leg[2][1], leg[3][0], leg[3][1]], ncol=2,  # ncol=len(axs[0].lines),
+plt.legend(handles=[leg[2][0], leg[3][0], leg[2][1], leg[3][1]], ncol=2,  # ncol=len(axs[0].lines),
            bbox_to_anchor=(0.3, 1.), loc='lower left', fontsize=8)
 plt.tight_layout()
 
@@ -150,6 +180,12 @@ print('Plot all PMOA emission trend and emission per SIC')
 panel_names = ['AER_F_POL', 'AER_F_PRO', 'AER_F_LIP']
 panel_var_trend, panel_var_pval, panel_lim, panel_unit = utils.alloc_metadata(panel_names,
                                                                               variables_info_seaice)
+
+panel_var_perc_incr = []
+for vv in panel_names:
+    panel_var_perc_incr.append(percent_icrease(variables_info_yr, vv, decade))
+
+
 panel_var_trend_tr, panel_var_pval_tr, panel_lim_tr, panel_unit_tr = utils.alloc_metadata(panel_names,
                                                                                           variables_info_yr,
                                                                                           trends=True)
@@ -159,9 +195,20 @@ fig_titles = [[['PCHO$_{aer}$ emission trend', r'$\bf{(a)}$'], ['PCHO$_{aer}$  p
                ['PL$_{aer}$  emission trend', r'$\bf{(e)}$'], ['PL$_{aer}$  per unit of SIC', r'$\bf{(f)}$']]]
 
 
+
+
 panel_var_trend_new = [panel_var_trend_tr[0], fill_with_nan(panel_var_trend[0]),
                        panel_var_trend_tr[1], fill_with_nan(panel_var_trend[1]),
                        panel_var_trend_tr[2], fill_with_nan(panel_var_trend[2])]
+
+panel_var_perc_incr_new = [panel_var_perc_incr[0], fill_with_nan(panel_var_trend[0]),
+                       panel_var_perc_incr[1], fill_with_nan(panel_var_trend[1]),
+                       panel_var_perc_incr[2], fill_with_nan(panel_var_trend[2])]
+
+
+
+
+
 panel_unit_new = [panel_unit_tr[0], panel_unit[0],
                   panel_unit_tr[1], panel_unit[1],
                   panel_unit_tr[2], panel_unit[2]]
@@ -172,12 +219,12 @@ panel_var_trend_new_signif = []
 for i, pval in enumerate(panel_var_pval_new):
     panel_var_trend_new_signif.append(np.ma.masked_where(np.isnan(pval), panel_var_trend_new[i]))
 
-plots.plot_6_2_pannel_trend(panel_var_trend_new,  # panel_var_trend_new_signif
+plots.plot_6_2_pannel_trend(panel_var_perc_incr_new,#panel_var_trend_new,
                             seaice,
                             panel_var_pval_new,
                             lat_aer,
                             lon_aer,
-                            [0.00015, 0.003, 0.0007, 0.03, 0.03, 0.8],  # [100,  1.5,  0.02, 0.8, 0.3, 10],
+                            [7, 0.003, 7, 0.03, 7, 0.8],#[0.00015, 0.003, 0.0007, 0.03, 0.03, 0.8],
                             panel_unit_new,
                             fig_titles,
                             f'{season}_all_Emission_flux_trends_and_per_ice',

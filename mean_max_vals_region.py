@@ -218,7 +218,8 @@ def percent_icrease(variables_info_yr, vv, reg_na, decade):
         vals = variables_info_yr[vv][reg_na][decade]['data_aver_reg']
         last_val = slope * 30 + interc
         perc_inc = (last_val / interc - 1) * 100 / 30
-        print(slope, perc_inc, interc, pval)
+        perc_inc = (slope/interc) * 100
+        print(vv, reg_na, slope, perc_inc, interc, pval)
     else:
         perc_inc = np.nan
     return perc_inc
@@ -287,7 +288,7 @@ if __name__ == '__main__':
         variables_info_seaice = pickle.load(myFile)
 
     print('Aerosols from ECHAM')
-    panel_names = ['AER_F_POL_yr', 'AER_F_PRO_yr', 'AER_F_LIP_yr', 'AER_F_SS_yr']
+    panel_names = ['AER_F_POL_m', 'AER_F_PRO_m', 'AER_F_LIP_m', 'AER_F_SS_m']
     var_na_aer = ['PCHO$_{aer}$', 'DCAA$_{aer}$', 'PL$_{aer}$', 'SS$_{aer}$']
     lat = variables_info_yr[panel_names[0]]['lat']
     lon_360 = variables_info_yr[panel_names[0]]['lon']
@@ -303,11 +304,11 @@ if __name__ == '__main__':
     ###############################
     decades = ['1990-2019', '1990-2004', '2005-2019']
 
-    panel_names = [['AER_SIC'], ['AER_SST'], ['AER_F_SS_yr'], ['AER_F_POL_yr'], ['AER_F_PRO_yr'], ['AER_F_LIP_yr']]
+    panel_names = [['AER_SIC'], ['AER_SST'], ['AER_F_SS_m'], ['AER_F_POL_m'], ['AER_F_PRO_m'], ['AER_F_LIP_m']]
     var_na_aer = [['SIC'], ['SST'], ['SS$_{aer}$'], ['PCHO$_{aer}$'], ['DCAA$_{aer}$'], ['PL$_{aer}$']]
     right_label_show = [True, True, True, False, False, True]
     no_ylabel_show = [False, True, True, False, True, True]
-    col_emi_name_sl = 4 * [' Emission \n (Tg ${yr^{-1}}$ ${yr^{-1}}$)']
+    col_emi_name_sl = 4 * [' Emission \n (Tg ${month^{-1}}$ ${yr^{-1}}$)']
     col_name_sl = ['\n SIC \n (% ${yr^{-1}}$)',
                    '\n SST \n (C$^{o}$ ${yr^{-1}}$)']
 
@@ -334,8 +335,8 @@ if __name__ == '__main__':
 
     ###############################
 
-    panel_names = [['AER_SIC'], ['AER_F_POL_yr'], ['AER_F_PRO_yr'], ['AER_F_LIP_yr'], ['AER_F_SS_yr']]
-    var_na_aer = [['SIC'], ['PCHO$_{aer}$'], ['DCAA$_{aer}$'], ['PL$_{aer}$'], ['SS$_{aer}$']]
+    panel_names = [['AER_SIC_area_px'], ['AER_F_POL_m'], ['AER_F_PRO_m'], ['AER_F_LIP_m'], ['AER_F_SS_m']]
+    var_na_aer = [['Sea Ice \n extent'], ['PCHO$_{aer}$'], ['DCAA$_{aer}$'], ['PL$_{aer}$'], ['SS$_{aer}$']]
     right_label_show = [False, False, False, False, False]
     no_ylabel_show = [False, True, True, True, True]
     col_name_sl = 5 * [' Emission (Tg ${yr^{-1}}$ ${yr^{-1}}$)' + '\n ']

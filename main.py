@@ -183,16 +183,21 @@ if __name__ == '__main__':
                            dtype=ftype)
         intercept = np.empty((x_lat, y_lon),
                              dtype=ftype)
+        adj_r2 = np.empty((x_lat, y_lon),
+                             dtype=ftype)
 
         process_array_slope(Y,
                             X,
                             slope,
                             p_value,
-                            intercept)
+                            intercept,
+                            adj_r2)
 
         variables_info[var_na]['slope'] = slope
         variables_info[var_na]['pval'] = p_value
         variables_info[var_na]['intercept'] = intercept
+        variables_info[var_na]['adj_r2'] = adj_r2
+
         # plots.plot_trend(slope,
         #                  p_value,
         #                  lat,

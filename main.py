@@ -121,7 +121,7 @@ if __name__ == '__main__':
     print('Finished reading OMF  data')
 
     C_pcho, C_dcaa, C_pl, C_ice, C_temp, C_NPP, C_DIN = read_data.read_ocean_data()
-    C_ice_area_px = utils.compute_seaice_area_px(C_ice)
+    C_ice_area_px = utils.compute_seaice_area_px(C_ice) # sea ice from FESOM-RECOM
     print('C_ice_area_px', C_ice_area_px.max().values, C_ice_area_px.mean().values)
     print('Finished reading biomolecule concentration and SIC from FESOm-REcoM data')
 

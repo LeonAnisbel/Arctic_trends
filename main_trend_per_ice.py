@@ -58,14 +58,24 @@ if __name__ == '__main__':
     #C_pro = read_data.read_each_aerosol_data(months, 'PRO_AS', 'PRO_AS_t63', 1e12)
     #C_lip = read_data.read_each_aerosol_data(months, 'LIP_AS', 'LIP_AS_t63', 1e12)
 
-    C_ss_emi = read_data.read_each_aerosol_data(months, 'emi_SS', 'emi', 1e12, two_dim=True)
-    C_pol_emi = read_data.read_each_aerosol_data(months, 'emi_POL', 'emi', 1e12, two_dim=True)
-    C_pro_emi = read_data.read_each_aerosol_data(months, 'emi_PRO', 'emi', 1e12, two_dim=True)
-    C_lip_emi = read_data.read_each_aerosol_data(months, 'emi_LIP', 'emi', 1e12, two_dim=True)
+    C_emi = []
+    var_ids = ['emi_POL', 'emi_PRO', 'emi_LIP', 'emi_SS']
+    for c_elem in range(len(var_ids)):
+        emi, _ = read_data.read_each_aerosol_data(months,
+                                                      var_ids[c_elem],
+                                                      'emi',
+                                                      1e12,
+                                                      two_dim=True)
+        C_emi.append(emi)
 
+    C_tot_emi = C_emi[0] + C_emi[1] + C_emi[2]
     # sst_aer = read_data.read_each_aerosol_data(months, 'tsw', 'echam', 1, two_dim=True) - 273.16
     # u10 = read_data.read_each_aerosol_data(months, 'wind10', 'echam', 1, two_dim=True)
-    seaice_aer = read_data.read_each_aerosol_data(months, 'seaice', 'echam', 1, two_dim=True)  # * 100
+    seaice_aer, _ = read_data.read_each_aerosol_data(months,
+                                                     'seaice',
+                                                     'echam',
+                                                     1,
+                                                     two_dim=True)  # * 100
 
     data_omf = read_data.read_omf_data()  # * 100
     tot_omf = (data_omf['OMF_POL'] +
@@ -84,8 +94,7 @@ if __name__ == '__main__':
         # C_ice_area_px, C_ice_area_px,
         # C_temp, C_NPP,
         # C_DIN,
-        C_pol_emi,
-        C_pro_emi, C_lip_emi, C_ss_emi,
+        C_emi[0], C_emi[1], C_emi[2], C_emi[3],
         # u10, sst_aer, seaice_aer, seaice_aer,
      #   C_pol, C_pro, C_lip, C_ss,
         data_omf['OMF_POL'],

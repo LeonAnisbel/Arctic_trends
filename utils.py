@@ -40,7 +40,6 @@ def pick_month_var_reg(data, months, aer_conc=False):
         print('entered here')
         data_month = season_aver(data, months)
 
-    print(data_month.shape)
     data_month_reg = data_month.where(data_month.lat > 60, drop=True)
     lat = data_month_reg.lat
     lon = data_month_reg.lon

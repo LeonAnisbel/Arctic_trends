@@ -244,7 +244,8 @@ def plot_trend(subfig, trend, ice, pval, lat, lon, titles, vlim, unit, cm, vlim0
 #     cbar.set_label(label=units, size='large', weight='bold')
 
 
-def iterate_subfig(fig, subfigs, fig_name, trend_vars, ice_var, pval_vars, lat, lon, vlim_vars, unit_vars, title_vars,
+def iterate_subfig(fig, subfigs, fig_name, trend_vars, ice_var,
+                   pval_vars, lat, lon, vlim_vars, unit_vars, title_vars,
                    not_aerosol=True, percent_increase=False, seaice_conc=False):
     if seaice_conc:
         cm, vlim0 = 'Blues_r', 0

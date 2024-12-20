@@ -39,6 +39,8 @@ def cols_df(variables_info_yr, panel_names, var_na_title, decade, type):
     for vidx, var_na in enumerate(panel_names):
         if type[:5] == 'slope' and var_na[:5]=='AER_F':
             factor = global_vars.factor_eim_heatmaps
+        elif type[:5] == 'slope' and var_na[:7]=='AER_SIC':
+            factor = global_vars.factor_sic_heatmaps
         else:
             factor = 1.
         for reg_na in reg_names:
@@ -148,7 +150,7 @@ if __name__ == '__main__':
     var_na_aer = [[' '], ['PCHO$_{aer}$'], ['DCAA$_{aer}$'], ['PL$_{aer}$'], ['SS$_{aer}$']]
     right_label_show = [True, False, False, False, True]
     no_ylabel_show = [False, True, True, True, True]
-    col_name_sl = ['\n Sea Ice area \n (10$^{6}$ ${m^{2}}$ ${yr^{-1}}$) \n']
+    col_name_sl = ['\n Sea Ice area \n (10$^{8}$ ${m^{2}}$ ${yr^{-1}}$) \n']
     for c in col_emi_name_sl:
         col_name_sl.append(c)
 

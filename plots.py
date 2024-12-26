@@ -30,9 +30,8 @@ def plot_fit_trends(ax, C, title, axis_label, vm, colors, leg, fig_name,
     new_line_color = colors[0]
     if seaice:
         new_line_color = 'lightblue'
-        ax.fill_between(t_ax, 0, C_ice, alpha=0.2, color=new_line_color)  # C_ice.min() - C_ice.min()/10
-    #         ax.fill_between(t_ax[:16],C_ice_doc[:16]-0.4,C_ice_doc[:16], alpha=0.5,color=new_line_color)
-    p1, = ax.plot(t_ax, C_ice, new_line_color, label=leg[0], linewidth=1.)
+        ax.fill_between(t_ax, 0, C_ice, alpha=0.2, color=new_line_color)
+        p1, = ax.plot(t_ax, C_ice, new_line_color, label=leg[0], linewidth=1.)
     ax.scatter(t_ax, C_ice, s=15, c=new_line_color)
     p2, = ax2.plot(t_ax, C_biom, colors[1], label=leg[1], linewidth=1.)
     ax2.scatter(t_ax, C_biom, s=15, c=colors[1])
@@ -43,30 +42,19 @@ def plot_fit_trends(ax, C, title, axis_label, vm, colors, leg, fig_name,
     a = [0.5, 1]
     f1_list, f2_list = [], []
     for idx, dec in enumerate(decades):
-        # print(dec, 'min SIC', C[0][dec]['data_aver_reg'].min().values,
-        #         'max SIC', C[0][dec]['data_aver_reg'].max().values,
-        #         'mean SIC',  C[0][dec]['data_aver_reg'].mean().values)
-        # print(dec, 'min PMOA', C[1][dec]['data_aver_reg'].min().values,
-        #         'max PMOA', C[1][dec]['data_aver_reg'].max().values,
-        #         'mean PMOA', C[1][dec]['data_aver_reg'].mean().values, '\n')
-
-        # sl = [C[0][dec]['slope_aver_reg'], C[1][dec]['slope_aver_reg']]
-        # itc = [C[0][dec]['intercept_aver_reg'], C[1][dec]['intercept_aver_reg']]
-        # pval = [C[0][dec]['pval_aver_reg'], C[1][dec]['pval_aver_reg']]
 
         t_ax = C[0][dec]['data_aver_reg'].time.values
 
         x = t_ax.reshape((-1, 1))
         y = C[0][dec]['data_aver_reg'].values
-        print(x, y)
         model = LinearRegression()
         model_sic = model.fit(x, y)
-        print(f"coefficient of determination SIC: {model.score(x, y)}")
+        #print(f"coefficient of determination SIC: {model.score(x, y)}")
 
         y = C[1][dec]['data_aver_reg'].values
         model1 = LinearRegression()
         model_emi = model1.fit(x, y)
-        print(f"coefficient of determination EMI: {model1.score(x, y)}")
+        #print(f"coefficient of determination EMI: {model1.score(x, y)}")
 
         sl = [model_sic.coef_[0], model_emi.coef_[0]]
         itc = [model_sic.intercept_, model_emi.intercept_]
@@ -99,11 +87,8 @@ def plot_fit_trends(ax, C, title, axis_label, vm, colors, leg, fig_name,
     ax.set_title(title[0] + '\n', loc='right', fontsize=10)
     ax.set_title(title[1], loc='left', fontsize=10)
 
-    # ax.legend(loc='lower left', fontsize=8)
-    # ax2.legend(loc='upper right', fontsize=8)
-    ax.set_ylim(vm[0][0], vm[0][1])
-    # ax2.set_ylim(vm[1][0], vm[1][1])
 
+    ax.set_ylim(vm[0][0], vm[0][1])
     ax.grid(linestyle='--', linewidth=0.4)
     ax.xaxis.set_tick_params(labelsize=8)
     ax.yaxis.set_tick_params(labelsize=8, color=colors[0])
@@ -143,9 +128,6 @@ def add_ice_colorbar(fig, ic, ic2):
 
 def plot_trend(subfig, trend, ice, pval, lat, lon, titles, vlim, unit, cm, vlim0,
                not_aerosol=True, percent_increase=False, seaice_conc=False):
-    # fig, ax = plt.subplots(1, 1,
-    #                        figsize=(5, 4),
-    #                        subplot_kw={'projection': ccrs.NorthPolarStereo()}, )
     ax = subfig.subplots(nrows=1,
                          ncols=1,
                          sharex=True,
@@ -225,23 +207,6 @@ def plot_trend(subfig, trend, ice, pval, lat, lon, titles, vlim, unit, cm, vlim0
         return [ic, ic2]
     else:
         return
-
-
-# def plot_each_fig(subfig,C,titles,vm, units, colorbar):
-#     axes = subfig.subplots(nrows=1, ncols=1, sharex=True,
-#                          subplot_kw={'projection': ccrs.Robinson()})
-#     cmap = plt.get_cmap(colorbar, 11)    # 11 discrete colors
-#     im = axes.pcolormesh(C.lon, C.lat, C,
-#                         cmap=cmap, transform=ccrs.PlateCarree(),
-#                        vmin = 0,vmax = vm)
-#     axes.set_title(titles[0],loc='right', fontsize = 12)
-#     axes.set_title(titles[1], loc='left', fontsize = 12)
-#     axes.coastlines()
-#
-#
-#     cbar = subfig.colorbar(im, orientation="horizontal", extend = 'max')#,cax = cbar_ax
-#     cbar.ax.tick_params(labelsize=12)
-#     cbar.set_label(label=units, size='large', weight='bold')
 
 
 def iterate_subfig(fig, subfigs, fig_name, trend_vars, ice_var,

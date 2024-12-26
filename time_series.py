@@ -35,7 +35,12 @@ if __name__ == '__main__':
         for idx, dec in enumerate(decades):
             print('mean Sea ice', seaice_lin[reg][dec]['data_aver_reg'].mean(skipna=True).values)
             print('mean emission flux', biomol[reg][dec]['data_aver_reg'].mean(skipna=True).values)
-
+            print('')
+            print('min Sea ice', seaice_lin[reg][dec]['data_aver_reg'].min(skipna=True).values)
+            print('min emission flux', biomol[reg][dec]['data_aver_reg'].min(skipna=True).values)
+            print('')
+            print('max Sea ice', seaice_lin[reg][dec]['data_aver_reg'].max(skipna=True).values)
+            print('max emission flux', biomol[reg][dec]['data_aver_reg'].max(skipna=True).values)
         decade = '1990-2019'
         leg = plots.plot_fit_trends(axs[idx],
                                     [seaice_lin[reg], biomol[reg]],

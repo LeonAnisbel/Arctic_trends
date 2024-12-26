@@ -147,10 +147,11 @@ if __name__ == '__main__':
     ###############################
 
     panel_names = [['AER_SIC_area_px'], ['AER_F_POL_m'], ['AER_F_PRO_m'], ['AER_F_LIP_m'], ['AER_F_SS_m']]
-    var_na_aer = [[' '], ['PCHO$_{aer}$'], ['DCAA$_{aer}$'], ['PL$_{aer}$'], ['SS$_{aer}$']]
+    var_na_aer = [['SIC'], ['PCHO$_{aer}$'], ['DCAA$_{aer}$'], ['PL$_{aer}$'], ['SS$_{aer}$']]
     right_label_show = [True, False, False, False, True]
     no_ylabel_show = [False, True, True, True, True]
-    col_name_sl = ['\n Sea Ice area \n (10$^{8}$ ${m^{2}}$ ${yr^{-1}}$) \n']
+    col_name_sl = ['\n (% ${yr^{-1}}$) \n']
+
     for c in col_emi_name_sl:
         col_name_sl.append(c)
 

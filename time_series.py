@@ -43,7 +43,7 @@ if __name__ == '__main__':
                                     ['Sea Ice Area \n (millions of km$^{2}$)', f'PMOA emission mass \n flux {unit}'],
                                     # ['Sea ice \n Concentration ($million km^{2})$', 'Total biomolecule \n concentration'],
                                     # [[6, 10.5], [0.1, 0.1]],
-                                    idx['lims'],
+                                    region[reg]['lims'],
                                     colors,
                                     ['Sea ice', 'PMOA'],
                                     # ['Sea Ice', 'Biomolecules'],

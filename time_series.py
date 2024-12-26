@@ -30,7 +30,7 @@ if __name__ == '__main__':
             'Kara Sea':{'lims':[[0., 0.6], [0.1, 0.1]]},
             'Barents Sea':{'lims':[[0, 0.23], [0.1, 0.1]]}}
 
-    for idx,reg in region.keys():
+    for reg, idx in region.items():
         decades = ['1990-2004', '2005-2019']
         for idx, dec in enumerate(decades):
             print('mean Sea ice', seaice_lin[reg][dec]['data_aver_reg'].mean(skipna=True).values)
@@ -43,7 +43,7 @@ if __name__ == '__main__':
                                     ['Sea Ice Area \n (millions of km$^{2}$)', f'PMOA emission mass \n flux {unit}'],
                                     # ['Sea ice \n Concentration ($million km^{2})$', 'Total biomolecule \n concentration'],
                                     # [[6, 10.5], [0.1, 0.1]],
-                                    region[reg]['lims'],
+                                    idx['lims'],
                                     colors,
                                     ['Sea ice', 'PMOA'],
                                     # ['Sea Ice', 'Biomolecules'],

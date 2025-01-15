@@ -4,3 +4,5 @@ __pycache__
 emi_regions
 plots
 *.pkl
+process_statsmodels.c
+process_statsmodels.cpython-310-x86_64-linux-gnu.so

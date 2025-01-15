@@ -1,6 +1,20 @@
 import xarray as xr
 import numpy as np
 
+def create_var_info_dict():
+    vars_names = ['Sea_ice', 'Sea_ice_1m', 'Sea_ice_area_px',
+                  'SST', 'NPP', 'DIN',
+                  'AER_F_POL', 'AER_F_PRO', 'AER_F_LIP', 'AER_F_tot', 'AER_F_SS', 'AER_F_SSA',
+                  'AER_F_POL_m', 'AER_F_PRO_m', 'AER_F_LIP_m', 'AER_F_tot_m', 'AER_F_SS_m', 'AER_F_SSA_m',
+                  'AER_U10', 'AER_SST', 'AER_SIC', 'AER_SIC_area_px', 'AER_SIC_1m',
+                  'AER_POL', 'AER_PRO', 'AER_LIP', 'AER_tot', 'AER_SS', 'AER_SSA',
+                  'OMF_POL', 'OMF_PRO', 'OMF_LIP', 'OMF_tot',
+                  'PCHO', 'DCAA', 'PL', 'Biom_tot']
+    variables_info = {}
+    for names in vars_names:
+        variables_info[names] = {}
+    return variables_info
+
 def get_month(da,m):
     da_yr = da
     da_t = da_yr.where(da_yr.time.dt.month == m, drop=True)

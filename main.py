@@ -24,44 +24,7 @@ if __name__ == '__main__':
     # season='JFM'
     # one_month = [1]
 
-    variables_info = {
-        'Sea_ice': {'lim': 1.5, 'unit': '% '},
-        'Sea_ice_1m': {'lim': 1.5, 'unit': '% '},
-        'Sea_ice_area_px': {'lim': 1.5, 'unit': '% '},
-        # 'Sea_ice_area_px_1m': {'lim': 1.5, 'unit': '% '},
-        'SST': {'lim': 0.1, 'unit': '$^{o}C$ '},
-        'NPP': {'lim': 1, 'unit': '$mmol\ C$ ${m^{-2}}$ ${d^{-1}}$ '},
-        'DIN': {'lim': 0.01, 'unit': '$mmol\ C$ ${m^{-2}}$ ${d^{-1}}$ '},
-        'AER_F_POL': {'lim': 0.01, 'unit': 'ng ${m^{-2}}$ ${s^{-1}}$'},
-        'AER_F_PRO': {'lim': 0.1, 'unit': 'ng ${m^{-2}}$ ${s^{-1}}$'},
-        'AER_F_LIP': {'lim': 2, 'unit': 'ng ${m^{-2}}$ ${s^{-1}}$'},
-        'AER_F_tot': {'lim': 2, 'unit': 'ng ${m^{-2}}$ ${s^{-1}}$'},
-        'AER_F_SS': {'lim': 4, 'unit': 'ng ${m^{-2}}$ ${s^{-1}}$'},
-        'AER_F_POL_m': {'lim': 0.01, 'unit': 'Tg\ month$^{-1}$'},
-        'AER_F_PRO_m': {'lim': 0.1, 'unit': 'Tg\ month$^{-1}$'},
-        'AER_F_LIP_m': {'lim': 2, 'unit': 'Tg\ month$^{-1}$'},
-        'AER_F_tot_m': {'lim': 2, 'unit': 'Tg\ month$^{-1}$'},
-        'AER_F_SS_m': {'lim': 4, 'unit': 'Tg\ month$^{-1}$'},
-        'AER_U10': {'lim': 4, 'unit': 'm ${s^{-1}}$'},
-        'AER_SST': {'lim': 4, 'unit': '$^{o}C$'},
-        'AER_SIC': {'lim': 4, 'unit': '%'},
-        'AER_SIC_area_px': {'lim': 4, 'unit': '%'},
-        'AER_SIC_1m': {'lim': 4, 'unit': '%'},
-        'AER_POL': {'lim': 0.01, 'unit': 'ng ${m^{-3}}$ '},
-        'AER_PRO': {'lim': 0.1, 'unit': 'ng ${m^{-3}}$ '},
-        'AER_LIP': {'lim': 2, 'unit': 'ng ${m^{-3}}$ '},
-        'AER_tot': {'lim': 2, 'unit': 'ng ${m^{-3}}$ '},
-        'AER_SS': {'lim': 4, 'unit': 'ng ${m^{-3}}$ '},
-        'OMF_POL': {'lim': 0.003, 'unit': '% '},
-        'OMF_PRO': {'lim': 0.02, 'unit': '% '},
-        'OMF_LIP': {'lim': 0.5, 'unit': '% '},
-        'OMF_tot': {'lim': 0.8, 'unit': '% '},
-        'PCHO': {'lim': 0.05, 'unit': '$mmol\ C$ ${m^{-3}}$ '},
-        'DCAA': {'lim': 0.02, 'unit': '$mmol\ C$ ${m^{-3}}$ '},
-        'PL': {'lim': 0.01, 'unit': '$mmol\ C$ ${m^{-3}}$ '},
-        'Biom_tot': {'lim': 0.1, 'unit': '$mmol\ C$ ${m^{-3}}$ '}
-    }
-
+# Read in aerosol concentration
     C_conc = []
     var_ids = ['POL_AS', 'PRO_AS', 'LIP_AS', 'SS_AS']
     for c_elem in range(len(var_ids)):
@@ -72,7 +35,9 @@ if __name__ == '__main__':
                                                    two_dim=False)
         C_conc.append(conc)
     C_tot_conc = C_conc[0] + C_conc[1] + C_conc[2]
+    C_conc_ssa = C_tot_conc + C_conc[3]
 
+# Read in aerosol emission mass flux and flux per month (_m)
     C_emi = []
     C_emi_m = []
     var_ids = ['emi_POL', 'emi_PRO', 'emi_LIP', 'emi_SS']
@@ -86,15 +51,21 @@ if __name__ == '__main__':
         C_emi_m.append(emi_m)
 
     C_tot_emi = C_emi[0] + C_emi[1] + C_emi[2]
+    C_emi_ssa = C_tot_emi +  C_emi[3]
+
     C_tot_emi_m = C_emi_m[0] + C_emi_m[1] + C_emi_m[2]
+    C_ssa_emi_m =  C_tot_emi_m +  C_emi_m[3]
 
     print('Finished reading aerosol emission data')
 
+# Read in emission drivers
     sst_aer, _ = read_data.read_each_aerosol_data(months,
                                                   'tsw',
                                                   'echam',
                                                   1,
                                                   two_dim=True)
+    sst_aer_K = sst_aer - 273.16
+
     u10, _ = read_data.read_each_aerosol_data(months,
                                               'velo10m',
                                               'vphysc',
@@ -111,41 +82,33 @@ if __name__ == '__main__':
                                                     1,
                                                     two_dim=True)
     C_ice_aer_area_px = seaice_aer * gbox_area * 1.e-6  # from m2 to km2
+    print('Finished reading aerosol emission drivers')
 
-    print('Finished reading SST, SIC and  wind data', C_ice_aer_area_px.max().values, C_ice_aer_area_px.mean().values)
-
+# Read in aerosol organic mass fraction (OMF)
     data_omf = read_data.read_omf_data() * 100
     tot_omf = (data_omf['OMF_POL'] +
                data_omf['OMF_LIP'] +
                data_omf['OMF_PRO'])
     print('Finished reading OMF  data')
 
+# Read in biomolecule ocean concentration and other biogeochemical indicators from the BGC model (FESOM-REcoM)
     C_pcho, C_dcaa, C_pl, C_ice, C_temp, C_NPP, C_DIN = read_data.read_ocean_data()
     C_ice_area_px = utils.compute_seaice_area_px(C_ice) # sea ice from FESOM-RECOM
-    print('C_ice_area_px', C_ice_area_px.max().values, C_ice_area_px.mean().values)
+    tot_biom_conc = C_pcho + C_dcaa + C_pl
     print('Finished reading biomolecule concentration and SIC from FESOm-REcoM data')
 
-    tot_biom_oc = C_pcho + C_dcaa + C_pl
     list_variables = [
-        C_ice * 100, C_ice * 100,
-        C_ice_area_px,  # C_ice_area_px,
-        C_temp, C_NPP,
-        C_DIN,
-        C_emi[0], C_emi[1], C_emi[2], C_tot_emi, C_emi[3],
-        C_emi_m[0], C_emi_m[1], C_emi_m[2], C_tot_emi_m, C_emi_m[3],
-        u10, sst_aer- 273.16,
-        seaice_aer * 100, C_ice_aer_area_px, seaice_aer * 100,
-        C_conc[0], C_conc[1], C_conc[2], C_tot_conc, C_conc[3],
-        data_omf['OMF_POL'],
-        data_omf['OMF_PRO'],
-        data_omf['OMF_LIP'],
-        tot_omf,
-        C_pcho,
-        C_dcaa,
-        C_pl,
-        tot_biom_oc,
+        C_ice * 100, C_ice * 100, C_ice_area_px,  # C_ice_area_px,
+        C_temp, C_NPP, C_DIN,
+        C_emi[0], C_emi[1], C_emi[2], C_tot_emi, C_emi[3], C_emi_ssa,
+        C_emi_m[0], C_emi_m[1], C_emi_m[2], C_tot_emi_m, C_emi_m[3], C_ssa_emi_m,
+        u10, sst_aer_K, seaice_aer * 100, C_ice_aer_area_px, seaice_aer * 100,
+        C_conc[0], C_conc[1], C_conc[2], C_tot_conc, C_conc[3], C_conc_ssa,
+        data_omf['OMF_POL'], data_omf['OMF_PRO'], data_omf['OMF_LIP'], tot_omf,
+        C_pcho, C_dcaa, C_pl, tot_biom_conc,
+        ]
+    variables_info = utils.create_var_info_dict()
 
-    ]
 
     for idx, var_na in enumerate(list(variables_info.keys())):
         variables_info[var_na]['data'] = list_variables[idx]

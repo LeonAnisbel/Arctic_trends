@@ -12,7 +12,7 @@ def plot_trend(variables_info_seaice, variables_info_yr, seaice, season):
                    ['Total concentration$_{sw}$', r'$\bf{(c)}$'],
                    ['Total OMF', r'$\bf{(d)}$']]]
 
-    # panel_var_trend, panel_var_pval, panel_lim, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr, trends=True)
+    # panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr, trends=True)
     # vlims = utils.find_max_lim(panel_var_trend)
     # plots.plot_4_pannel_trend(panel_var_trend,
     #                           seaice,
@@ -35,7 +35,7 @@ def plot_trend(variables_info_seaice, variables_info_yr, seaice, season):
                    ['SIC', r'$\bf{(c)}$'],
                    ['NPP', r'$\bf{(d)}$']]]
     vlims = [0.04, 0.008, 3, 1.]
-    panel_var_trend, panel_var_pval, panel_lim, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
+    panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
                                                                                   trends=True)
 
     plots.plot_4_pannel_trend(panel_var_trend,
@@ -55,7 +55,7 @@ def plot_trend(variables_info_seaice, variables_info_yr, seaice, season):
     fig_titles = [['PCHO$_{sw}$', r'$\bf{(a)}$'], ['DCAA$_{sw}$', r'$\bf{(b)}$'], ['PL$_{sw}$', r'$\bf{(c)}$'],
                   ['PCHO$_{aer}$ OMF', r'$\bf{(d)}$'], ['DCAA$_{aer}$ OMF', r'$\bf{(e)}$'],
                   ['PL$_{aer}$ OMF', r'$\bf{(f)}$']],
-    panel_var_trend, panel_var_pval, panel_lim, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr)
+    panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr)
     vlims = utils.find_max_lim(panel_var_trend)
 
     # plots.plot_6_pannel_trend(panel_var_trend,
@@ -82,7 +82,7 @@ def plot_trend(variables_info_seaice, variables_info_yr, seaice, season):
                    ['SIC', r'$\bf{(e)}$'],
                    ['NPP', r'$\bf{(f)}$']]]
     vlims = [0.04, 0.002, 0.008, 0.25, 3, 1.]
-    panel_var_trend, panel_var_pval, panel_lim, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
+    panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
                                                                                   trends=True)
 
     plots.plot_6_2_pannel_trend(panel_var_trend,
@@ -105,7 +105,7 @@ def plot_trend(variables_info_seaice, variables_info_yr, seaice, season):
     fig_titles = [['Sea ice', r'$\bf{(a)}$'], ['SST', r'$\bf{(b)}$'], ['NPP', r'$\bf{(c)}$']],
     lat = variables_info_yr[panel_names[0]]['lat']
     lon = variables_info_yr[panel_names[0]]['lon']
-    panel_var_trend, panel_var_pval, panel_lim, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
+    panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
                                                                                   trends=True)
     plots.plot_3_pannel_trend(panel_var_trend,
                               seaice,

@@ -44,7 +44,7 @@ def plot_trend_emission(variables_info_seaice, variables_info_yr, seaice, season
     #               ['SS$_{aer}$', r'$\bf{(d)}$']],
     lat_aer = variables_info_yr[panel_names[0]]['lat']
     lon_aer = variables_info_yr[panel_names[0]]['lon']
-    # panel_var_trend, panel_var_pval, panel_lim, panel_unit = utils.alloc_metadata(panel_names, variables_info)
+    # panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info)
     # panel_lim = [3, 3, 3, 3]
     # percent_increase_yr, panel_unit = get_perc_increase(variables_info, panel_names)
     # plots.plot_4_pannel_trend(percent_increase_yr,
@@ -63,7 +63,7 @@ def plot_trend_emission(variables_info_seaice, variables_info_yr, seaice, season
     # lat_aer = variables_info[panel_names[0]]['lat']
     # lon_aer = variables_info[panel_names[0]]['lon']
     # fig_titles = [['PCHO', r'$\bf{(a)}$'], ['DCAA', r'$\bf{(b)}$'], ['PL', r'$\bf{(c)}$'], ['SS', r'$\bf{(d)}$']],
-    # panel_var_trend, panel_var_pval, panel_lim, panel_unit = utils.alloc_metadata(panel_names, variables_info)
+    # panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info)
     # panel_std = []
     # for i in panel_names:
     #     std = variables_info[i]['data_season_reg'].std(dim='time')
@@ -82,16 +82,16 @@ def plot_trend_emission(variables_info_seaice, variables_info_yr, seaice, season
 
     print('Plot all PMOA emission trend and emission per SIC')
     panel_names = ['AER_F_POL', 'AER_F_PRO', 'AER_F_LIP']
-    panel_var_trend, panel_var_pval, panel_lim, panel_unit = utils.alloc_metadata(panel_names,
-                                                                                  variables_info_seaice)
+    panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names,
+                                                                        variables_info_seaice)
 
     panel_var_perc_incr = []
     for vv in panel_names:
         panel_var_perc_incr.append(percent_icrease(variables_info_yr, vv, decade))
 
-    panel_var_trend_tr, panel_var_pval_tr, panel_lim_tr, panel_unit_tr = utils.alloc_metadata(panel_names,
-                                                                                              variables_info_yr,
-                                                                                              trends=True)
+    panel_var_trend_tr, panel_var_pval_tr, panel_unit_tr = utils.alloc_metadata(panel_names,
+                                                                                  variables_info_yr,
+                                                                                  trends=True)
 
     fig_titles = [[['PCHO$_{aer}$ emission trend', r'$\bf{(a)}$'], ['PCHO$_{aer}$  per unit SIC', r'$\bf{(b)}$'],
                    ['DCAA$_{aer}$ emission trend', r'$\bf{(c)}$'], ['DCAA$_{aer}$  per unit SIC', r'$\bf{(d)}$'],
@@ -130,7 +130,7 @@ def plot_trend_emission(variables_info_seaice, variables_info_yr, seaice, season
     print('Plot 10 m wind and SSt trend')
     panel_names = ['AER_U10', 'AER_SST']
     fig_titles = [['Wind10', r'$\bf{(a)}$'], ['Surface temperature', r'$\bf{(b)}$']],
-    panel_var_trend, panel_var_pval, panel_lim, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
+    panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
                                                                                   trends=True)
     panel_var_trend_signif = []
     for i, pval in enumerate(panel_var_pval):
@@ -152,9 +152,9 @@ def plot_trend_emission(variables_info_seaice, variables_info_yr, seaice, season
     print('')
     print('FINALL six panel plot emission and emiss/SIC')
     panel_names = ['AER_F_LIP', 'AER_F_SS']
-    panel_var_trend, panel_var_pval, panel_lim, panel_unit = utils.alloc_metadata(panel_names, variables_info_seaice)
+    panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_seaice)
     panel_names = ['AER_SIC', 'AER_F_LIP', 'AER_F_SS']
-    panel_var_trend_tr, panel_var_pval_tr, panel_lim_tr, panel_unit_tr = utils.alloc_metadata(panel_names,
+    panel_var_trend_tr, panel_var_pval_tr, panel_unit_tr = utils.alloc_metadata(panel_names,
                                                                                               variables_info_yr,
                                                                                               trends=True)
 
@@ -198,7 +198,7 @@ def plot_trend_aer_concentration(variables_info_yr, seaice, season):
                    ['PL$_{aer}$', r'$\bf{(b)}$'],
                    ['SS', r'$\bf{(d)}$']]]
     vlims = [0.005, 0.03, 0.9, 4]
-    panel_var_trend, panel_var_pval, panel_lim, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
+    panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
                                                                                   trends=True)
 
     plots.plot_4_pannel_trend(panel_var_trend,

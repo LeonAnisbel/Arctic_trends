@@ -2,17 +2,27 @@ import xarray as xr
 import numpy as np
 
 def create_var_info_dict():
-    vars_names = ['Sea_ice', 'Sea_ice_1m', 'Sea_ice_area_px',
-                  'SST', 'NPP', 'DIN',
-                  'AER_F_POL', 'AER_F_PRO', 'AER_F_LIP', 'AER_F_tot', 'AER_F_SS', 'AER_F_SSA',
-                  'AER_F_POL_m', 'AER_F_PRO_m', 'AER_F_LIP_m', 'AER_F_tot_m', 'AER_F_SS_m', 'AER_F_SSA_m',
-                  'AER_U10', 'AER_SST', 'AER_SIC', 'AER_SIC_area_px', 'AER_SIC_1m',
-                  'AER_POL', 'AER_PRO', 'AER_LIP', 'AER_tot', 'AER_SS', 'AER_SSA',
-                  'OMF_POL', 'OMF_PRO', 'OMF_LIP', 'OMF_tot',
-                  'PCHO', 'DCAA', 'PL', 'Biom_tot']
+    npp_din_u = '$mmol\ C$ ${m^{-2}}$ ${d^{-1}}$ '
+    flux_u = 'ng ${m^{-2}}$ ${s^{-1}}$'
+    flux_mo_u = 'Tg\ month$^{-1}$'
+    sic_u = '% '
+    conc_u = 'ng ${m^{-3}}$ '
+    conc_biom_u = '$mmol\ C$ ${m^{-3}}$ '
+    vars_names = [['Sea_ice', sic_u], ['Sea_ice_1m', sic_u], ['Sea_ice_area_px', sic_u],
+                  ['SST', '$^{o}C$ '],['NPP', npp_din_u], ['DIN', npp_din_u],
+                  ['AER_F_POL', flux_u], ['AER_F_PRO', flux_u], ['AER_F_LIP', flux_u],
+                  ['AER_F_tot', flux_u], ['AER_F_SS', flux_u], ['AER_F_SSA', flux_u],
+                  ['AER_F_POL_m', flux_mo_u], ['AER_F_PRO_m', flux_mo_u], ['AER_F_LIP_m', flux_mo_u],
+                  ['AER_F_tot_m', flux_mo_u], ['AER_F_SS_m', flux_mo_u], ['AER_F_SSA_m', flux_mo_u],
+                  ['AER_U10', 'm ${s^{-1}}$'], ['AER_SST', '$^{o}C$ '],
+                  ['AER_SIC', sic_u], ['AER_SIC_area_px', sic_u], ['AER_SIC_1m', sic_u],
+                  ['AER_POL', conc_u], ['AER_PRO', conc_u], ['AER_LIP', conc_u],
+                  ['AER_tot', conc_u], ['AER_SS', conc_u], ['AER_SSA', conc_u],
+                  ['OMF_POL', sic_u], ['OMF_PRO', sic_u], ['OMF_LIP', sic_u], ['OMF_tot', sic_u],
+                  ['PCHO', conc_biom_u], ['DCAA', conc_biom_u], ['PL', conc_biom_u], ['Biom_tot', conc_biom_u]]
     variables_info = {}
-    for names in vars_names:
-        variables_info[names] = {}
+    for li in vars_names:
+        variables_info[li[0]] = {'unit': li[1]}
     return variables_info
 
 def get_month(da,m):
@@ -66,14 +76,13 @@ def alloc_metadata(names, variables_info, trends=False):
     for id in names:
         var_trend.append(variables_info[id]['slope'])
         var_pval.append(variables_info[id]['pval'])
-        var_lim.append(variables_info[id]['lim'])
         if trends:
             var_unit.append(variables_info[id]['unit'] +  ' $yr^{-1}$')
         else:
             var_unit.append(variables_info[id]['unit'])
 
 
-    return var_trend, var_pval, var_lim, var_unit
+    return var_trend, var_pval, var_unit
 
 
 def find_yr_min_ice(v_1month):

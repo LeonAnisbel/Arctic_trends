@@ -13,7 +13,7 @@ def read_files_data(path_dir):
 
 
 def read_ocean_data():
-    ocean_dir = "../regular_grid_interp/"
+    ocean_dir = global_vars.ocean_dir_path
 
     C_ice_msk = read_files_data(ocean_dir + "mask_a_ice*")['VAR']
 

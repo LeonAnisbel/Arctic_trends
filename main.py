@@ -2,27 +2,24 @@ import numpy as np
 import statsmodels.api as sm
 import pickle
 import Trend_all_arctic
+import global_vars
 from process_statsmodels import process_array_slope
 import read_data, utils
 import plots
 
 ftype = np.float64
+
+
+def initialize_array():
+    return np.empty((x_lat, y_lon), dtype=ftype)
+
+
 if __name__ == '__main__':
-    months = [7, 8, 9]
-    season = 'JAS'
-    one_month = [9]
+    season = global_vars.season_to_analise
+    season_dict = global_vars.seasons_info[season]
+    months = season_dict['months']
+    one_month = season_dict['one_month']
 
-    # months = [6, 7, 8]
-    # season='JJA'
-    # one_month = [8]
-
-    # months = [4, 5, 6]
-    # season='AMJ'
-    # one_month = [6]
-
-    # months = [1, 2, 3]
-    # season='JFM'
-    # one_month = [1]
 
 # Read in aerosol concentration
     C_conc = []
@@ -140,14 +137,10 @@ if __name__ == '__main__':
 
         x_lat, y_lon = Y.shape[1:]
 
-        slope = np.empty((x_lat, y_lon),
-                         dtype=ftype)
-        p_value = np.empty((x_lat, y_lon),
-                           dtype=ftype)
-        intercept = np.empty((x_lat, y_lon),
-                             dtype=ftype)
-        adj_r2 = np.empty((x_lat, y_lon),
-                             dtype=ftype)
+        slope = initialize_array()
+        p_value = initialize_array()
+        intercept = initialize_array()
+        adj_r2 = initialize_array()
 
         process_array_slope(Y,
                             X,

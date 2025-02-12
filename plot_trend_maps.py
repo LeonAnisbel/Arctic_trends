@@ -1,13 +1,12 @@
 import pickle
+
+import global_vars
 import plots, utils
 import numpy as np
 import plot_aerosol_trend
 
 if __name__ == '__main__':
-
-    season = 'JAS'
-    # season='AMJ'
-    # season = 'JJA'
+    season = global_vars.season_to_analise
 
     with open(f"TrendsDict_{season}.pkl", "rb") as myFile:
         variables_info_yr = pickle.load(myFile)

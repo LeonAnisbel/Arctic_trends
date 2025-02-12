@@ -2,23 +2,17 @@ import numpy as np
 import statsmodels.api as sm
 import pickle
 import Trend_all_arctic
+import global_vars
 from process_statsmodels import process_array_slope_per_ice
 import read_data, utils
 import plots
 
 ftype = np.float64
 if __name__ == '__main__':
-    months = [7, 8, 9]
-    season='JAS'
-    one_month = [9]
-
-    #months = [4, 5, 6]
-    #season='AMJ'
-    #one_month = [6]
-
-    #months = [6, 7, 8]
-    #season='JJA'
-    #one_month = [8]
+    season = global_vars.season_to_analise
+    season_dict = global_vars.seasons_info[season]
+    months = season_dict['months']
+    one_month = season_dict['one_month']
 
     variables_info = {
         # 'Sea_ice': {'lim': 1.5, 'unit': '% '},

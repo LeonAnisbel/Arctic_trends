@@ -91,7 +91,7 @@ def plot_heatmap_multipanel(variables_info, panel_names, var_na_aer, right_label
 
 if __name__ == '__main__':
 
-    season = 'JAS'
+    season = global_vars.season_to_analise
     with open(f"TrendsDict_{season}.pkl", "rb") as myFile:
         variables_info_yr = pickle.load(myFile)
 

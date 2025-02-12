@@ -1,4 +1,6 @@
 import numpy as np
+
+import global_vars
 from utils import get_var_reg, get_seaice_vals, get_min_seaice, regions, get_conds
 import pickle
 import xarray as xr
@@ -171,7 +173,7 @@ def reg_sel(lat, lon, data, var_na):
 
 
 if __name__=='__main__':
-    season = 'JAS'
+    season = global_vars.season_to_analise
     with open(f"TrendsDict_{season}.pkl", "rb") as myFile:
         variables_info_yr = pickle.load(myFile)
 

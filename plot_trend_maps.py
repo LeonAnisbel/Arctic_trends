@@ -1,6 +1,7 @@
 import pickle
 
 import global_vars
+import plot_biomolecule_trend
 import plots, utils
 import numpy as np
 import plot_aerosol_trend
@@ -33,3 +34,4 @@ if __name__ == '__main__':
 
     plot_aerosol_trend.plot_trend_aer_concentration(variables_info_yr, seaice, season)
     plot_aerosol_trend.plot_trend_emission(variables_info_seaice, variables_info_yr, seaice, season, decade)
+    plot_biomolecule_trend.plot_trend(variables_info_seaice, variables_info_yr, seaice, season)

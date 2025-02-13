@@ -4,6 +4,8 @@ import global_vars
 import plots, utils
 import matplotlib.pyplot as plt
 
+from utils import regions
+
 if __name__ == '__main__':
     season = global_vars.season_to_analise
 
@@ -23,26 +25,15 @@ if __name__ == '__main__':
 
     seaice = utils.get_seaice_vals(variables_info_yr, 'Sea_ice')
     seaice_lin = variables_info_yr['AER_SIC_area_px']
-    biomol = variables_info_yr['AER_F_tot_m']  # AER_LIP #AER_F_tot_yr
-
+    flux = variables_info_yr['AER_F_tot_m']  # AER_LIP #AER_F_tot_yr
+    conc = variables_info_yr['AER_tot']  # AER_LIP #AER_F_tot_yr
     region = {'Arctic':{'lims':[[4.3, 7.5], [0.1, 0.1]]},
             'Kara Sea':{'lims':[[0., 0.6], [0.1, 0.1]]},
             'Barents Sea':{'lims':[[0, 0.23], [0.1, 0.1]]}}
 
-    for reg, idx in region.items():
-        decades = ['1990-2004', '2005-2019']
-        for idx, dec in enumerate(decades):
-            print('mean Sea ice', seaice_lin[reg][dec]['data_aver_reg'].mean(skipna=True).values)
-            print('mean emission flux', biomol[reg][dec]['data_aver_reg'].mean(skipna=True).values)
-            print('')
-            print('min Sea ice', seaice_lin[reg][dec]['data_aver_reg'].min(skipna=True).values)
-            print('min emission flux', biomol[reg][dec]['data_aver_reg'].min(skipna=True).values)
-            print('')
-            print('max Sea ice', seaice_lin[reg][dec]['data_aver_reg'].max(skipna=True).values)
-            print('max emission flux', biomol[reg][dec]['data_aver_reg'].max(skipna=True).values)
-        decade = '1990-2019'
+    for idx, reg in enumerate(list(region.keys())):
         leg = plots.plot_fit_trends(axs[idx],
-                                    [seaice_lin[reg], biomol[reg]],
+                                    [seaice_lin[reg], flux[reg]],
                                     [reg, r'$\bf{(a)}$'],
                                     ['Sea Ice Area \n (millions of km$^{2}$)', f'PMOA emission mass \n flux {unit}'],
                                     # ['Sea ice \n Concentration ($million km^{2})$', 'Total biomolecule \n concentration'],
@@ -63,5 +54,29 @@ if __name__ == '__main__':
                        bbox_to_anchor=(0.3, 1.), loc='lower left', fontsize=8)
 
     plt.tight_layout()
+    plt.savefig(f'./plots/{season}_multipanel_time_series.png', dpi=300)
 
-    plt.savefig(f'./plots/{season}_multipanel_time_series.png', dpi=200)
+
+    region = utils.regions()
+    for reg, idx in region.items():
+        decades = ['1990-2004', '2005-2019']
+        for idx, dec in enumerate(decades):
+            with open("Region_means.txt", "a") as f:
+                print(reg, dec,
+                      'mean SIC',
+                      seaice_lin[reg][dec]['data_aver_reg'].mean(skipna=True).values,
+                      '\n',
+                      file=f)
+                print(reg, dec,
+                      'mean PMOA surface concentration',
+                      conc[reg][dec]['data_aver_reg'].mean(skipna=True).values,
+                      '\n',
+                      file=f)
+                print(reg, dec,
+                      'mean PMOA emission flux',
+                      flux[reg][dec]['data_aver_reg'].mean(skipna=True).values,
+                      file=f)
+                print('\n\n',
+                      file=f)
+
+

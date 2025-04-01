@@ -35,7 +35,7 @@ def plot_test_map(reg_sel_vals, var_na, reg_na):
         plt.savefig(f'TEST.png')
 
 
-def scatter_plot(fig, axs, df, col_name, title, vm, no_left_labels=False, no_colorbar=False):
+def scatter_plot(fig, axs, df, col_name, title, vm, font, no_left_labels=False, no_colorbar=False):
     sc = axs.scatter(
         x=df['Variables'],
         y=df['Regions'],
@@ -45,22 +45,28 @@ def scatter_plot(fig, axs, df, col_name, title, vm, no_left_labels=False, no_col
         vmax=vm,
     )
 
-    axs.tick_params(axis='x', pad=0.2)
+    axs.tick_params(axis='both',
+                    pad=0.2,
+                    labelsize=font)
     axs.xaxis.labelpad = 0.2
     # plt.xlim((-1,1))
-    axs.set_xlim((-0.5, 1.5))
+    axs.set_xlim((-0.5, 2.3))
 
     if no_left_labels:
         axs.set(yticklabels=[])
         axs.tick_params(left=False)
     axs.set(ylabel="", xlabel="")
-    axs.set_title(title[0], loc='right')
+    axs.set_title(title[0],
+                  loc='right',
+                  fontsize=font)
 
     if no_colorbar:
         plt.colorbar(sc, ax=axs).remove()
     else:
         cbar = plt.colorbar(sc, ax=axs)
-        cbar.set_label(title[1])
+        cbar.set_label(title[1],
+                       fontsize=font-2
+                       )
 
 def create_df_plot_heatmap(col, col_name, return_colorbar=False):
     df_vals = pd.DataFrame({'Regions': col[0],
@@ -103,7 +109,8 @@ def plot_each_heatmap(ax, df_vals_piv, fig_title, cmap, no_ylabel=False, right_l
     hm.set(ylabel="", xlabel="")
     hm.xaxis.tick_top()
     if right_label:
-        hm.set_title(fig_title, loc='right')
+        hm.set_title(fig_title,
+                     loc='right')
 
 
 def reg_sel(lat, lon, data, var_na):
@@ -170,6 +177,112 @@ def reg_sel(lat, lon, data, var_na):
             reg_data[reg_na]['fraction_grid_negat'] = np.nan
     return reg_data
 
+def subplots_plot_heatmap_scatter(ax, df_vals_piv, df_grid_percent, col_name, cmaps, label, font):
+    ax[0].set_title(label[0]+ '\n ',
+                    loc='left',
+                    fontsize=font+2)
+    plot_each_heatmap(ax[0],
+                      df_vals_piv[0],
+                      col_name,
+                      cmaps[0],
+                      right_label=False)
+    plot_each_heatmap(ax[1],
+                      df_vals_piv[1],
+                      col_name,
+                      cmaps[1],
+                      no_ylabel=True, right_label=False)
+    plot_each_heatmap(ax[2],
+                      df_vals_piv[2],
+                      col_name,
+                      cmaps[2],
+                      no_ylabel=True)
+
+    scatter_plot(fig, ax[5],
+                 df_grid_percent,
+                 col_name_signif,
+                 ['', 'Grid fraction with \n significant trend (%)'],
+                 30,
+                 font,
+                 no_left_labels=True,
+                 no_colorbar=False)
+
+    ax[3].set_title(label[1] + '\n ',
+                    loc='left',
+                    fontsize=font+2)
+    vm = 100
+    scatter_plot(fig, ax[3],
+                 df_grid_percent,
+                 col_name_grid_pos,
+                 ['Fraction with \n increasing trend',
+                  'Grid fraction (%)'],
+                 vm,
+                 font,
+                 no_left_labels=True,
+                 no_colorbar=True)
+    ax[5].set_title(label[2] + '\n ',
+                    loc='left',
+                    fontsize=font+2)
+
+    scatter_plot(fig, ax[4],
+                 df_grid_percent,
+                 col_name_grid_neg,
+                 ['Fraction with \n decreasing trend',
+                  'Grid fraction (%)'],
+                 vm,
+                 font,
+                 no_left_labels=True,
+                 no_colorbar=False)
+
+    for a in ax[3:]:
+        a.tick_params(axis='x',
+                          rotation=45)
+    ax[0].tick_params(axis='y',
+                  labelsize=font,)
+    for a in ax[:3]:
+        a.tick_params(axis='y',
+                      labelsize=font,)
+
+def create_df_pivot(variables_info_yr, var_na_sw_aer, panel_names, col_name_oc):
+    columns = [[], [], []]
+    columns1 = [[], [], []]
+    for vidx, var_na in enumerate(panel_names):
+        for reg_na in list(reg_names.keys())[1:]:
+            max_abs = variables_info_yr[var_na]['regions_vals'][reg_na]['max_absolute']
+            columns[0].append(reg_na)
+            columns[1].append(var_na_sw_aer[vidx])
+            columns[2].append(max_abs)
+
+            max_abs = variables_info_yr[var_na]['regions_vals'][reg_na]['fraction_grid_posit']
+            columns1[0].append(max_abs)
+
+            max_abs = variables_info_yr[var_na]['regions_vals'][reg_na]['fraction_grid_negat']
+            columns1[1].append(max_abs)
+
+            max_abs = variables_info_yr[var_na]['regions_vals'][reg_na]['grid_signif']
+            columns1[2].append(max_abs)
+
+    data_percent = {'Regions': columns[0],
+                    'Variables': columns[1],
+                    col_name_grid_pos: columns1[0],
+                    col_name_grid_neg: columns1[1],
+                    col_name_signif: columns1[2], }
+    df_ocean_grid_percent = pd.DataFrame(data_percent).sort_values(by=['Regions', 'Variables'],
+                                                                   ascending=[False, True])
+    df_ocean_grid_percent = df_ocean_grid_percent[df_ocean_grid_percent['Regions'] != 'Central Arctic']
+
+    df_vals_piv_ocean, cmaps = [], []
+    for vidx, var_na in enumerate(panel_names):
+        columns = [[], [], []]
+        for reg_na in list(reg_names.keys())[1:]:
+            max_abs = variables_info_yr[var_na]['regions_vals'][reg_na]['max_absolute']
+            columns[0].append(reg_na)
+            columns[1].append(var_na_sw_aer[vidx])
+            columns[2].append(max_abs)
+
+        df_vals_piv, cm = create_df_plot_heatmap(columns, col_name_oc, return_colorbar=True)
+        df_vals_piv_ocean.append(df_vals_piv)
+        cmaps.append(cm)
+    return df_vals_piv_ocean, df_ocean_grid_percent, cmaps
 
 
 if __name__=='__main__':
@@ -188,285 +301,81 @@ if __name__=='__main__':
     # apply min ice mask
     for var_na in panel_names:
         # print(var_na, seaice[2].shape,seaice_min.shape, variables_info_yr[var_na]['slope'].shape)
-        data_seaice_mask = np.ma.masked_where(seaice_min > 10, variables_info_yr[var_na]['slope'])
-        data_seaice_mask = np.ma.masked_where(np.isnan(variables_info_yr[var_na]['pval']), data_seaice_mask)
+        data_seaice_mask = np.ma.masked_where(seaice_min > 10,
+                                              variables_info_yr[var_na]['slope'])
+        data_seaice_mask = np.ma.masked_where(np.isnan(variables_info_yr[var_na]['pval']),
+                                              data_seaice_mask)
         data_seaice_mask = data_seaice_mask.filled(np.nan)
-        variables_info_yr[var_na]['regions_vals'] = reg_sel(lat, lon, data_seaice_mask, var_na)
-        print('''''')
-
-        # print(data_seaice_mask)
+        variables_info_yr[var_na]['regions_vals'] = reg_sel(lat,
+                                                            lon,
+                                                            data_seaice_mask,
+                                                            var_na)
 
     reg_names = regions()
-    var_na_sw_aer = ['PCHO$_{sw}$', 'PL$_{sw}$']  # , 'DCAA$_{sw}$', 'Total$_{sw}$']
-    panel_names = ['PCHO', 'PL']  # , 'DCAA','Biom_tot']
-    columns = [[], [], []]
-    columns1 = [[], [], []]
-
-    for vidx, var_na in enumerate(panel_names):
-        for reg_na in list(reg_names.keys())[1:]:
-            max_abs = variables_info_yr[var_na]['regions_vals'][reg_na]['max_absolute']
-            columns[0].append(reg_na)
-            columns[1].append(var_na_sw_aer[vidx])
-            columns[2].append(max_abs)
-
-            max_abs = variables_info_yr[var_na]['regions_vals'][reg_na]['fraction_grid_posit']
-            columns1[0].append(max_abs)
-
-            max_abs = variables_info_yr[var_na]['regions_vals'][reg_na]['fraction_grid_negat']
-            columns1[1].append(max_abs)
-
-            max_abs = variables_info_yr[var_na]['regions_vals'][reg_na]['grid_signif']
-            columns1[2].append(max_abs)
-
-    col_name_oc = 'Ocean concentration \n (mmol C ${m^{-3}}$ ${yr^{-1}}$)'
-    df_vals_piv_ocean, cmap_oc = create_df_plot_heatmap(columns, col_name_oc, return_colorbar=True)
-    #    plot_heatmap(df_vals_piv_ocean, col_name_oc, f'{season}_Ocean_conc_abs_max_')
+    col_name_oc = 'Ocean concentration (mmol C ${m^{-3}}$ ${yr^{-1}}$)'
+    var_na_sw_aer = ['PCHO$_{sw}$', 'DCAA$_{sw}$', 'PL$_{sw}$']  # , 'Total$_{sw}$']
+    panel_names = ['PCHO', 'DCAA', 'PL']  # , 'DCAA','Biom_tot']
 
     col_name_grid_pos = '% of grid with increasing trend'
     col_name_grid_neg = '% of grid with decreasing trend'
     col_name_signif = '% of grid with significant trend'
-    data_percent = {'Regions': columns[0],
-                    'Variables': columns[1],
-                    col_name_grid_pos: columns1[0],
-                    col_name_grid_neg: columns1[1],
-                    col_name_signif: columns1[2], }
-    df_ocean_grid_percent = pd.DataFrame(data_percent).sort_values(by=['Regions', 'Variables'], ascending=[False, True])
-    df_ocean_grid_percent = df_ocean_grid_percent[df_ocean_grid_percent['Regions'] != 'Central Arctic']
+    df_vals_piv_ocean, df_ocean_grid_percent, cmaps = create_df_pivot(variables_info_yr,
+                                                                      var_na_sw_aer,
+                                                                      panel_names,
+                                                                      col_name_oc)
+#################################################################################################
+    #OMF
+    col_name_omf = 'OMF (% ${yr^{-1}}$)'
 
-    reg_names = regions()
-    var_na_sw_aer = ['PCHO$_{sw}$', 'PL$_{sw}$']  # , 'DCAA$_{sw}$', 'Total$_{sw}$']
-    panel_names = ['PCHO', 'PL']  # , 'DCAA','Biom_tot']
-    columns = [[], [], []]
-    df_vals_piv_ocean_pol_pl, cmap_oc_pol_pl = [], []
-    for vidx, var_na in enumerate(panel_names):
-        columns = [[], [], []]
-        for reg_na in list(reg_names.keys())[1:]:
-            max_abs = variables_info_yr[var_na]['regions_vals'][reg_na]['max_absolute']
-            columns[0].append(reg_na)
-            columns[1].append(var_na_sw_aer[vidx])
-            columns[2].append(max_abs)
+    var_na_sw_aer = ['PCHO$_{aer}$','DCAA$_{aer}$', 'PL$_{aer}$', ]  #   'DCAA$_{aer}$']
+    panel_names = ['OMF_POL','OMF_PRO', 'OMF_LIP', ]  # , 'OMF_tot']
+    df_vals_piv_omf, df_omf_grid_percent, _ = create_df_pivot(variables_info_yr,
+                                                              var_na_sw_aer,
+                                                              panel_names,
+                                                              col_name_omf)
 
-        df_vals_piv, cmaps = create_df_plot_heatmap(columns, col_name_oc, return_colorbar=True)
-        df_vals_piv_ocean_pol_pl.append(df_vals_piv)
-        cmap_oc_pol_pl.append(cmaps)
-
-    var_na_sw_aer = ['PCHO$_{aer}$', 'PL$_{aer}$', ]  # 'DCAA$_{aer}$',  'DCAA$_{aer}$']
-    panel_names = ['OMF_POL', 'OMF_LIP', ]  # 'OMF_PRO', 'OMF_tot']
-    columns1 = [[], [], []]
-    columns2 = [[], [], []]
-    for vidx, var_na in enumerate(panel_names):
-        for reg_na in list(reg_names.keys())[1:]:
-            columns1[0].append(reg_na)
-            columns1[1].append(var_na_sw_aer[vidx])
-
-            max_abs = variables_info_yr[var_na]['regions_vals'][reg_na]['fraction_grid_posit']
-            columns2[0].append(max_abs)
-
-            max_abs = variables_info_yr[var_na]['regions_vals'][reg_na]['fraction_grid_negat']
-            columns2[1].append(max_abs)
-
-            max_abs = variables_info_yr[var_na]['regions_vals'][reg_na]['grid_signif']
-            columns2[2].append(max_abs)
-
-    col_name_grid_pos = '% of grid with increasing trend'
-    col_name_grid_neg = '% of grid with decreasing trend'
-    col_name_signif = '% of grid with significant trend'
-
-    data_percent = {'Regions': columns1[0],
-                    'Variables': columns1[1],
-                    col_name_grid_pos: columns2[0],
-                    col_name_grid_neg: columns2[1],
-                    col_name_signif: columns2[2], }
-
-    df_omf_grid_percent = pd.DataFrame(data_percent).sort_values(by=['Regions', 'Variables'], ascending=[False, True])
-    df_omf_grid_percent = df_omf_grid_percent[df_omf_grid_percent['Regions'] != 'Central Arctic']
-
-    var_na_sw_aer = ['PCHO$_{aer}$']  # ,'DCAA$_{aer}$']#
-    panel_names = ['OMF_POL']  # ,'OMF_PRO']
-    columns = [[], [], []]
-    for vidx, var_na in enumerate(panel_names):
-        for reg_na in list(reg_names.keys())[1:]:
-            columns[0].append(reg_na)
-            max_abs = variables_info_yr[var_na]['regions_vals'][reg_na]['max_absolute']
-            # print(max_abs, var_na, reg_na)
-            columns[1].append(var_na_sw_aer[vidx])
-            columns[2].append(max_abs)
-    col_name_omf = 'OMF \n (% ${yr^{-1}}$)'
-    df_vals_piv_omf_pol, cmap_omf_pol = create_df_plot_heatmap(columns, col_name_omf, return_colorbar=True)
-    #    plot_heatmap(df_vals_piv_omf, col_name_omf, f'{season}_OMF_abs_max_')
-
-    ###################################3
-
-    fig, ax = plt.subplots(1, 4, figsize=(12, 4))
-    fig = plt.figure(figsize=(14, 10))
-    # ax.flatten()
-    ax1 = plt.subplot2grid((11, 4), (1, 0), colspan=2, rowspan=5)
-    ax2 = plt.subplot2grid((11, 4), (1, 2), rowspan=5)
-    ax3 = plt.subplot2grid((11, 4), (1, 3), rowspan=5)
-
-    ax4 = plt.subplot2grid((11, 4), (6, 0), rowspan=5)
-    ax5 = plt.subplot2grid((11, 4), (6, 1), rowspan=5)
-    ax6 = plt.subplot2grid((11, 4), (6, 2), rowspan=5)
-    ax7 = plt.subplot2grid((11, 4), (6, 3), rowspan=5)
-
-    plot_each_heatmap(ax1, df_vals_piv_ocean, col_name_oc, cmap_oc)
-    ax1.set_title(r'$\bf{(a)}$' + '\n ', loc='left')
-    plot_each_heatmap(ax2, df_vals_piv_omf_pol, col_name_omf, cmap_oc, no_ylabel=True, right_label=False)
-    ax2.set_title(r'$\bf{(b)}$' + '\n ', loc='left')
-
-    var_na_sw_aer = ['PL$_{aer}$', ]  # 'Total$_{aer}$']#
-    panel_names = ['OMF_LIP', ]  # 'OMF_tot']
-    columns = [[], [], []]
-    for vidx, var_na in enumerate(panel_names):
-        for reg_na in list(reg_names.keys())[1:]:
-            columns[0].append(reg_na)
-            max_abs = variables_info_yr[var_na]['regions_vals'][reg_na]['max_absolute']
-            # print(max_abs, var_na, reg_na)
-            columns[1].append(var_na_sw_aer[vidx])
-            columns[2].append(max_abs)
-    col_name_omf = 'OMF \n (% ${yr^{-1}}$)'
-    df_vals_piv_omf, cmap_omf_pl = create_df_plot_heatmap(columns, col_name_omf, return_colorbar=True)
-    #   plot_heatmap(df_vals_piv_omf, col_name_omf, f'{season}_OMF_abs_max_')
-
-    plot_each_heatmap(ax3, df_vals_piv_omf, col_name_omf, cmap_omf_pl, no_ylabel=True)
-
-    vm = 100
-    scatter_plot(fig, ax4,
-                 df_ocean_grid_percent,
-                 col_name_grid_pos,
-                 'Fraction with \n icreasing trend',
-                 vm,
-                 no_left_labels=False,
-                 no_colorbar=True)
-    ax4.set_title(r'$\bf{(c)}$' + '\n ', loc='left')
-
-    scatter_plot(fig, ax5,
-                 df_ocean_grid_percent,
-                 col_name_grid_neg,
-                 'Fraction with \n decreasing trend',
-                 vm,
-                 no_left_labels=True,
-                 no_colorbar=False)
-    # ax5.set_title('Ocean concentration '+'\n ', loc='right')
-
-    scatter_plot(fig, ax6,
-                 df_omf_grid_percent,
-                 col_name_grid_pos,
-                 'Fraction with \n increasing trend',
-                 vm,
-                 no_left_labels=True,
-                 no_colorbar=True)
-    ax6.set_title(r'$\bf{(d)}$' + '\n ', loc='left')
-
-    scatter_plot(fig, ax7,
-                 df_omf_grid_percent,
-                 col_name_grid_neg,
-                 'Fraction with \n decreasing trend',
-                 vm,
-                 no_left_labels=True,
-                 no_colorbar=False)
-    # ax7.set_title('OMF '+'\n ', loc='right')
-
-    plt.tight_layout()
-    # plt.savefig(f'{season}_Heatmap_Ocean_OMF.png',dpi = 300)
-    # plt.close()
-
-    #################################
-
-    fig, ax = plt.subplots(1, 2, figsize=(8, 4))
-    ax.flatten()
-    vm = 10
-    scatter_plot(fig, ax[0],
-                 df_ocean_grid_percent,
-                 col_name_signif,
-                 'Ocean',
-                 30,
-                 no_left_labels=False,
-                 no_colorbar=False)
-    ax[0].set_title(r'$\bf{(a)}$' + '\n ', loc='left')
-
-    scatter_plot(fig, ax[1],
-                 df_omf_grid_percent,
-                 col_name_signif,
-                 'OMF',
-                 25,
-                 no_left_labels=True,
-                 no_colorbar=False)
-    # ax7.set_title('OMF '+'\n ', loc='right')
-    plt.tight_layout()
-    # plt.savefig(f'{season}_scatter_plots_grid_fraction.png',dpi = 300)
-    # plt.close()
-
-    #################################
+#################################
 
 #### plot figure with grid fracions of increasing or decreasing trend
-    fig, axs = plt.subplots(1, 5, figsize=(14, 5))#14, 10
+    fig, axs = plt.subplots(1, 6,
+                            figsize=(14, 4),)
+    plt.subplots_adjust(wspace=0.005)
     ax = axs.flatten()
-    plot_each_heatmap(ax[0], df_vals_piv_ocean_pol_pl[0], col_name_oc, cmap_oc_pol_pl[0], right_label=False)
-    ax[0].set_title(r'$\bf{(a)}$' + '\n ', loc='left')
-    plot_each_heatmap(ax[1], df_vals_piv_ocean_pol_pl[1], col_name_oc, cmap_oc_pol_pl[1], no_ylabel=True)
-    scatter_plot(fig, ax[4],
-                 df_ocean_grid_percent,
-                 col_name_signif,
-                 ['', 'Grid fraction with \n significant trend (%)'],
-                 30,
-                 no_left_labels=True,
-                 no_colorbar=False)
-    ax[2].set_title(r'$\bf{(b)}$' + '\n ', loc='left')
-    vm = 100
-    scatter_plot(fig, ax[2],
-                 df_ocean_grid_percent,
-                 col_name_grid_pos,
-                 ['Fraction with \n icreasing trend',
-                  'Grid fraction (%)'],
-                 vm,
-                 no_left_labels=True,
-                 no_colorbar=True)
-    ax[4].set_title(r'$\bf{(c)}$' + '\n ', loc='left')
 
-    scatter_plot(fig, ax[3],
-                 df_ocean_grid_percent,
-                 col_name_grid_neg,
-                 ['Fraction with \n decreasing trend',
-                  'Grid fraction (%)'],
-                 vm,
-                 no_left_labels=True,
-                 no_colorbar=False)
-
+    font = 10
+    label = [r'$\bf{(a)}$', r'$\bf{(b)}$'+'\n', r'$\bf{(c)}$'+'\n']
+    subplots_plot_heatmap_scatter(ax,
+                                  df_vals_piv_ocean,
+                                  df_ocean_grid_percent,
+                                  col_name_oc,
+                                  cmaps,
+                                  label,
+                                  font)
     plt.tight_layout()
     plt.savefig(f'./plots/{season}_heatmap_scatter_plots_grid_fraction_biomolcules.png', dpi=300)
     plt.close()
 
-    plot_each_heatmap(ax[5], df_vals_piv_omf_pol, col_name_omf, cmap_omf_pol, right_label=False)
-    ax[5].set_title(r'$\bf{(d)}$' + '\n ', loc='left')
-    plot_each_heatmap(ax[6], df_vals_piv_omf, col_name_omf, cmap_omf_pl, no_ylabel=True)
-    scatter_plot(fig, ax[9],
-                 df_omf_grid_percent,
-                 col_name_signif,
-                 ['', 'Grid fraction with \n significant trend (%)'],
-                 25,
-                 no_left_labels=True,
-                 no_colorbar=False)
-    ax[7].set_title(r'$\bf{(e)}$' + '\n ', loc='left')
-    scatter_plot(fig, ax[7],
-                 df_omf_grid_percent,
-                 col_name_grid_pos,
-                 ['Fraction with \n increasing trend',
-                  'Grid fraction (%)'],
-                 vm,
-                 no_left_labels=True,
-                 no_colorbar=True)
-    ax[9].set_title(r'$\bf{(f)}$' + '\n ', loc='left')
+    fig, axs = plt.subplots(2, 6, figsize=(14, 8))#14, 10
+    plt.subplots_adjust(wspace=0.005)
+    ax = axs.flatten()
+    ax1 = ax[:6]
+    subplots_plot_heatmap_scatter(ax1,
+                                  df_vals_piv_ocean,
+                                  df_ocean_grid_percent,
+                                  col_name_oc,
+                                  cmaps,
+                                  label,
+                                  font)
 
-    scatter_plot(fig, ax[8],
-                 df_omf_grid_percent,
-                 col_name_grid_neg,
-                 ['Fraction with \n decreasing trend',
-                  'Grid fraction (%)'],
-                 vm,
-                 no_left_labels=True,
-                 no_colorbar=False)
-
+    label2 = [r'$\bf{(d)}$', r'$\bf{(e)}$'+'\n', r'$\bf{(f)}$'+'\n']
+    ax2 = ax[6:]
+    subplots_plot_heatmap_scatter(ax2,
+                                  df_vals_piv_omf,
+                                  df_omf_grid_percent,
+                                  col_name_omf,
+                                  cmaps,
+                                  label2,
+                                  font)
     plt.tight_layout()
     plt.savefig(f'./plots/{season}_heatmap_scatter_plots_grid_fraction_biomolcules_OMF.png', dpi=300)
     plt.close()

@@ -8,8 +8,7 @@ def create_var_info_dict():
     sic_u = '% '
     conc_u = 'ng ${m^{-3}}$ '
     conc_biom_u = '$mmol\ C$ ${m^{-3}}$ '
-    vars_names = [['Sea_ice', sic_u], ['Sea_ice_1m', sic_u], ['Sea_ice_area_px', sic_u],
-                  ['SST', '$^{o}C$ '],['NPP', npp_din_u], ['DIN', npp_din_u],
+    vars_names = [
                   ['AER_F_POL', flux_u], ['AER_F_PRO', flux_u], ['AER_F_LIP', flux_u],
                   ['AER_F_tot', flux_u], ['AER_F_SS', flux_u], ['AER_F_SSA', flux_u],
                   ['AER_F_POL_m', flux_mo_u], ['AER_F_PRO_m', flux_mo_u], ['AER_F_LIP_m', flux_mo_u],
@@ -19,7 +18,10 @@ def create_var_info_dict():
                   ['AER_POL', conc_u], ['AER_PRO', conc_u], ['AER_LIP', conc_u],
                   ['AER_tot', conc_u], ['AER_SS', conc_u], ['AER_SSA', conc_u],
                   ['OMF_POL', sic_u], ['OMF_PRO', sic_u], ['OMF_LIP', sic_u], ['OMF_tot', sic_u],
-                  ['PCHO', conc_biom_u], ['DCAA', conc_biom_u], ['PL', conc_biom_u], ['Biom_tot', conc_biom_u]]
+                  ['PCHO', conc_biom_u], ['DCAA', conc_biom_u], ['PL', conc_biom_u], ['Biom_tot', conc_biom_u],
+                  ['Sea_ice', sic_u], ['Sea_ice_1m', sic_u], ['Sea_ice_area_px', sic_u],
+                  ['SST', '$^{o}C$ '], ['NPP', npp_din_u], ['DIN', npp_din_u],
+    ]
     variables_info = {}
     for li in vars_names:
         variables_info[li[0]] = {'unit': li[1]}
@@ -43,7 +45,6 @@ def tri_month_mean(v_month, months):
     else:
         da_tri_mean_yrs = v_month[0]
 
-    #print('trimestre', da_tri_mean_yrs)
     return da_tri_mean_yrs
 
 def season_aver(data, months):
@@ -61,7 +62,6 @@ def pick_month_var_reg(data, months, aer_conc=False):
     if aer_conc:
         data_month = data
     else:
-        print('entered here')
         data_month = season_aver(data, months)
 
     data_month_reg = data_month.where(data_month.lat > 60, drop=True)
@@ -90,7 +90,7 @@ def find_yr_min_ice(v_1month):
     for i in v_1month.time:
         list_mins.append(v_1month.where((v_1month.time == i), drop=True).mean(skipna=True))
         years.append(i)
-    min_val = list_mins.index(min(list_mins))
+    min_val = list_mins.index(np.nanmin(list_mins))
     return years[min_val]
 
 def find_max_lim(panel_var):
@@ -110,25 +110,24 @@ def get_seaice_vals(variables_info, var_na):
 def get_min_seaice(variables_info, var_na):
     v_1month = variables_info[f'{var_na}_1m']['data_season_reg'].compute()
     year_min = find_yr_min_ice(v_1month)
+    print(year_min)
     seaice_min = v_1month.where((v_1month.time == year_min), drop=True).isel(time=0)
     return seaice_min
 
 def get_perc_increase(variables_info, panel_names):
     percent_increase_yr, panel_unit = [], []
     unit_percent_increase_yr = '% '
-    nan_matrix = np.empty((variables_info[panel_names[0]]['intercept'].shape))
+    nan_matrix = np.empty((variables_info[panel_names[0]]['data_time_mean'].shape))
     nan_matrix[:] = np.nan
     for id in panel_names:
-        linear_increase = variables_info[id]['intercept'] - (
-                variables_info[id]['intercept'] + (variables_info[id]['slope'] * 30))
-        percent_increase = (np.divide(linear_increase, variables_info[id]['intercept'],
+        percent_increase = (np.divide(variables_info[id]['slope'],
+                                    variables_info[id]['data_time_mean'],
                                       out=nan_matrix,
-                                      where=(variables_info[id]['intercept'] >= 0)))
+                                      where=(variables_info[id]['data_time_mean'] >= 0)))
         # #variables_info[id]['intercept'] > 0))
 
-        print('max % of increase', percent_increase.max(), 'and min % of increase', percent_increase.min())
         # percent_increase = (linear_increase / variables_info[id]['intercept']) - 1
-        percent_increase_yr.append(percent_increase * 100 / 30)
+        percent_increase_yr.append(percent_increase * 100)
         panel_unit.append(unit_percent_increase_yr)
     return percent_increase_yr, panel_unit
 

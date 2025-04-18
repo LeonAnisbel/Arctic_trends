@@ -1,12 +1,21 @@
+from math import log10
+
 import numpy as np
 import statsmodels.api as sm
 import pickle
+
+import xarray as xr
 import Trend_all_arctic
 import global_vars
 from process_statsmodels import process_array_slope
 import read_data, utils
 import plots
-
+import warnings
+warnings.filterwarnings(
+    "ignore",
+    message="invalid value encountered in double_scalars",
+    module="statsmodels.regression.linear_model"
+)
 ftype = np.float64
 
 
@@ -95,20 +104,22 @@ if __name__ == '__main__':
     print('Finished reading biomolecule concentration and SIC from FESOm-REcoM data')
 
     list_variables = [
-        C_ice * 100, C_ice * 100, C_ice_area_px,  # C_ice_area_px,
-        C_temp, C_NPP, C_DIN,
         C_emi[0], C_emi[1], C_emi[2], C_tot_emi, C_emi[3], C_emi_ssa,
         C_emi_m[0], C_emi_m[1], C_emi_m[2], C_tot_emi_m, C_emi_m[3], C_ssa_emi_m,
         u10, sst_aer_K, seaice_aer * 100, C_ice_aer_area_px, seaice_aer * 100,
         C_conc[0], C_conc[1], C_conc[2], C_tot_conc, C_conc[3], C_conc_ssa,
         data_omf['OMF_POL'], data_omf['OMF_PRO'], data_omf['OMF_LIP'], tot_omf,
         C_pcho, C_dcaa, C_pl, tot_biom_conc,
+        C_ice * 100, C_ice * 100, C_ice_area_px,  # C_ice_area_px,
+        C_temp, C_NPP, C_DIN,
         ]
     variables_info = utils.create_var_info_dict()
 
-
+    da_type = global_vars.data_type
+    file_name = da_type
+    print(da_type)
     for idx, var_na in enumerate(list(variables_info.keys())):
-        variables_info[var_na]['data'] = list_variables[idx]
+        variables_info[var_na]['orig_data'] = list_variables[idx]
 
     for var_na, dict_var in variables_info.items():
         # var_na = list(variables_info['var_names'].keys())[i]
@@ -117,57 +128,69 @@ if __name__ == '__main__':
         aer_conc = False
         if var_na[:3] == 'AER':
             aer_conc = True
-
-        if var_na == 'Sea_ice_1m' or var_na == 'Sea_ice_area_px_1m' or var_na == 'AER_SIC_1m':
-            months_list = one_month
+            if da_type == 'log_data':
+                da_tmp = variables_info[var_na]['orig_data'].where(variables_info[var_na]['orig_data'] > 0,
+                                                   other=np.nan)
+                variables_info[var_na][da_type] = np.log(da_tmp)
         else:
-            months_list = months
+            da_type = 'orig_data'
 
-        data_month_reg, lat, lon = utils.pick_month_var_reg(dict_var['data'],
-                                                            months_list,
-                                                            aer_conc=aer_conc)
-        variables_info[var_na]['data_season_reg'] = data_month_reg
+        if var_na == 'Sea_ice_1m' or var_na == 'Sea_ice_area_px_1m' :#or var_na == 'AER_SIC_1m':
+            data_reg = dict_var[da_type].where(dict_var[da_type].lat > 60,
+                                               drop=True)
+            da_months = data_reg.where((data_reg.time.dt.month >= months[0]) &
+                                       (data_reg.time.dt.month <= months[1]),
+                                       drop=True)
+            variables_info[var_na]['data_season_reg'] = da_months
+        else:
+            data_month_arctic, lat, lon = utils.pick_month_var_reg(dict_var[da_type],
+                                                                months,
+                                                                aer_conc=aer_conc)
 
-        variables_info[var_na]['lat'] = lat
-        variables_info[var_na]['lon'] = lon
+            variables_info[var_na]['data_season_reg'] = data_month_arctic
+            variables_info[var_na]['data_time_mean'] = data_month_arctic.mean('time',
+                                                                           skipna=True)
 
-        X = data_month_reg.time.values.astype(ftype)  # dt.year.
-        X = sm.add_constant(X)
-        Y = data_month_reg.values.astype(ftype)
+            variables_info[var_na]['lat'] = lat
+            variables_info[var_na]['lon'] = lon
 
-        x_lat, y_lon = Y.shape[1:]
+            X = data_month_arctic.time.values.astype(ftype)  # dt.year.
+            X = sm.add_constant(X)
+            Y = data_month_arctic.values.astype(ftype)
 
-        slope = initialize_array()
-        p_value = initialize_array()
-        intercept = initialize_array()
-        adj_r2 = initialize_array()
+            x_lat, y_lon = Y.shape[1:]
 
-        process_array_slope(Y,
-                            X,
-                            slope,
-                            p_value,
-                            intercept,
-                            adj_r2)
+            slope = initialize_array()
+            p_value = initialize_array()
+            intercept = initialize_array()
+            adj_r2 = initialize_array()
 
-        variables_info[var_na]['slope'] = slope
-        variables_info[var_na]['pval'] = p_value
-        variables_info[var_na]['intercept'] = intercept
-        variables_info[var_na]['adj_r2'] = adj_r2
+            process_array_slope(Y,
+                                X,
+                                slope,
+                                p_value,
+                                intercept,
+                                adj_r2)
 
-        # plots.plot_trend(slope,
-        #                  p_value,
-        #                  lat,
-        #                  lon,
-        #                  'Trend_' + var_na + '.png',
-        #                  dict_var['lim'],
-        #                  dict_var['unit'])
+            variables_info[var_na]['slope'] = slope
+            variables_info[var_na]['pval'] = p_value
+            variables_info[var_na]['intercept'] = intercept
+            variables_info[var_na]['adj_r2'] = adj_r2
 
-        Trend_all_arctic.trend_aver_per_reg(variables_info,
-                                            var_na,
-                                            data_month_reg,
-                                            data_month_reg,
-                                            var_na[:3],
-                                            per_unit_sic=False)
+            # plots.plot_trend(slope,
+            #                  p_value,
+            #                  lat,
+            #                  lon,
+            #                  'Trend_' + var_na + '.png',
+            #                  dict_var['lim'],
+            #                  dict_var['unit'])
 
-    with open(f"TrendsDict_{season}.pkl", "wb") as myFile:
+            Trend_all_arctic.trend_aver_per_reg(variables_info,
+                                                var_na,
+                                                data_month_arctic,
+                                                data_month_arctic,
+                                                var_na[:3],
+                                                per_unit_sic=False)
+
+    with open(f"TrendsDict_{season}_{file_name}.pkl", "wb") as myFile:
         pickle.dump(variables_info, myFile)

@@ -3,7 +3,12 @@ import statsmodels.api as sm
 import read_data, utils
 import xarray as xr
 import pickle
-
+import warnings
+warnings.filterwarnings(
+    "ignore",
+    message="invalid value encountered in double_scalars",
+    module="statsmodels.regression.linear_model"
+)
 ftype = np.float64
 def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_reg, var_type, per_unit_sic=False):
     lon_360 = data_month_reg.lon.data
@@ -31,7 +36,6 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
         conditions = utils.get_conds(data_ds.lat, data_ds.lon)
         reg_sel_vals_whole = utils.get_var_reg(data_ds, conditions[idx])
         for dec_na, dec in enumerate(decades):
-            print(var_na,dec)
             if var_type == 'AER':
 
                 reg_sel_vals = reg_sel_vals_whole.where((reg_sel_vals_whole.time >= decades_idx[dec_na][0])&
@@ -46,17 +50,17 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
                 data_month = reg_sel_vals['data_region'].sum(dim=['lat', 'lon'],
                                                              skipna=True) * 1e-6 # from km2 to millions of km2
                 variables_info[var_na][reg_na][decades_na[dec_na]]['data_aver_reg'] = data_month
-                print(var_na)
+
+                data_time_mean = data_month.mean(dim='time', skipna=True)
 
             else:
                 data_month = reg_sel_vals['data_region']#
             # print('Computing ' + var_na + ' trend', data_month.max().values)
-                variables_info[var_na][reg_na][decades_na[dec_na]]['data_aver_reg'] = data_month.mean(dim=('lat', 'lon'),
-                                                                                                      skipna=True)
-#                if reg_na == 'Chukchi Sea' and var_na=='OMF_POL':
- #                   print(reg_na, var_na, 'VALUES')
-  #                  print(variables_info[var_na][reg_na][decades_na[dec_na]]['data_aver_reg'])
-   #                 exit()
+                data_latlon_mean = data_month.mean(dim=('lat', 'lon'), skipna=True)
+                variables_info[var_na][reg_na][decades_na[dec_na]]['data_aver_reg'] = data_latlon_mean
+
+                data_time_mean = data_latlon_mean.mean(dim='time', skipna=True)
+            variables_info[var_na][reg_na][decades_na[dec_na]]['data_time_mean'] = data_time_mean
 
 
             if per_unit_sic:
@@ -111,7 +115,6 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
             variables_info[var_na][reg_na][decades_na[dec_na]]['intercept_aver_reg'] = intercept
             variables_info[var_na][reg_na][decades_na[dec_na]]['adj_r2'] = adj_r2
 
-            print(decades_na[dec_na], dec_na, variables_info[var_na][reg_na])
         # with open("TrendsDictWholeArctic.txt", "wb") as myFile:
         #     pickle.dump(variables_info, myFile)
 

@@ -46,6 +46,7 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
                                                   (reg_sel_vals_whole.time <= dec[1]),
                                                   drop=True)
 
+            weights = utils.get_weights(reg_sel_vals['data_region'])
             if var_na == 'Sea_ice_area_px' or var_na=='AER_SIC_area_px':
                 data_month = reg_sel_vals['data_region'].sum(dim=['lat', 'lon'],
                                                              skipna=True) * 1e-6 # from km2 to millions of km2
@@ -54,9 +55,9 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
                 data_time_mean = data_month.mean(dim='time', skipna=True)
 
             else:
-                data_month = reg_sel_vals['data_region']#
-            # print('Computing ' + var_na + ' trend', data_month.max().values)
-                data_latlon_mean = data_month.mean(dim=('lat', 'lon'), skipna=True)
+                data_month = reg_sel_vals['data_region']
+                data_month_wm = data_month.weighted(weights)
+                data_latlon_mean = data_month_wm.mean(dim=('lat', 'lon'), skipna=True)
                 variables_info[var_na][reg_na][decades_na[dec_na]]['data_aver_reg'] = data_latlon_mean
 
                 data_time_mean = data_latlon_mean.mean(dim='time', skipna=True)
@@ -64,19 +65,19 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
 
 
             if per_unit_sic:
-                # X_aux = np.ma.masked_where(data_month_ice_reg.mean(dim = 'time') < 0.5, data_month_ice_reg.mean(dim = 'time'))
                 data_ds = utils.create_ds(data_month_ice_reg, lon)
                 conditions = utils.get_conds(data_ds.lat, data_ds.lon)
                 reg_sel_vals_ice = utils.get_var_reg(data_ds, conditions[idx])
                 X_aux = np.ma.masked_where(reg_sel_vals_ice['data_region'] < 0.2,
                                            reg_sel_vals_ice['data_region'])
                 X_aux = X_aux.filled(np.nan)
-                #print('shape X_Aux',X_aux.shape)
-                #print(reg_sel_vals_ice['data_region'])
+
                 data_month_ice = utils.create_ds2(X_aux, reg_sel_vals_ice['data_region'])
-                data_month_ice = data_month_ice.mean(dim=('lat', 'lon'),
-                                                     skipna=True)
-                X = data_month_ice.data
+
+                data_month_ice_wm = data_month_ice.weighted(weights)
+                data_month_ice_latlon_mean = data_month_ice_wm.mean(dim=('lat', 'lon'),
+                                                                    skipna=True)
+                X = data_month_ice_latlon_mean.data
 
                 Y_aux = np.ma.masked_where(reg_sel_vals_ice['data_region'] < 0.2, data_month)
                 Y_aux = Y_aux.filled(np.nan)

@@ -56,25 +56,26 @@ if __name__ == '__main__':
     plt.tight_layout()
     plt.savefig(f'./plots/{season}_multipanel_time_series.png', dpi=300)
 
-
     region = utils.regions()
     for reg, idx in region.items():
         decades = ['1990-2004', '2005-2019']
         for idx, dec in enumerate(decades):
+            weights = utils.get_weights(conc[reg][dec]['data_aver_reg'])
+
             with open("Region_means.txt", "a") as f:
                 print(reg, dec,
                       'mean SIC',
-                      seaice_lin[reg][dec]['data_aver_reg'].mean(skipna=True).values,
+                      seaice_lin[reg][dec]['data_aver_reg'].weighted(weights).mean(skipna=True).values,
                       '\n',
                       file=f)
                 print(reg, dec,
                       'mean PMOA surface concentration',
-                      conc[reg][dec]['data_aver_reg'].mean(skipna=True).values,
+                      conc[reg][dec]['data_aver_reg'].weighted(weights).mean(skipna=True).values,
                       '\n',
                       file=f)
                 print(reg, dec,
                       'mean PMOA emission flux',
-                      flux[reg][dec]['data_aver_reg'].mean(skipna=True).values,
+                      flux[reg][dec]['data_aver_reg'].weighted(weights).mean(skipna=True).values,
                       file=f)
                 print('\n\n',
                       file=f)

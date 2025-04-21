@@ -24,8 +24,9 @@ if __name__ == '__main__':
         decades = ['1990-2004', '2005-2019']
 
         for idx, dec in enumerate(decades):
-            print(reg, dec, 'mean SST', sst[dec]['data_aver_reg'].mean().values, )
-            print(reg, dec, 'mean wind', wind[dec]['data_aver_reg'].mean().values, )
+            weights = utils.get_weights(sst[dec]['data_aver_reg'])
+            print(reg, dec, 'mean SST', sst[dec]['data_aver_reg'].weighted(weights).mean().values, )
+            print(reg, dec, 'mean wind', wind[dec]['data_aver_reg'].weighted(weights).mean().values, )
 
     with open(f"TrendsDict_per_ice_{season}.pkl", "rb") as myFile:
         variables_info_seaice = pickle.load(myFile)

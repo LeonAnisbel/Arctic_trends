@@ -131,6 +131,10 @@ def get_perc_increase(variables_info, panel_names):
     return percent_increase_yr, panel_unit
 
 
+def get_weights(data):
+    weights = np.cos(np.deg2rad(data.lat))
+    weights /= weights.sum()
+    return weights
 
 
 def get_conds(lat,lon):

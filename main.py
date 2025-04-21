@@ -10,12 +10,8 @@ import global_vars
 from process_statsmodels import process_array_slope
 import read_data, utils
 import plots
-import warnings
-warnings.filterwarnings(
-    "ignore",
-    message="invalid value encountered in double_scalars",
-    module="statsmodels.regression.linear_model"
-)
+from utils import calculate_anomaly
+
 ftype = np.float64
 
 
@@ -32,6 +28,7 @@ if __name__ == '__main__':
 
 # Read in aerosol concentration
     C_conc = []
+    C_conc_anomaly = []
     var_ids = ['POL_AS', 'PRO_AS', 'LIP_AS', 'SS_AS']
     for c_elem in range(len(var_ids)):
         conc, _ = read_data.read_each_aerosol_data(months,
@@ -39,13 +36,20 @@ if __name__ == '__main__':
                                                    'tracer',
                                                    1e12,
                                                    two_dim=False)
+
         C_conc.append(conc)
+        C_conc_anomaly.append(calculate_anomaly(conc))
+
     C_tot_conc = C_conc[0] + C_conc[1] + C_conc[2]
     C_conc_ssa = C_tot_conc + C_conc[3]
+
+    C_tot_conc_anomaly = calculate_anomaly(C_tot_conc)
+    C_conc_ssa_anomaly = calculate_anomaly(C_conc_ssa)
 
 # Read in aerosol emission mass flux and flux per month (_m)
     C_emi = []
     C_emi_m = []
+    C_emi_anomaly = []
     var_ids = ['emi_POL', 'emi_PRO', 'emi_LIP', 'emi_SS']
     for c_elem in range(len(var_ids)):
         emi, emi_m = read_data.read_each_aerosol_data(months,
@@ -55,9 +59,13 @@ if __name__ == '__main__':
                                                       two_dim=True)
         C_emi.append(emi)
         C_emi_m.append(emi_m)
+        C_emi_anomaly.append(calculate_anomaly(emi))
 
     C_tot_emi = C_emi[0] + C_emi[1] + C_emi[2]
     C_emi_ssa = C_tot_emi +  C_emi[3]
+
+    C_tot_emi_anomaly = calculate_anomaly(C_tot_emi)
+    C_emi_ssa_anomaly = calculate_anomaly(C_emi_ssa)
 
     C_tot_emi_m = C_emi_m[0] + C_emi_m[1] + C_emi_m[2]
     C_ssa_emi_m =  C_tot_emi_m +  C_emi_m[3]
@@ -105,9 +113,11 @@ if __name__ == '__main__':
 
     list_variables = [
         C_emi[0], C_emi[1], C_emi[2], C_tot_emi, C_emi[3], C_emi_ssa,
+        C_emi_anomaly[0], C_emi_anomaly[1], C_emi_anomaly[2], C_tot_emi_anomaly, C_emi_anomaly[3], C_emi_ssa_anomaly,
         C_emi_m[0], C_emi_m[1], C_emi_m[2], C_tot_emi_m, C_emi_m[3], C_ssa_emi_m,
         u10, sst_aer_K, seaice_aer * 100, C_ice_aer_area_px, seaice_aer * 100,
         C_conc[0], C_conc[1], C_conc[2], C_tot_conc, C_conc[3], C_conc_ssa,
+        C_conc_anomaly[0], C_conc_anomaly[1], C_conc_anomaly[2], C_tot_conc_anomaly, C_conc_anomaly[3], C_conc_ssa_anomaly,
         data_omf['OMF_POL'], data_omf['OMF_PRO'], data_omf['OMF_LIP'], tot_omf,
         C_pcho, C_dcaa, C_pl, tot_biom_conc,
         C_ice * 100, C_ice * 100, C_ice_area_px,  C_ice_area_px,

@@ -11,12 +11,16 @@ def create_var_info_dict():
     vars_names = [
                   ['AER_F_POL', flux_u], ['AER_F_PRO', flux_u], ['AER_F_LIP', flux_u],
                   ['AER_F_tot', flux_u], ['AER_F_SS', flux_u], ['AER_F_SSA', flux_u],
+                  ['AER_F_POL_anom', flux_u], ['AER_F_PRO_anom', flux_u], ['AER_F_LIP_anom', flux_u],
+                  ['AER_F_tot_anom', flux_u], ['AER_F_SS_anom', flux_u], ['AER_F_SSA_anom', flux_u],
                   ['AER_F_POL_m', flux_mo_u], ['AER_F_PRO_m', flux_mo_u], ['AER_F_LIP_m', flux_mo_u],
                   ['AER_F_tot_m', flux_mo_u], ['AER_F_SS_m', flux_mo_u], ['AER_F_SSA_m', flux_mo_u],
                   ['AER_U10', 'm ${s^{-1}}$'], ['AER_SST', '$^{o}C$ '],
                   ['AER_SIC', sic_u], ['AER_SIC_area_px', sic_u], ['AER_SIC_1m', sic_u],
                   ['AER_POL', conc_u], ['AER_PRO', conc_u], ['AER_LIP', conc_u],
                   ['AER_tot', conc_u], ['AER_SS', conc_u], ['AER_SSA', conc_u],
+                  ['AER_POL_anom', conc_u], ['AER_PRO_anom', conc_u], ['AER_LIP_anom', conc_u],
+                  ['AER_tot_anom', conc_u], ['AER_SS_anom', conc_u], ['AER_SSA_anom', conc_u],
                   ['OMF_POL', sic_u], ['OMF_PRO', sic_u], ['OMF_LIP', sic_u], ['OMF_tot', sic_u],
                   ['PCHO', conc_biom_u], ['DCAA', conc_biom_u], ['PL', conc_biom_u], ['Biom_tot', conc_biom_u],
                   ['Sea_ice', sic_u], ['Sea_ice_1m', sic_u], ['Sea_ice_area_px', sic_u], ['Sea_ice_area_px_1m', sic_u],
@@ -217,3 +221,9 @@ def compute_seaice_area_px(C_ice):
             bx_size * 111.320 * np.cos(np.deg2rad(C_ice.lat)))  # from % sea ice of grid to km2
     C_ice_area_px = C_ice * grid_bx_area
     return C_ice_area_px
+
+def calculate_anomaly(conc):
+    conc_climatology = conc.mean(dim='time',
+                                 skipna=True)
+    conc_anomaly = conc - conc_climatology
+    return conc_anomaly

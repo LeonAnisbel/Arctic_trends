@@ -91,29 +91,32 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
             X = sm.add_constant(X)
             Y = Y.astype(ftype)
 
-            if np.sum(np.logical_not(np.isnan(Y))) > 0:
-                result = sm.OLS(np.array(Y), np.array(X), missing='drop').fit()
+            y_arr = np.array(Y, dtype=float)
+            x_arr = np.array(X, dtype=float)
+            mask = ~np.isnan(y_arr)
+            n = mask.sum()
+            y_clean = y_arr[mask]
+            x_clean = x_arr[mask]
+
+            if n >= 2 and not np.allclose(y_clean, y_clean[0]):
+                result = sm.OLS(y_clean, x_clean).fit()
                 intercept = result.params[0]
                 slope = result.params[1]
                 pval = result.pvalues[1]
-                adj_r2 = result.rsquared_adj
 
                 if pval > 0.05:
                     pval = np.nan
                     slope = np.nan
                     intercept = np.nan
-                    adj_r2 = np.nan
                 p_value = pval
             else:
                 slope = np.nan
                 p_value = np.nan
                 intercept = np.nan
-                adj_r2 = np.nan
 
             variables_info[var_na][reg_na][decades_na[dec_na]]['slope_aver_reg'] = slope
             variables_info[var_na][reg_na][decades_na[dec_na]]['pval_aver_reg'] = p_value
             variables_info[var_na][reg_na][decades_na[dec_na]]['intercept_aver_reg'] = intercept
-            variables_info[var_na][reg_na][decades_na[dec_na]]['adj_r2'] = adj_r2
 
         # with open("TrendsDictWholeArctic.txt", "wb") as myFile:
         #     pickle.dump(variables_info, myFile)

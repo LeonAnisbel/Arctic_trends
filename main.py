@@ -110,7 +110,7 @@ if __name__ == '__main__':
         C_conc[0], C_conc[1], C_conc[2], C_tot_conc, C_conc[3], C_conc_ssa,
         data_omf['OMF_POL'], data_omf['OMF_PRO'], data_omf['OMF_LIP'], tot_omf,
         C_pcho, C_dcaa, C_pl, tot_biom_conc,
-        C_ice * 100, C_ice * 100, C_ice_area_px,  # C_ice_area_px,
+        C_ice * 100, C_ice * 100, C_ice_area_px,  C_ice_area_px,
         C_temp, C_NPP, C_DIN,
         ]
     variables_info = utils.create_var_info_dict()
@@ -139,7 +139,7 @@ if __name__ == '__main__':
             data_reg = dict_var[da_type].where(dict_var[da_type].lat > 60,
                                                drop=True)
             da_months = data_reg.where((data_reg.time.dt.month >= months[0]) &
-                                       (data_reg.time.dt.month <= months[1]),
+                                       (data_reg.time.dt.month <= months[-1]),
                                        drop=True)
             variables_info[var_na]['data_season_reg'] = da_months
         else:
@@ -163,19 +163,16 @@ if __name__ == '__main__':
             slope = initialize_array()
             p_value = initialize_array()
             intercept = initialize_array()
-            adj_r2 = initialize_array()
 
             process_array_slope(Y,
                                 X,
                                 slope,
                                 p_value,
-                                intercept,
-                                adj_r2)
+                                intercept,)
 
             variables_info[var_na]['slope'] = slope
             variables_info[var_na]['pval'] = p_value
             variables_info[var_na]['intercept'] = intercept
-            variables_info[var_na]['adj_r2'] = adj_r2
 
             # plots.plot_trend(slope,
             #                  p_value,

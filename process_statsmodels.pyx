@@ -2,7 +2,7 @@ import statsmodels.api as sm
 import numpy as np
 
 
-def process_array_slope(double[:,:,:] Y, double[:,:] X, double[:, :] slope, double[:, :] p_value, double[:, :] intercept, double[:, :] adj_r2):
+def process_array_slope(double[:,:,:] Y, double[:,:] X, double[:, :] slope, double[:, :] p_value, double[:, :] intercept):
    
     cdef size_t i, j, y_lon, x_lon
     cdef double[:] y_sub
@@ -13,11 +13,20 @@ def process_array_slope(double[:,:,:] Y, double[:,:] X, double[:, :] slope, doub
     for i in range(y_lon):
         for j in range(x_lat):
             y_sub = Y[:,j,i]
-            if np.sum(np.logical_not(np.isnan(y_sub))) > 0:
-                result = sm.OLS(np.array(y_sub), np.array(X), missing='drop').fit()
+
+            y_arr = np.array(y_sub, dtype=float)
+            x_arr = np.array(X, dtype=float)
+
+            mask = ~np.isnan(y_arr)
+            n = mask.sum()
+
+            y_clean = y_arr[mask]
+            x_clean = x_arr[mask]
+
+            if n >= 2 and not np.allclose(y_clean, y_clean[0]):
+                result = sm.OLS(y_clean, x_clean).fit()
                 intercept[j,i] = result.params[0]
                 slope[j,i] = result.params[1]
-                adj_r2[j, i] = result.rsquared_adj
 
                 pval = result.pvalues[1]
 
@@ -28,7 +37,6 @@ def process_array_slope(double[:,:,:] Y, double[:,:] X, double[:, :] slope, doub
                 slope[j,i] = np.nan
                 p_value[j,i] = np.nan
                 intercept[j, i] = np.nan
-                adj_r2[j, i] = np.nan
 
 
 def process_array_slope_per_ice(double[:,:,:] Y, double[:,:,:] X, double[:, :] slope, double[:, :] p_value, double[:, :] intercept):

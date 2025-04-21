@@ -39,25 +39,32 @@ def percent_icrease(variables_info_yr, vv, decade):
 def plot_trend_emission(variables_info_seaice, variables_info_yr, seaice, season, decade):
 
     seaice_aer = utils.get_seaice_vals(variables_info_yr, 'AER_SIC')
-    panel_names = ['AER_F_POL', 'AER_F_PRO', 'AER_F_LIP', 'AER_F_SS']
-    # fig_titles = [['PCHO$_{aer}$', r'$\bf{(a)}$'], ['DCAA$_{aer}$', r'$\bf{(b)}$'], ['PL$_{aer}$', r'$\bf{(c)}$'],
-    #               ['SS$_{aer}$', r'$\bf{(d)}$']],
+    panel_names = ['AER_POL', 'AER_PRO', 'AER_LIP', 'AER_SS']
+
     lat_aer = variables_info_yr[panel_names[0]]['lat']
     lon_aer = variables_info_yr[panel_names[0]]['lon']
-    # panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info)
-    # panel_lim = [3, 3, 3, 3]
-    # percent_increase_yr, panel_unit = get_perc_increase(variables_info, panel_names)
-    # plots.plot_4_pannel_trend(percent_increase_yr,
-    #                           seaice_aer,
-    #                           panel_var_pval,
-    #                           lat_aer,
-    #                           lon_aer,
-    #                           panel_lim,
-    #                           panel_unit,
-    #                           fig_titles,
-    #                           'Aerosol_mass_flux_percent_trend',
-    #                           not_aerosol=True,
-    #                           percent_increase=True)
+
+    with open(f"TrendsDict_{season}_log_data.pkl", "rb") as myFile:
+        variables_info_yr_log = pickle.load(myFile)
+    percent_increase_yr, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr_log)
+
+    panel_lim = [3, 3, 3, 3]
+#    panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr)
+    _, panel_unit = utils.get_perc_increase(variables_info_yr, panel_names)
+
+    fig_titles = [['PCHO$_{aer}$', r'$\bf{(a)}$'], ['DCAA$_{aer}$', r'$\bf{(b)}$'], ['PL$_{aer}$', r'$\bf{(c)}$'],
+                  ['SS$_{aer}$', r'$\bf{(d)}$']],
+    plots.plot_4_pannel_trend(percent_increase_yr,
+                              seaice_aer,
+                              panel_var_pval,
+                              lat_aer,
+                              lon_aer,
+                              panel_lim,
+                              panel_unit,
+                              fig_titles,
+                              f'{season}_Aerosol_conc_percent_trend',
+                              not_aerosol=False,
+                              percent_increase=False)
 
     # panel_names = ['AER_F_POL', 'AER_F_PRO', 'AER_F_LIP', 'AER_F_SS']
     # lat_aer = variables_info[panel_names[0]]['lat']

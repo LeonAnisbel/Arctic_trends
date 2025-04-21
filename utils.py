@@ -19,7 +19,7 @@ def create_var_info_dict():
                   ['AER_tot', conc_u], ['AER_SS', conc_u], ['AER_SSA', conc_u],
                   ['OMF_POL', sic_u], ['OMF_PRO', sic_u], ['OMF_LIP', sic_u], ['OMF_tot', sic_u],
                   ['PCHO', conc_biom_u], ['DCAA', conc_biom_u], ['PL', conc_biom_u], ['Biom_tot', conc_biom_u],
-                  ['Sea_ice', sic_u], ['Sea_ice_1m', sic_u], ['Sea_ice_area_px', sic_u],
+                  ['Sea_ice', sic_u], ['Sea_ice_1m', sic_u], ['Sea_ice_area_px', sic_u], ['Sea_ice_area_px_1m', sic_u],
                   ['SST', '$^{o}C$ '], ['NPP', npp_din_u], ['DIN', npp_din_u],
     ]
     variables_info = {}
@@ -57,8 +57,6 @@ def season_aver(data, months):
     return v_tri_mo
 
 def pick_month_var_reg(data, months, aer_conc=False):
-    # data_month = data.where((data.time.dt.month == 9), drop=True)
-
     if aer_conc:
         data_month = data
     else:
@@ -80,15 +78,13 @@ def alloc_metadata(names, variables_info, trends=False):
             var_unit.append(variables_info[id]['unit'] +  ' $yr^{-1}$')
         else:
             var_unit.append(variables_info[id]['unit'])
-
-
     return var_trend, var_pval, var_unit
 
 
 def find_yr_min_ice(v_1month):
     list_mins, years = [], []
     for i in v_1month.time:
-        list_mins.append(v_1month.where((v_1month.time == i), drop=True).mean(skipna=True))
+        list_mins.append(v_1month.where((v_1month.time == i), drop=True).values)
         years.append(i)
     min_val = list_mins.index(np.nanmin(list_mins))
     return years[min_val]
@@ -99,19 +95,25 @@ def find_max_lim(panel_var):
         vlims.append(vl.max())
     return vlims
 
-def get_seaice_vals(variables_info, var_na):
+def get_seaice_vals(variables_info, var_na, get_min_area=False):
     v_season = variables_info[var_na]['data_season_reg'].compute()
-    seaice_min = get_min_seaice(variables_info, var_na)
-    seaice_min_10 = seaice_min.where(seaice_min > 10, drop=True)
-    
+    if get_min_area:
+        seaice_min = get_min_seaice(variables_info, var_na)
+        seaice_min_10 = seaice_min.where(seaice_min > 10, drop=True)
+    else:
+        seaice_min = None
+        seaice_min_10 = None
     seaice_mean = v_season.mean('time')
     return [seaice_min_10, seaice_mean, seaice_min]
 
 def get_min_seaice(variables_info, var_na):
-    v_1month = variables_info[f'{var_na}_1m']['data_season_reg'].compute()
-    year_min = find_yr_min_ice(v_1month)
+    v_1month_area = variables_info[f'{var_na}_area_px_1m']['data_season_reg'].compute()
+    v_1month_area_tot = v_1month_area.sum(dim=['lat', 'lon'],
+                                 skipna=True) * 1e-6
+    year_min = find_yr_min_ice(v_1month_area_tot)
     print(year_min)
-    seaice_min = v_1month.where((v_1month.time == year_min), drop=True).isel(time=0)
+    v_1month_conc = variables_info[f'{var_na}_1m']['data_season_reg'].compute()
+    seaice_min = v_1month_conc.where((v_1month_conc.time == year_min), drop=True).isel(time=0)
     return seaice_min
 
 def get_perc_increase(variables_info, panel_names):
@@ -124,9 +126,6 @@ def get_perc_increase(variables_info, panel_names):
                                     variables_info[id]['data_time_mean'],
                                       out=nan_matrix,
                                       where=(variables_info[id]['data_time_mean'] >= 0)))
-        # #variables_info[id]['intercept'] > 0))
-
-        # percent_increase = (linear_increase / variables_info[id]['intercept']) - 1
         percent_increase_yr.append(percent_increase * 100)
         panel_unit.append(unit_percent_increase_yr)
     return percent_increase_yr, panel_unit

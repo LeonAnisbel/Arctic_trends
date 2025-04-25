@@ -73,10 +73,13 @@ def pick_month_var_reg(data, months, aer_conc=False):
     return data_month_reg, lat, lon
 
 
-def alloc_metadata(names, variables_info, trends=False):
+def alloc_metadata(names, variables_info, trends=False, percent_increase=False):
     var_trend, var_pval, var_lim, var_unit = [], [], [], []
     for id in names:
-        var_trend.append(variables_info[id]['slope'])
+        sl = variables_info[id]['slope']
+        if percent_increase:
+            sl = sl * 100
+        var_trend.append(sl)
         var_pval.append(variables_info[id]['pval'])
         if trends:
             var_unit.append(variables_info[id]['unit'] +  ' $yr^{-1}$')
@@ -123,14 +126,14 @@ def get_min_seaice(variables_info, var_na):
 def get_perc_increase(variables_info, panel_names):
     percent_increase_yr, panel_unit = [], []
     unit_percent_increase_yr = '% '
-    nan_matrix = np.empty((variables_info[panel_names[0]]['data_time_mean'].shape))
+    nan_matrix = np.empty((variables_info[panel_names[0]]['data_time_median'].shape))
     nan_matrix[:] = np.nan
     for id in panel_names:
         percent_increase = (np.divide(variables_info[id]['slope'],
-                                    variables_info[id]['data_time_mean'],
-                                      out=nan_matrix,
-                                      where=(variables_info[id]['data_time_mean'] >= 0)))
-        percent_increase_yr.append(percent_increase * 100)
+                                    variables_info[id]['data_time_median'])
+                                    )
+        percent_increase_yr.append(percent_increase*100)
+        print(percent_increase.min().values)
         panel_unit.append(unit_percent_increase_yr)
     return percent_increase_yr, panel_unit
 

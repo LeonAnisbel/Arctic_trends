@@ -4,11 +4,8 @@ import read_data, utils
 import xarray as xr
 import pickle
 import warnings
-warnings.filterwarnings(
-    "ignore",
-    message="invalid value encountered in double_scalars",
-    module="statsmodels.regression.linear_model"
-)
+
+
 ftype = np.float64
 def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_reg, var_type, per_unit_sic=False):
     lon_360 = data_month_reg.lon.data
@@ -53,6 +50,8 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
                 variables_info[var_na][reg_na][decades_na[dec_na]]['data_aver_reg'] = data_month
 
                 data_time_mean = data_month.mean(dim='time', skipna=True)
+                da_compute = data_month.compute()
+                data_time_median = da_compute.median(dim='time', skipna=True)
 
             else:
                 data_month = reg_sel_vals['data_region']
@@ -61,7 +60,12 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
                 variables_info[var_na][reg_na][decades_na[dec_na]]['data_aver_reg'] = data_latlon_mean
 
                 data_time_mean = data_latlon_mean.mean(dim='time', skipna=True)
+                da_compute = data_latlon_mean.compute()
+                data_time_median = da_compute.median(dim='time', skipna=True)
+
+            del da_compute
             variables_info[var_na][reg_na][decades_na[dec_na]]['data_time_mean'] = data_time_mean
+            variables_info[var_na][reg_na][decades_na[dec_na]]['data_time_median'] = data_time_median
 
 
             if per_unit_sic:

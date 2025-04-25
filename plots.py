@@ -7,7 +7,7 @@ from matplotlib import ticker as mticker
 import matplotlib.path as mpath
 import matplotlib.colors as mcolors
 from pyparsing import alphas
-from sklearn.linear_model import LinearRegression
+from scipy.stats import linregress
 from decimal import Decimal
 
 
@@ -15,9 +15,32 @@ def plot_fit(ax, t_ax, p_fit, eq, color, a):
     return ax.plot(t_ax, p_fit, color, linestyle='dashed', label=eq, linewidth=1, alpha=a)
 
 
-def plot_fit_trends(ax, C, title, axis_label, vm, colors, leg, fig_name,
+def plot_fit_trends(ax, C, title, axis_label, vm, colors, leg, fig_name, var_type,
                     echam_data=True, seaice=False, multipanel=False):
-    if multipanel:  # ,limits):
+
+    y = C[1]['1990-2019']['data_aver_reg'].values
+    fig, ax = plt.subplots(1, 1,
+                               figsize=(5, 4), )
+    mu = np.nanmean(y)
+    print(mu, np.nanmedian(y))
+    sigma = np.nanstd(y)
+    plt.hist(y, bins='auto', density=True, alpha=0.6)
+    x = np.linspace(y.min(), y.max(), 100)
+    pdf = (1 / (sigma * np.sqrt(2 * np.pi))) * np.exp(- (x - mu)**2 / (2 * sigma**2))
+
+    # Overlay the normal distribution curve
+    plt.plot(x, pdf, linewidth=2, label = 'Normal Dist.')
+    plt.axvline(mu, color='k', linestyle='dashed', linewidth=2, label = 'Mean')
+    plt.axvline(np.nanmedian(y), color='g', linestyle='dashed', linewidth=2, label = 'Median')
+    plt.legend()
+    plt.title('Histogram with Normal Distribution Fit \n '+ var_type[2] + ' in the '+ title[0])
+    plt.xlabel('Value')
+    plt.ylabel('Density')
+    fig.tight_layout()
+    plt.savefig(f'./plots/histogram_{var_type[1]}_{title[0]}.png')
+    plt.close()
+
+    if multipanel:
         pass
     else:
         fig, ax = plt.subplots(1, 1,
@@ -33,8 +56,10 @@ def plot_fit_trends(ax, C, title, axis_label, vm, colors, leg, fig_name,
         ax.fill_between(t_ax, 0, C_ice, alpha=0.2, color=new_line_color)
         p1, = ax.plot(t_ax, C_ice, new_line_color, label=leg[0], linewidth=1.)
     ax.scatter(t_ax, C_ice, s=15, c=new_line_color)
+
     p2, = ax2.plot(t_ax, C_biom, colors[1], label=leg[1], linewidth=1.)
     ax2.scatter(t_ax, C_biom, s=15, c=colors[1])
+    ax2.axhline(y=0.0, c=colors[1], linewidth=0.5, alpha=0.2)
 
     decades = ['1990-1999', '2000-2009', '2010-2019']
     decades = ['1990-2004', '2005-2019']
@@ -45,34 +70,30 @@ def plot_fit_trends(ax, C, title, axis_label, vm, colors, leg, fig_name,
 
         t_ax = C[0][dec]['data_aver_reg'].time.values
 
-        x = t_ax.reshape((-1, 1))
         y = C[0][dec]['data_aver_reg'].values
-        model = LinearRegression()
-        model_sic = model.fit(x, y)
-        #print(f"coefficient of determination SIC: {model.score(x, y)}")
+        model_sic = linregress(t_ax, y)
 
         y = C[1][dec]['data_aver_reg'].values
-        model1 = LinearRegression()
-        model_emi = model1.fit(x, y)
-        #print(f"coefficient of determination EMI: {model1.score(x, y)}")
+        model_emi = linregress(t_ax, y)
 
-        sl = [model_sic.coef_[0], model_emi.coef_[0]]
-        itc = [model_sic.intercept_, model_emi.intercept_]
+        sl = [model_sic.slope, model_emi.slope]
+        itc = [model_sic.intercept, model_emi.intercept]
 
         p_fit = [p * sl[0] + itc[0] for p in t_ax]
-        m = "{:.2E}".format(Decimal(float(sl[0])))
-        b = "{:.2E}".format(Decimal(float(itc[0])))
-        eq = m+' x + '+b
-
         eq = f'{sl[0]:.1e}x + {itc[0]:.1e}'
-
-        f1, = plot_fit(ax, t_ax, p_fit, eq, colors[0], a[idx])
-        f1_list.append(f1)
+        if model_sic.pvalue < 0.05:
+            f1, = plot_fit(ax, t_ax, p_fit, eq, colors[0], a[idx])
+            f1_list.append(f1)
+        else:
+            f1_list.append(p1)
 
         p_fit = [p * sl[1] + itc[1] for p in t_ax]
         eq = f'{sl[1]:.1e}x + {itc[1]:.1e}'
-        f2, = plot_fit(ax2, t_ax, p_fit, eq, colors[1], a[idx])
-        f2_list.append(f2)
+        if model_emi.pvalue < 0.05:
+            f2, = plot_fit(ax2, t_ax, p_fit, eq, colors[1], a[idx])
+            f2_list.append(f2)
+        else:
+            f2_list.append(p2)
 
     ax.set_ylabel(axis_label[0], fontsize=8)
     ax.tick_params(axis='x')
@@ -88,8 +109,8 @@ def plot_fit_trends(ax, C, title, axis_label, vm, colors, leg, fig_name,
     ax.set_title(title[1], loc='left', fontsize=10)
 
 
-    ax.set_ylim(vm[0][0], vm[0][1])
-    ax.grid(linestyle='--', linewidth=0.4)
+    ax.set_ylim(vm[0][0], None)
+    #ax.grid(linestyle='--', linewidth=0.4)
     ax.xaxis.set_tick_params(labelsize=8)
     ax.yaxis.set_tick_params(labelsize=8, color=colors[0])
     ax.tick_params(axis='y', colors=colors[0])

@@ -9,7 +9,7 @@ import plot_aerosol_trend
 if __name__ == '__main__':
     season = global_vars.season_to_analise
 
-    with open(f"TrendsDict_{season}.pkl", "rb") as myFile:
+    with open(f"TrendsDict_{season}_orig_data.pkl", "rb") as myFile:
         variables_info_yr = pickle.load(myFile)
     seaice = utils.get_seaice_vals(variables_info_yr, 'Sea_ice', get_min_area=True)
 
@@ -24,9 +24,8 @@ if __name__ == '__main__':
         decades = ['1990-2004', '2005-2019']
 
         for idx, dec in enumerate(decades):
-            weights = utils.get_weights(sst[dec]['data_aver_reg'])
-            print(reg, dec, 'mean SST', sst[dec]['data_aver_reg'].weighted(weights).mean().values, )
-            print(reg, dec, 'mean wind', wind[dec]['data_aver_reg'].weighted(weights).mean().values, )
+            print(reg, dec, 'mean SST', sst[dec]['data_aver_reg'].mean().values, )
+            print(reg, dec, 'mean wind', wind[dec]['data_aver_reg'].mean().values, )
 
     with open(f"TrendsDict_per_ice_{season}.pkl", "rb") as myFile:
         variables_info_seaice = pickle.load(myFile)

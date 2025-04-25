@@ -1,5 +1,5 @@
 import numpy as np
-
+import pickle
 import plots
 import utils
 
@@ -24,7 +24,6 @@ def percent_icrease(variables_info_yr, vv, decade):
     interc_sign = np.ma.masked_where(interc<l, interc)
     slope_sign = np.ma.masked_where(slope==0, slope)
 
-    vals = variables_info_yr[vv]['data']
     last_val = slope_sign * 30 + interc_sign
     perc_inc = (last_val / interc_sign - 1) * 100 / 30
     perc_inc = (slope_sign/interc_sign )*30 * 100 / 30
@@ -46,9 +45,11 @@ def plot_trend_emission(variables_info_seaice, variables_info_yr, seaice, season
 
     with open(f"TrendsDict_{season}_log_data.pkl", "rb") as myFile:
         variables_info_yr_log = pickle.load(myFile)
-    percent_increase_yr, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr_log)
+    percent_increase_yr, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names,
+                                                                           variables_info_yr_log,
+                                                                           percent_increase=True)
 
-    panel_lim = [3, 3, 3, 3]
+    panel_lim = [10, 10, 10, 10]
 #    panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr)
     _, panel_unit = utils.get_perc_increase(variables_info_yr, panel_names)
 
@@ -62,7 +63,21 @@ def plot_trend_emission(variables_info_seaice, variables_info_yr, seaice, season
                               panel_lim,
                               panel_unit,
                               fig_titles,
-                              f'{season}_Aerosol_conc_percent_trend',
+                              f'{season}_Aerosol_conc_percent_trend_with_log',
+                              not_aerosol=False,
+                              percent_increase=False)
+
+
+    percent_increase_yr, _ = utils.get_perc_increase(variables_info_yr, panel_names)
+    plots.plot_4_pannel_trend(percent_increase_yr,
+                              seaice_aer,
+                              panel_var_pval,
+                              lat_aer,
+                              lon_aer,
+                              panel_lim,
+                              panel_unit,
+                              fig_titles,
+                              f'{season}_Aerosol_conc_percent_trend_with_mean',
                               not_aerosol=False,
                               percent_increase=False)
 

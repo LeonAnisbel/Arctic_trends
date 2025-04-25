@@ -9,7 +9,7 @@ from utils import regions
 if __name__ == '__main__':
     season = global_vars.season_to_analise
 
-    with open(f"TrendsDict_{season}.pkl", "rb") as myFile:
+    with open(f"TrendsDict_{season}_orig_data.pkl", "rb") as myFile:
         variables_info_yr = pickle.load(myFile)
 
     with open(f"TrendsDict_per_ice_{season}.pkl", "rb") as myFile:
@@ -25,11 +25,20 @@ if __name__ == '__main__':
 
     seaice = utils.get_seaice_vals(variables_info_yr, 'Sea_ice')
     seaice_lin = variables_info_yr['AER_SIC_area_px']
-    flux = variables_info_yr['AER_F_tot_m']  # AER_LIP #AER_F_tot_yr
+    var_type = ['Biom_tot', 'biom', 'Biomolecule concentration']
+    var_type = ['AER_tot', 'aer_conc', 'Aerosol concentration']
+    var_type = ['AER_F_tot', 'aer_flux', 'Aerosol emission flux']
+    var_type = ['AER_F_tot_anom', 'aer_flux_anom', 'Aerosol emission flux anomaly']
+
+    flux = variables_info_yr[var_type[0]]  # AER_LIP #AER_F_tot_yr
     conc = variables_info_yr['AER_tot']  # AER_LIP #AER_F_tot_yr
     region = {'Arctic':{'lims':[[4.3, 7.5], [0.1, 0.1]]},
             'Kara Sea':{'lims':[[0., 0.6], [0.1, 0.1]]},
             'Barents Sea':{'lims':[[0, 0.23], [0.1, 0.1]]}}
+
+    region = {'Arctic':{'lims':[[10, 7.5], [0.1, 0.1]]},
+            'Kara Sea':{'lims':[[0.7, 0.6], [0.1, 0.1]]},
+            'Barents Sea':{'lims':[[0.25, 0.23], [0.1, 0.1]]}}
 
     for idx, reg in enumerate(list(region.keys())):
         leg = plots.plot_fit_trends(axs[idx],
@@ -43,6 +52,7 @@ if __name__ == '__main__':
                                     ['Sea ice', 'PMOA'],
                                     # ['Sea Ice', 'Biomolecules'],
                                     f'{season}_Ocean_Flux_PL',
+                                    var_type,
                                     echam_data=True,
                                     seaice=True,
                                     multipanel=True)
@@ -60,22 +70,22 @@ if __name__ == '__main__':
     for reg, idx in region.items():
         decades = ['1990-2004', '2005-2019']
         for idx, dec in enumerate(decades):
-            weights = utils.get_weights(conc[reg][dec]['data_aver_reg'])
+            #weights = utils.get_weights(conc[reg][dec]['data_aver_reg'])
 
             with open("Region_means.txt", "a") as f:
                 print(reg, dec,
                       'mean SIC',
-                      seaice_lin[reg][dec]['data_aver_reg'].weighted(weights).mean(skipna=True).values,
+                      seaice_lin[reg][dec]['data_aver_reg'].mean(skipna=True).values,
                       '\n',
                       file=f)
                 print(reg, dec,
                       'mean PMOA surface concentration',
-                      conc[reg][dec]['data_aver_reg'].weighted(weights).mean(skipna=True).values,
+                      conc[reg][dec]['data_aver_reg'].mean(skipna=True).values,
                       '\n',
                       file=f)
                 print(reg, dec,
                       'mean PMOA emission flux',
-                      flux[reg][dec]['data_aver_reg'].weighted(weights).mean(skipna=True).values,
+                      flux[reg][dec]['data_aver_reg'].mean(skipna=True).values,
                       file=f)
                 print('\n\n',
                       file=f)

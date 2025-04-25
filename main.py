@@ -1,5 +1,4 @@
-from math import log10
-
+import gc
 import numpy as np
 import statsmodels.api as sm
 import pickle
@@ -160,6 +159,10 @@ if __name__ == '__main__':
             variables_info[var_na]['data_season_reg'] = data_month_arctic
             variables_info[var_na]['data_time_mean'] = data_month_arctic.mean('time',
                                                                            skipna=True)
+            da_compute = data_month_arctic.compute()
+            variables_info[var_na]['data_time_median'] = da_compute.median('time',
+                                                                           skipna=True)
+            del da_compute
 
             variables_info[var_na]['lat'] = lat
             variables_info[var_na]['lon'] = lon
@@ -198,6 +201,8 @@ if __name__ == '__main__':
                                                 data_month_arctic,
                                                 var_na[:3],
                                                 per_unit_sic=False)
+
+            gc.collect()
 
     with open(f"TrendsDict_{season}_{file_name}.pkl", "wb") as myFile:
         pickle.dump(variables_info, myFile)

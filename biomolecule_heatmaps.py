@@ -303,7 +303,7 @@ if __name__=='__main__':
         # print(var_na, seaice[2].shape,seaice_min.shape, variables_info_yr[var_na]['slope'].shape)
         data_seaice_mask = np.ma.masked_where(seaice_min > 10,
                                               variables_info_yr[var_na]['slope'])
-        data_seaice_mask = np.ma.masked_where(np.isnan(variables_info_yr[var_na]['pval']),
+        data_seaice_mask = np.ma.masked_where(np.isnan(variables_info_yr[var_na]['significance']),
                                               data_seaice_mask)
         data_seaice_mask = data_seaice_mask.filled(np.nan)
         variables_info_yr[var_na]['regions_vals'] = reg_sel(lat,

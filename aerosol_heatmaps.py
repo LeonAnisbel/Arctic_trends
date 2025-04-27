@@ -15,7 +15,7 @@ def plot_heatmap(df_vals_piv, col_name, fig_title):
 
 
 def percent_icrease(variables_info_yr, vv, reg_na, decade):
-    pval = variables_info_yr[vv][reg_na][decade]['pval_aver_reg']
+    pval = variables_info_yr[vv][reg_na][decade]['significance']
     if pval < 0.05:
         interc = variables_info_yr[vv][reg_na][decade]['intercept_aver_reg']
         slope = variables_info_yr[vv][reg_na][decade]['slope_aver_reg']

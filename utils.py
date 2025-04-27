@@ -80,7 +80,7 @@ def alloc_metadata(names, variables_info, trends=False, percent_increase=False):
         if percent_increase:
             sl = sl * 100
         var_trend.append(sl)
-        var_pval.append(variables_info[id]['pval'])
+        var_pval.append(variables_info[id]['significance'])
         if trends:
             var_unit.append(variables_info[id]['unit'] +  ' $yr^{-1}$')
         else:

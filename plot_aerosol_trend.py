@@ -10,7 +10,7 @@ def fill_with_nan(panel_var_trend):
 
 
 def percent_icrease(variables_info_yr, vv, decade):
-    pval = variables_info_yr[vv]['pval']
+    pval = variables_info_yr[vv]['significance']
     #if pval < 0.05:
     interc = variables_info_yr[vv]['intercept']
     slope = variables_info_yr[vv]['slope']

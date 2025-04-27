@@ -176,16 +176,25 @@ if __name__ == '__main__':
             slope = initialize_array()
             p_value = initialize_array()
             intercept = initialize_array()
+            trend = initialize_array()
+            tau = initialize_array()
+            significance = initialize_array()
 
             process_array_slope(Y,
                                 X,
                                 slope,
                                 p_value,
-                                intercept,)
+                                intercept,
+                                trend,
+                                tau,
+                                significance)
 
             variables_info[var_na]['slope'] = slope
             variables_info[var_na]['pval'] = p_value
             variables_info[var_na]['intercept'] = intercept
+            variables_info[var_na]['trend'] = trend
+            variables_info[var_na]['tau'] = tau
+            variables_info[var_na]['significance'] = significance
 
             # plots.plot_trend(slope,
             #                  p_value,

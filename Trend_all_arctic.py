@@ -104,24 +104,31 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
             x_clean = x_arr[mask]
 
             if n >= 2 and not np.allclose(y_clean, y_clean[0]):
-                result = sm.OLS(y_clean, x_clean).fit()
-                intercept = result.params[0]
-                slope = result.params[1]
-                pval = result.pvalues[1]
+                result = mk.original_test(y_clean)
+                intercept = result.intercept
+                slope = result.slope
+                trend = result.trend
+                tau = result.Tau
+                p_value = result.p
 
-                if pval > 0.05:
-                    pval = np.nan
-                    slope = np.nan
-                    intercept = np.nan
-                p_value = pval
+                if pmk.h==False:
+                    signif = np.nan
+                else:
+                    signif = 0.0001 # assign arbitrary small amount
             else:
                 slope = np.nan
                 p_value = np.nan
                 intercept = np.nan
+                trend = 'not enough data'
+                tau = np.nan
+                signif = np.nan
 
             variables_info[var_na][reg_na][decades_na[dec_na]]['slope_aver_reg'] = slope
             variables_info[var_na][reg_na][decades_na[dec_na]]['pval_aver_reg'] = p_value
             variables_info[var_na][reg_na][decades_na[dec_na]]['intercept_aver_reg'] = intercept
+            variables_info[var_na][reg_na][decades_na[dec_na]]['trend'] = trend
+            variables_info[var_na][reg_na][decades_na[dec_na]]['tau'] = tau
+            variables_info[var_na][reg_na][decades_na[dec_na]]['significance'] = signif
 
         # with open("TrendsDictWholeArctic.txt", "wb") as myFile:
         #     pickle.dump(variables_info, myFile)

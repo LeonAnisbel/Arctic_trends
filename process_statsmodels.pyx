@@ -1,8 +1,9 @@
-import statsmodels.api as sm
+import pymannkendall as mk
 import numpy as np
 
 
-def process_array_slope(double[:,:,:] Y, double[:,:] X, double[:, :] slope, double[:, :] p_value, double[:, :] intercept):
+def process_array_slope(double[:,:,:] Y, double[:,:] X, double[:, :] slope, double[:, :] p_value,
+                        double[:, :] intercept, double[:, :] trend, double[:, :] tau, double[:, :] significance):
    
     cdef size_t i, j, y_lon, x_lon
     cdef double[:] y_sub
@@ -24,20 +25,25 @@ def process_array_slope(double[:,:,:] Y, double[:,:] X, double[:, :] slope, doub
             x_clean = x_arr[mask]
 
             if n >= 2 and not np.allclose(y_clean, y_clean[0]):
-                result = sm.OLS(y_clean, x_clean).fit()
-                intercept[j,i] = result.params[0]
-                slope[j,i] = result.params[1]
+                result = mk.original_test(y_clean)
+                intercept[j,i] = result.intercept
+                slope[j,i] = result.slope
+                trend[j,i] = result.trend
+                tau[j,i] = result.Tau
+                p_value[j,i] = result.p
 
-                pval = result.pvalues[1]
-
-                if pval > 0.05:
-                    pval = np.nan
-                p_value[j,i] = pval
+                if pmk.h==False:
+                    signif = np.nan
+                else:
+                    signif = 0.0001 # assign arbitrary small amount
+                significance[j,i] = signif
             else:
                 slope[j,i] = np.nan
                 p_value[j,i] = np.nan
                 intercept[j, i] = np.nan
-
+                trend[j,i] = 'not enough data'
+                tau[j,i] = result.Tau
+                significance[j, i] = np.nan
 
 def process_array_slope_per_ice(double[:,:,:] Y, double[:,:,:] X, double[:, :] slope, double[:, :] p_value, double[:, :] intercept):
 

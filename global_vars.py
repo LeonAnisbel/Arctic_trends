@@ -4,7 +4,7 @@ omf_dir_path = root_dir+"MOA_DATA_ECHAM/OMF_data/fesom_recon_oceanfilms_no_icema
 ocean_dir_path = root_dir+"MOA_DATA_ECHAM/regular_grid_interp/"
 factor_eim_heatmaps = 1.e7
 factor_sic_heatmaps = 1.
-data_type = 'log_data'#'orig_data'
+data_type = 'orig_data'#'log_data'#
 season_to_analise = 'AMJ'
 seasons_info = {'JFM': {'months' : [1, 2, 3],
                         'one_month': [1],

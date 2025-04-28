@@ -6,18 +6,18 @@ from cartopy.mpl.gridliner import LATITUDE_FORMATTER
 from matplotlib import ticker as mticker
 import matplotlib.path as mpath
 import matplotlib.colors as mcolors
-from pyparsing import alphas
 from scipy.stats import linregress
 from decimal import Decimal
+import pymannkendall as mk
+from statsmodels.tsa.stattools import acf
+import statsmodels.api as sm
+
 
 
 def plot_fit(ax, t_ax, p_fit, eq, color, a):
     return ax.plot(t_ax, p_fit, color, linestyle='dashed', label=eq, linewidth=1, alpha=a)
 
-
-def plot_fit_trends(ax, C, title, axis_label, vm, colors, leg, fig_name, var_type,
-                    echam_data=True, seaice=False, multipanel=False):
-
+def create_histogram(C, title, var_type):
     y = C[1]['1990-2019']['data_aver_reg'].values
     fig, ax = plt.subplots(1, 1,
                                figsize=(5, 4), )
@@ -40,6 +40,24 @@ def plot_fit_trends(ax, C, title, axis_label, vm, colors, leg, fig_name, var_typ
     plt.savefig(f'./plots/histogram_{var_type[1]}_{title[0]}.png')
     plt.close()
 
+def autocorrelation(C, title, var_type):
+    y = C[1]['1990-2019']['data_aver_reg'].values
+    fig, ax = plt.subplots(1, 1,
+                               figsize=(5, 4), )
+    acf_values = acf(y, nlags=15, fft=False)
+    sm.graphics.tsa.plot_acf(y, lags=15, ax=ax)
+    plt.xlabel('Lag')
+    plt.ylabel('ACF')
+    plt.grid()
+    r1 = acf_values
+    print(f"Lag-1 autocorrelation (r1): {r1}")
+    plt.title('Autocorrelation Function')
+    plt.savefig(f'./plots/autocorrelation_{var_type[1]}_{title[0]}.png')
+    plt.close()
+
+def plot_fit_trends(ax, C, title, axis_label, vm, colors, leg, fig_name, var_type,
+                    echam_data=True, seaice=False, multipanel=False):
+
     if multipanel:
         pass
     else:
@@ -48,6 +66,7 @@ def plot_fit_trends(ax, C, title, axis_label, vm, colors, leg, fig_name, var_typ
 
     C_ice, C_biom = C[0]['1990-2019']['data_aver_reg'], C[1]['1990-2019']['data_aver_reg']
     t_ax = C_ice.time.values
+    print(C_ice, C_biom)
 
     ax2 = ax.twinx()
     new_line_color = colors[0]
@@ -70,26 +89,31 @@ def plot_fit_trends(ax, C, title, axis_label, vm, colors, leg, fig_name, var_typ
 
         t_ax = C[0][dec]['data_aver_reg'].time.values
 
-        y = C[0][dec]['data_aver_reg'].values
-        model_sic = linregress(t_ax, y)
+        C_ice = C[0][dec]['data_aver_reg'].values
+        model_sic = mk.hamed_rao_modification_test(C_ice)#linregress(t_ax, y)
 
-        y = C[1][dec]['data_aver_reg'].values
-        model_emi = linregress(t_ax, y)
+        C_emi = C[1][dec]['data_aver_reg'].values
+        model_emi = mk.hamed_rao_modification_test(C_emi)
 
         sl = [model_sic.slope, model_emi.slope]
         itc = [model_sic.intercept, model_emi.intercept]
+        significance = [model_sic.h, model_emi.h]
+        trend = [model_sic.trend, model_emi.trend]
 
-        p_fit = [p * sl[0] + itc[0] for p in t_ax]
+        print('SIC ', C_ice, trend[0], significance[0])
+        print('Emission ', C_emi, trend[1], significance[1])
+
+        p_fit = [p * sl[0] + itc[0] for p in np.arange(len(t_ax))]
         eq = f'{sl[0]:.1e}x + {itc[0]:.1e}'
-        if model_sic.pvalue < 0.05:
+        if significance[0]:
             f1, = plot_fit(ax, t_ax, p_fit, eq, colors[0], a[idx])
             f1_list.append(f1)
         else:
             f1_list.append(p1)
 
-        p_fit = [p * sl[1] + itc[1] for p in t_ax]
+        p_fit = [p * sl[1] + itc[1] for p in np.arange(len(t_ax))]
         eq = f'{sl[1]:.1e}x + {itc[1]:.1e}'
-        if model_emi.pvalue < 0.05:
+        if significance[1]:
             f2, = plot_fit(ax2, t_ax, p_fit, eq, colors[1], a[idx])
             f2_list.append(f2)
         else:

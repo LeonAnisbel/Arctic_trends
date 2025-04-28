@@ -5,8 +5,8 @@ import utils
 def plot_trend(variables_info_seaice, variables_info_yr, seaice, season):
     print('Trends of OMF and biom')
     panel_names = ['PCHO', 'PL', 'Biom_tot', 'OMF_tot']
-    lat = variables_info_seaice[panel_names[0]]['lat']
-    lon = variables_info_seaice[panel_names[0]]['lon']
+    lat = variables_info_yr[panel_names[0]]['lat']
+    lon = variables_info_yr[panel_names[0]]['lon']
     fig_titles = [[['PCHO$_{sw}$', r'$\bf{(a)}$'],
                    ['PL$_{sw}$', r'$\bf{(b)}$'],
                    ['Total concentration$_{sw}$', r'$\bf{(c)}$'],

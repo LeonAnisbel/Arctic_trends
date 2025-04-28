@@ -1,5 +1,6 @@
 import pymannkendall as mk
 import numpy as np
+import statsmodels.api as sm
 
 
 def process_array_slope(double[:,:,:] Y, double[:,:] X, double[:, :] slope, double[:, :] p_value,
@@ -25,24 +26,33 @@ def process_array_slope(double[:,:,:] Y, double[:,:] X, double[:, :] slope, doub
             x_clean = x_arr[mask]
 
             if n >= 2 and not np.allclose(y_clean, y_clean[0]):
-                result = mk.original_test(y_clean)
+                result = mk.hamed_rao_modification_test(y_clean)
                 intercept[j,i] = result.intercept
                 slope[j,i] = result.slope
-                trend[j,i] = result.trend
                 tau[j,i] = result.Tau
                 p_value[j,i] = result.p
 
-                if pmk.h==False:
+                if result.h==False:
                     signif = np.nan
                 else:
                     signif = 0.0001 # assign arbitrary small amount
                 significance[j,i] = signif
+
+                h = result.trend
+                if h == 'increasing':
+                    hh = 1
+                if h == 'decreasing':
+                    hh = -1
+                if h == 'no trend':
+                    hh = 0
+                trend[j,i] = hh
+
             else:
                 slope[j,i] = np.nan
                 p_value[j,i] = np.nan
                 intercept[j, i] = np.nan
-                trend[j,i] = 'not enough data'
-                tau[j,i] = result.Tau
+                trend[j,i] = np.nan
+                tau[j,i] = np.nan
                 significance[j, i] = np.nan
 
 def process_array_slope_per_ice(double[:,:,:] Y, double[:,:,:] X, double[:, :] slope, double[:, :] p_value, double[:, :] intercept):

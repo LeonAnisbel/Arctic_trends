@@ -1,5 +1,6 @@
 import numpy as np
 import statsmodels.api as sm
+import pymannkendall as mk
 import read_data, utils
 import xarray as xr
 import pickle
@@ -104,14 +105,22 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
             x_clean = x_arr[mask]
 
             if n >= 2 and not np.allclose(y_clean, y_clean[0]):
-                result = mk.original_test(y_clean)
+                result = mk.hamed_rao_modification_test(y_clean)
                 intercept = result.intercept
                 slope = result.slope
-                trend = result.trend
                 tau = result.Tau
                 p_value = result.p
 
-                if pmk.h==False:
+                h = result.trend
+                if h == 'increasing':
+                    hh = 1
+                if h == 'decreasing':
+                    hh = -1
+                if h == 'no trend':
+                    hh = 0
+                trend = hh
+
+                if result.h==False:
                     signif = np.nan
                 else:
                     signif = 0.0001 # assign arbitrary small amount
@@ -119,7 +128,7 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
                 slope = np.nan
                 p_value = np.nan
                 intercept = np.nan
-                trend = 'not enough data'
+                trend = np.nan
                 tau = np.nan
                 signif = np.nan
 

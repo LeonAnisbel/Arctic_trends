@@ -108,6 +108,7 @@ if __name__ == '__main__':
     C_pcho, C_dcaa, C_pl, C_ice, C_temp, C_NPP, C_DIN = read_data.read_ocean_data()
     C_ice_area_px = utils.compute_seaice_area_px(C_ice) # sea ice from FESOM-RECOM
     tot_biom_conc = C_pcho + C_dcaa + C_pl
+    C_NPP_anomaly = calculate_anomaly(C_NPP)
     print('Finished reading biomolecule concentration and SIC from FESOm-REcoM data')
 
     list_variables = [
@@ -120,7 +121,7 @@ if __name__ == '__main__':
         data_omf['OMF_POL'], data_omf['OMF_PRO'], data_omf['OMF_LIP'], tot_omf,
         C_pcho, C_dcaa, C_pl, tot_biom_conc,
         C_ice * 100, C_ice * 100, C_ice_area_px,  C_ice_area_px,
-        C_temp, C_NPP, C_DIN,
+        C_temp, C_NPP, C_NPP_anomaly, C_DIN,
         ]
     variables_info = utils.create_var_info_dict()
 

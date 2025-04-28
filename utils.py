@@ -24,7 +24,7 @@ def create_var_info_dict():
                   ['OMF_POL', sic_u], ['OMF_PRO', sic_u], ['OMF_LIP', sic_u], ['OMF_tot', sic_u],
                   ['PCHO', conc_biom_u], ['DCAA', conc_biom_u], ['PL', conc_biom_u], ['Biom_tot', conc_biom_u],
                   ['Sea_ice', sic_u], ['Sea_ice_1m', sic_u], ['Sea_ice_area_px', sic_u], ['Sea_ice_area_px_1m', sic_u],
-                  ['SST', '$^{o}C$ '], ['NPP', npp_din_u], ['DIN', npp_din_u],
+                  ['SST', '$^{o}C$ '], ['NPP', npp_din_u], ['NPP_anom', npp_din_u], ['DIN', npp_din_u],
     ]
     variables_info = {}
     for li in vars_names:
@@ -126,11 +126,11 @@ def get_min_seaice(variables_info, var_na):
 def get_perc_increase(variables_info, panel_names):
     percent_increase_yr, panel_unit = [], []
     unit_percent_increase_yr = '% '
-    nan_matrix = np.empty((variables_info[panel_names[0]]['data_time_median'].shape))
+    nan_matrix = np.empty((variables_info[panel_names[0]]['data_time_mean'].shape))
     nan_matrix[:] = np.nan
     for id in panel_names:
         percent_increase = (np.divide(variables_info[id]['slope'],
-                                    variables_info[id]['data_time_median'])
+                                    variables_info[id]['data_time_mean'])
                                     )
         percent_increase_yr.append(percent_increase*100)
         print(percent_increase.min().values)

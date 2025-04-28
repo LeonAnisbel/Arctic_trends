@@ -27,9 +27,9 @@ if __name__ == '__main__':
             print(reg, dec, 'mean SST', sst[dec]['data_aver_reg'].mean().values, )
             print(reg, dec, 'mean wind', wind[dec]['data_aver_reg'].mean().values, )
 
-    with open(f"TrendsDict_per_ice_{season}.pkl", "rb") as myFile:
-        variables_info_seaice = pickle.load(myFile)
-
+    # with open(f"TrendsDict_per_ice_{season}.pkl", "rb") as myFile:
+    #     variables_info_seaice = pickle.load(myFile)
+    variables_info_seaice = variables_info_yr
     decade = '1990-2019'
 
     plot_aerosol_trend.plot_trend_emission(variables_info_seaice, variables_info_yr, seaice, season, decade)

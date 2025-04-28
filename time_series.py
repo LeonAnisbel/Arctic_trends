@@ -12,11 +12,6 @@ if __name__ == '__main__':
     with open(f"TrendsDict_{season}_orig_data.pkl", "rb") as myFile:
         variables_info_yr = pickle.load(myFile)
 
-    with open(f"TrendsDict_per_ice_{season}.pkl", "rb") as myFile:
-        variables_info_seaice = pickle.load(myFile)
-
-
-
     unit = '(Tg ${month^{-1}}$)'
     fig, axes = plt.subplots(3, 1,
                              figsize=(8, 6), )
@@ -28,7 +23,7 @@ if __name__ == '__main__':
     var_type = ['Biom_tot', 'biom', 'Biomolecule concentration']
     var_type = ['AER_tot', 'aer_conc', 'Aerosol concentration']
     var_type = ['AER_F_tot', 'aer_flux', 'Aerosol emission flux']
-    var_type = ['AER_F_tot_anom', 'aer_flux_anom', 'Aerosol emission flux anomaly']
+    # var_type = ['AER_F_tot_anom', 'aer_flux_anom', 'Aerosol emission flux anomaly']
 
     flux = variables_info_yr[var_type[0]]  # AER_LIP #AER_F_tot_yr
     conc = variables_info_yr['AER_tot']  # AER_LIP #AER_F_tot_yr
@@ -40,7 +35,14 @@ if __name__ == '__main__':
             'Kara Sea':{'lims':[[0.7, 0.6], [0.1, 0.1]]},
             'Barents Sea':{'lims':[[0.25, 0.23], [0.1, 0.1]]}}
 
+
     for idx, reg in enumerate(list(region.keys())):
+        plots.autocorrelation([seaice_lin[reg], flux[reg]],
+                        [reg, r'$\bf{(a)}$'],
+                         var_type)
+        plots.create_histogram([seaice_lin[reg], flux[reg]],
+                        [reg, r'$\bf{(a)}$'],
+                         var_type)
         leg = plots.plot_fit_trends(axs[idx],
                                     [seaice_lin[reg], flux[reg]],
                                     [reg, r'$\bf{(a)}$'],

@@ -1,6 +1,6 @@
 import xarray as xr
 import numpy as np
-
+import os
 import global_vars
 import utils
 
@@ -116,32 +116,38 @@ def read_each_aerosol_data(months, var_id, file_type, unit_factor, per_month=Fal
 
         for yr in np.arange(1990, 2020):
             files = f'{aer_dir}_{yr}{mo_str}.01_{file_type}.nc'
-
-            if two_dim:
-                # calculate values per season without conversion from year to month
-                ds = read_files_data(files)
-                v_yr.append(ds.mean(dim='time', skipna=True))
-                if file_type == 'emi':
-                    # calculate values as a conversion from yr to month
-                    ds_gboxarea = ds.rename({'gboxarea': f'area_{var_id}'})
-                    ds_emi = ds.rename({var_id: f'area_{var_id}'})
-                    ds_emi_gboxarea = ds_gboxarea * ds_emi
-                    var_id_new = f'area_{var_id}'
-                    v_m_yr.append(ds_emi_gboxarea.sum(dim='time', skipna=True))
+            if os.path.isfile(files):
+                if two_dim:
+                    # calculate values per season without conversion from year to month
+                    ds = read_files_data(files)
+                    v_yr.append(ds.mean(dim='time', skipna=True))
+                    if file_type == 'emi':
+                        # calculate values as a conversion from yr to month
+                        ds_gboxarea = ds.rename({'gboxarea': f'area_{var_id}'})
+                        ds_emi = ds.rename({var_id: f'area_{var_id}'})
+                        ds_emi_gboxarea = ds_gboxarea * ds_emi
+                        var_id_new = f'area_{var_id}'
+                        v_m_yr.append(ds_emi_gboxarea.sum(dim='time', skipna=True))
+                else:
+                    files_dens = f'{aer_dir}_{yr}{mo_str}.01_vphysc.nc'
+                    print(files_dens)
+                    ds_dens = read_files_data(files_dens).isel(lev=46).rename({'rhoam1': f'{var_id}'})
+                    ds_conc = read_files_data(files).isel(lev=46)
+                    ds_conc_ng_m3 = ds_dens*ds_conc
+                    v_yr.append(ds_conc_ng_m3.mean(dim='time', skipna=True))
             else:
-                files_dens = f'{aer_dir}_{yr}{mo_str}.01_vphysc.nc'
-                ds_dens = read_files_data(files_dens).isel(lev=46).rename({'rhoam1': f'{var_id}'})
-                ds_conc = read_files_data(files).isel(lev=46)
-                ds_conc_ng_m3 = ds_dens*ds_conc
-                v_yr.append(ds_conc_ng_m3.mean(dim='time', skipna=True))
-
+                pass
         v_month = concat_months_selvar(v_yr, unit_factor, var_id, v_month)
         if two_dim and file_type == 'emi':
             v_m_month = concat_months_selvar(v_m_yr, 1e-9 * 86400, var_id_new, v_m_month)
 
     if two_dim and file_type == 'emi':
         C_m = utils.tri_month_mean(v_m_month, months)
+        # C_m_ds = xr.concat(v_m_month, dim='time')
+        # C_m = utils.season_aver(C_m_ds, months)
 
     C = utils.tri_month_mean(v_month, months)
+    # C_ds = xr.concat(v_month, dim='time')
+    # C = utils.season_aver(C_ds, months)
 
     return C, C_m

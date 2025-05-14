@@ -49,14 +49,19 @@ def tri_month_mean(v_month, months):
     else:
         da_tri_mean_yrs = v_month[0]
 
+    #da_tri_mean_yrs = v_month.groupby((v_month.time.dt.year, v_month.time.dt.month)).mean('time', skipna=True)
+
     return da_tri_mean_yrs
 
 def season_aver(data, months):
+    # da_tri_mean_yrs = data.groupby((data.time.dt.year)).mean('time', skipna=True)
+    # print(da_tri_mean_yrs.time)
     v_month = []
     for m in months:
         v_ti = get_month(data, m)
         v_ti['time'] = v_ti['time'].dt.year
         v_month.append(v_ti)
+#    v_month_da = xr.concat(v_month, dim='time')
     v_tri_mo = tri_month_mean(v_month, months)
     return v_tri_mo
 
@@ -138,10 +143,16 @@ def get_perc_increase(variables_info, panel_names):
     return percent_increase_yr, panel_unit
 
 
-def get_weights(data):
-    weights = np.cos(np.deg2rad(data.lat))
-    weights /= weights.sum()
-    return weights
+def get_weighted_mean(gboxarea_reg, data, aer_conc=False):
+    if aer_conc:
+        weights = gboxarea_reg / gboxarea_reg.sum(dim=('lat', 'lon'))
+    else:
+        weights = np.cos(np.deg2rad(data.lat))
+        weights /= weights.sum()
+
+    ds_weighted = data.weighted(weights)
+    ds_weighted_mean = ds_weighted.mean(dim=['lat', 'lon'], skipna=True)
+    return ds_weighted_mean
 
 
 def get_conds(lat,lon):

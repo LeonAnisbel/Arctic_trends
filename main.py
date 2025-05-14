@@ -103,6 +103,7 @@ if __name__ == '__main__':
                data_omf['OMF_LIP'] +
                data_omf['OMF_PRO'])
     print('Finished reading OMF  data')
+    print(data_omf['OMF_POL'])
 
 # Read in biomolecule ocean concentration and other biogeochemical indicators from the BGC model (FESOM-REcoM)
     C_pcho, C_dcaa, C_pl, C_ice, C_temp, C_NPP, C_DIN = read_data.read_ocean_data()
@@ -115,7 +116,8 @@ if __name__ == '__main__':
         C_emi[0], C_emi[1], C_emi[2], C_tot_emi, C_emi[3], C_emi_ssa,
         C_emi_anomaly[0], C_emi_anomaly[1], C_emi_anomaly[2], C_tot_emi_anomaly, C_emi_anomaly[3], C_emi_ssa_anomaly,
         C_emi_m[0], C_emi_m[1], C_emi_m[2], C_tot_emi_m, C_emi_m[3], C_ssa_emi_m,
-        u10, sst_aer_K, seaice_aer * 100, C_ice_aer_area_px, seaice_aer * 100,
+        u10, sst_aer_K,
+        seaice_aer * 100, C_ice_aer_area_px, seaice_aer * 100,
         C_conc[0], C_conc[1], C_conc[2], C_tot_conc, C_conc[3], C_conc_ssa,
         C_conc_anomaly[0], C_conc_anomaly[1], C_conc_anomaly[2], C_tot_conc_anomaly, C_conc_anomaly[3], C_conc_ssa_anomaly,
         data_omf['OMF_POL'], data_omf['OMF_PRO'], data_omf['OMF_LIP'], tot_omf,
@@ -145,6 +147,11 @@ if __name__ == '__main__':
         else:
             da_type = 'orig_data'
 
+        gbox_area_arctic = utils.pick_month_var_reg(gbox_area,
+                                                    months,
+                                                    aer_conc=True)
+
+
         if var_na == 'Sea_ice_1m' or var_na == 'Sea_ice_area_px_1m' :#or var_na == 'AER_SIC_1m':
             data_reg = dict_var[da_type].where(dict_var[da_type].lat > 60,
                                                drop=True)
@@ -160,6 +167,7 @@ if __name__ == '__main__':
             variables_info[var_na]['data_season_reg'] = data_month_arctic
             variables_info[var_na]['data_time_mean'] = data_month_arctic.mean('time',
                                                                            skipna=True)
+
             da_compute = data_month_arctic.compute()
             variables_info[var_na]['data_time_median'] = da_compute.median('time',
                                                                            skipna=True)
@@ -197,20 +205,15 @@ if __name__ == '__main__':
             variables_info[var_na]['tau'] = tau
             variables_info[var_na]['significance'] = significance
 
-            # plots.plot_trend(slope,
-            #                  p_value,
-            #                  lat,
-            #                  lon,
-            #                  'Trend_' + var_na + '.png',
-            #                  dict_var['lim'],
-            #                  dict_var['unit'])
-
             Trend_all_arctic.trend_aver_per_reg(variables_info,
                                                 var_na,
                                                 data_month_arctic,
                                                 data_month_arctic,
                                                 var_na[:3],
-                                                per_unit_sic=False)
+                                                gbox_area_arctic[0],
+                                                per_unit_sic=False,
+                                                aer_conc=aer_conc)
+
 
             gc.collect()
 

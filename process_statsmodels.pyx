@@ -25,7 +25,7 @@ def process_array_slope(double[:,:,:] Y, double[:,:] X, double[:, :] slope, doub
             y_clean = y_arr[mask]
             x_clean = x_arr[mask]
 
-            if n >= 2 and not np.allclose(y_clean, y_clean[0]):
+            if n >= 10 and not np.allclose(y_clean, y_clean[0]):
                 result = mk.hamed_rao_modification_test(y_clean)
                 intercept[j,i] = result.intercept
                 slope[j,i] = result.slope

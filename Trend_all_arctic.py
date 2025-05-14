@@ -8,7 +8,7 @@ import warnings
 
 
 ftype = np.float64
-def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_reg, var_type, per_unit_sic=False):
+def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_reg, var_type, gboxarea, per_unit_sic=False, aer_conc=False):
     lon_360 = data_month_reg.lon.data
     if var_type == 'AER':
         lon = ((lon_360 + 180) % 360) - 180
@@ -33,18 +33,25 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
         data_ds = utils.create_ds(data_month_reg, lon)
         conditions = utils.get_conds(data_ds.lat, data_ds.lon)
         reg_sel_vals_whole = utils.get_var_reg(data_ds, conditions[idx])
+        reg_sel_gboxarea = utils.get_var_reg(gboxarea, conditions[idx])
+
         for dec_na, dec in enumerate(decades):
             if var_type == 'AER':
 
                 reg_sel_vals = reg_sel_vals_whole.where((reg_sel_vals_whole.time >= decades_idx[dec_na][0])&
                                                   (reg_sel_vals_whole.time <= decades_idx[dec_na][1]),
                                                   drop=True)
+                reg_sel_vals_gbx = reg_sel_gboxarea.where((reg_sel_gboxarea.time >= decades_idx[dec_na][0])&
+                                                  (reg_sel_gboxarea.time <= decades_idx[dec_na][1]),
+                                                  drop=True)
             else:
                 reg_sel_vals = reg_sel_vals_whole.where((reg_sel_vals_whole.time >= dec[0])&
                                                   (reg_sel_vals_whole.time <= dec[1]),
                                                   drop=True)
+                reg_sel_vals_gbx = reg_sel_gboxarea.where((reg_sel_gboxarea.time >= dec[0])&
+                                                  (reg_sel_gboxarea.time <= dec[1]),
+                                                  drop=True)
 
-            weights = utils.get_weights(reg_sel_vals['data_region'])
             if var_na == 'Sea_ice_area_px' or var_na=='AER_SIC_area_px':
                 data_month = reg_sel_vals['data_region'].sum(dim=['lat', 'lon'],
                                                              skipna=True) * 1e-6 # from km2 to millions of km2
@@ -56,8 +63,8 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
 
             else:
                 data_month = reg_sel_vals['data_region']
-                data_month_wm = data_month.weighted(weights)
-                data_latlon_mean = data_month_wm.mean(dim=('lat', 'lon'), skipna=True)
+
+                data_latlon_mean = utils.get_weighted_mean(reg_sel_vals_gbx, data_month, aer_conc=aer_conc)
                 variables_info[var_na][reg_na][decades_na[dec_na]]['data_aver_reg'] = data_latlon_mean
 
                 data_time_mean = data_latlon_mean.mean(dim='time', skipna=True)
@@ -79,9 +86,8 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
 
                 data_month_ice = utils.create_ds2(X_aux, reg_sel_vals_ice['data_region'])
 
-                data_month_ice_wm = data_month_ice.weighted(weights)
-                data_month_ice_latlon_mean = data_month_ice_wm.mean(dim=('lat', 'lon'),
-                                                                    skipna=True)
+
+                data_month_ice_latlon_mean = utils.get_weighted_mean(reg_sel_vals_gbx, data_month_ice)
                 X = data_month_ice_latlon_mean.data
 
                 Y_aux = np.ma.masked_where(reg_sel_vals_ice['data_region'] < 0.2, data_month)

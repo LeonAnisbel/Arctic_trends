@@ -68,18 +68,29 @@ def process_array_slope_per_ice(double[:,:,:] Y, double[:,:,:] X, double[:, :] s
         for j in range(x_lat):
             y_sub = Y[:,j,i]
             x_sub = X[:,j,i]
-            if np.sum(np.logical_not(np.isnan(x_sub))) > 0:
-                if np.sum(np.logical_not(np.isnan(y_sub))) > 0:
-                    result = sm.OLS(np.array(y_sub), np.array(sm.add_constant(x_sub)), missing='drop').fit()
-                    intercept[j,i] = result.params[0]
-                    slope[j, i] = result.params[1]
-                    pval = result.pvalues[1]
 
-                    if pval > 0.05:
-                        pval = np.nan
-                    p_value[j,i] = pval
+            y_arr = np.array(y_sub, dtype=float)
+            x_arr = np.array(x_sub, dtype=float)
 
-                else:
-                    slope[j,i] = np.nan
-                    p_value[j,i] = np.nan
-                    intercept[j, i] = np.nan
+            masky = ~np.isnan(y_arr)
+            ny = masky.sum()
+            maskx = ~np.isnan(x_arr)
+            nx = maskx.sum()
+
+            y_clean = y_arr[masky]
+            x_clean = x_arr[maskx]
+
+            if ny >= 10 and not np.allclose(y_clean, y_clean[0]) and nx >= 10 and not np.allclose(x_clean, x_clean[0]) :
+                result = sm.OLS(np.array(y_clean), np.array(sm.add_constant(y_clean)), missing='drop').fit()
+                intercept[j,i] = result.params[0]
+                slope[j, i] = result.params[1]
+                pval = result.pvalues[1]
+
+                if pval > 0.05:
+                    pval = np.nan
+                p_value[j,i] = pval
+
+            else:
+                slope[j,i] = np.nan
+                p_value[j,i] = np.nan
+                intercept[j, i] = np.nan

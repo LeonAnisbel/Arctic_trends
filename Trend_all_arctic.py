@@ -110,10 +110,9 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
             y_clean = y_arr[mask]
             x_clean = x_arr[mask]
 
-            if n >= 2 and not np.allclose(y_clean, y_clean[0]):
+            if n >= 10 and not np.allclose(y_clean, y_clean[0]):
                 result = mk.hamed_rao_modification_test(y_clean)
-                intercept = result.intercept
-                slope = result.slope
+
                 tau = result.Tau
                 p_value = result.p
 
@@ -128,8 +127,12 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
 
                 if result.h==False:
                     signif = np.nan
+                    intercept = np.nan
+                    slope = np.nan
                 else:
                     signif = 0.0001 # assign arbitrary small amount
+                    intercept = result.intercept
+                    slope = result.slope
             else:
                 slope = np.nan
                 p_value = np.nan

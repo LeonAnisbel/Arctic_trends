@@ -111,7 +111,7 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
             x_clean = x_arr[mask]
 
             if n >= 10 and not np.allclose(y_clean, y_clean[0]):
-                result = mk.hamed_rao_modification_test(y_clean)
+                result = mk.original_test(y_clean)
 
                 tau = result.Tau
                 p_value = result.p

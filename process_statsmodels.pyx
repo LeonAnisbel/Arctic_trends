@@ -26,7 +26,7 @@ def process_array_slope(double[:,:,:] Y, double[:,:] X, double[:, :] slope, doub
             x_clean = x_arr[mask]
 
             if n >= 10 and not np.allclose(y_clean, y_clean[0]):
-                result = mk.hamed_rao_modification_test(y_clean)
+                result = mk.original_test(y_clean)
                 intercept[j,i] = result.intercept
                 slope[j,i] = result.slope
                 tau[j,i] = result.Tau
@@ -80,8 +80,8 @@ def process_array_slope_per_ice(double[:,:,:] Y, double[:,:,:] X, double[:, :] s
             y_clean = y_arr[masky]
             x_clean = x_arr[maskx]
 
-            if ny >= 10 and not np.allclose(y_clean, y_clean[0]) and nx >= 10 and not np.allclose(x_clean, x_clean[0]) :
-                result = sm.OLS(np.array(y_clean), np.array(sm.add_constant(y_clean)), missing='drop').fit()
+            if ny >= 2 and not np.allclose(y_clean, y_clean[0]) and nx >= 2 and not np.allclose(x_clean, x_clean[0]) :
+                result = sm.OLS(np.array(y_clean), np.array(sm.add_constant(x_clean)), missing='drop').fit()
                 intercept[j,i] = result.params[0]
                 slope[j, i] = result.params[1]
                 pval = result.pvalues[1]

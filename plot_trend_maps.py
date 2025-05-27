@@ -13,25 +13,11 @@ if __name__ == '__main__':
         variables_info_yr = pickle.load(myFile)
     seaice = utils.get_seaice_vals(variables_info_yr, 'Sea_ice', get_min_area=True)
 
-    seaice_lin = variables_info_yr['AER_SIC_area_px']
-    biomol = variables_info_yr['AER_F_tot_m']  # AER_LIP #AER_F_tot_yr
+    with open(f"TrendsDict_per_ice_{season}.pkl", "rb") as myFile:
+        variables_info_seaice = pickle.load(myFile)
 
-    region = ['Chukchi Sea', 'Greenland & Norwegian Sea', 'East-Siberian Sea', 'Kara Sea']
-    for reg in region:
-
-        sst = variables_info_yr['AER_SST'][reg]
-        wind = variables_info_yr['AER_U10'][reg]
-        decades = ['1990-2004', '2005-2019']
-
-        for idx, dec in enumerate(decades):
-            print(reg, dec, 'mean SST', sst[dec]['data_aver_reg'].mean().values, )
-            print(reg, dec, 'mean wind', wind[dec]['data_aver_reg'].mean().values, )
-
-    # with open(f"TrendsDict_per_ice_{season}.pkl", "rb") as myFile:
-    #     variables_info_seaice = pickle.load(myFile)
-    variables_info_seaice = variables_info_yr
     decade = '1990-2019'
 
+    plot_biomolecule_trend.plot_trend(variables_info_yr, seaice, season)
     plot_aerosol_trend.plot_trend_emission(variables_info_seaice, variables_info_yr, seaice, season, decade)
     plot_aerosol_trend.plot_trend_aer_concentration(variables_info_yr, seaice, season)
-    plot_biomolecule_trend.plot_trend(variables_info_seaice, variables_info_yr, seaice, season)

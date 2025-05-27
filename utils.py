@@ -2,12 +2,12 @@ import xarray as xr
 import numpy as np
 
 def create_var_info_dict():
-    npp_din_u = '$mmol\ C$ ${m^{-2}}$ ${d^{-1}}$ '
-    flux_u = 'ng ${m^{-2}}$ ${s^{-1}}$'
-    flux_mo_u = 'Tg\ month$^{-1}$'
+    npp_din_u = 'mmol C m${^{-2}}$ d${^{-1}}$ '
+    flux_u = 'ng m${^{-2}}$ s${^{-1}}$'
+    flux_mo_u = 'Tg month$^{-1}$'
     sic_u = '% '
-    conc_u = 'ng ${m^{-3}}$ '
-    conc_biom_u = '$mmol\ C$ ${m^{-3}}$ '
+    conc_u = 'ng m${^{-3}}$ '
+    conc_biom_u = 'mmol C m${^{-3}}$ '
     vars_names = [
                   ['AER_F_POL', flux_u], ['AER_F_PRO', flux_u], ['AER_F_LIP', flux_u],
                   ['AER_F_tot', flux_u], ['AER_F_SS', flux_u], ['AER_F_SSA', flux_u],
@@ -15,7 +15,7 @@ def create_var_info_dict():
                   ['AER_F_tot_anom', flux_u], ['AER_F_SS_anom', flux_u], ['AER_F_SSA_anom', flux_u],
                   ['AER_F_POL_m', flux_mo_u], ['AER_F_PRO_m', flux_mo_u], ['AER_F_LIP_m', flux_mo_u],
                   ['AER_F_tot_m', flux_mo_u], ['AER_F_SS_m', flux_mo_u], ['AER_F_SSA_m', flux_mo_u],
-                  ['AER_U10', 'm ${s^{-1}}$'], ['AER_SST', '$^{o}C$ '],
+                  ['AER_U10', 'm s${^{-1}}$'], ['AER_SST', '$^{o}C$ '],
                   ['AER_SIC', sic_u], ['AER_SIC_area_px', sic_u], ['AER_SIC_1m', sic_u],
                   ['AER_POL', conc_u], ['AER_PRO', conc_u], ['AER_LIP', conc_u],
                   ['AER_tot', conc_u], ['AER_SS', conc_u], ['AER_SSA', conc_u],
@@ -81,16 +81,20 @@ def pick_month_var_reg(data, months, aer_conc=False):
     return data_month_reg, lat, lon
 
 
-def alloc_metadata(names, variables_info, trends=False, percent_increase=False):
+def alloc_metadata(names, variables_info, trends=False, percent_increase=False, mk_method = True):
     var_trend, var_pval, var_lim, var_unit = [], [], [], []
     for id in names:
         sl = variables_info[id]['slope']
         if percent_increase:
             sl = sl * 100
         var_trend.append(sl)
-        var_pval.append(variables_info[id]['significance'])
+        if mk_method:
+            p = 'significance'
+        else:
+            p = 'pval'
+        var_pval.append(variables_info[id][p])
         if trends:
-            var_unit.append(variables_info[id]['unit'] +  ' $yr^{-1}$')
+            var_unit.append(variables_info[id]['unit'] +  ' yr$^{-1}$')
         else:
             var_unit.append(variables_info[id]['unit'])
     return var_trend, var_pval, var_unit

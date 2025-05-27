@@ -2,7 +2,7 @@ import plots
 import utils
 
 
-def plot_trend(variables_info_seaice, variables_info_yr, seaice, season):
+def plot_trend(variables_info_yr, seaice, season):
     print('Trends of OMF and biom')
     panel_names = ['PCHO', 'PL', 'Biom_tot', 'OMF_tot']
     lat = variables_info_yr[panel_names[0]]['lat']

@@ -2,10 +2,10 @@ root_dir= '/work/bb1005/b381361/'
 aer_dir_path = root_dir+'my_experiments/ac3_arctic/ac3_arctic'
 omf_dir_path = root_dir+"MOA_DATA_ECHAM/OMF_data/fesom_recon_oceanfilms_no_icemask/fesom_recon_oceanfilms_omf_*"
 ocean_dir_path = root_dir+"MOA_DATA_ECHAM/regular_grid_interp/"
-factor_eim_heatmaps = 1.e7
+factor_eim_heatmaps = 1.e6
 factor_sic_heatmaps = 1.
 data_type = 'orig_data'#'log_data'#
-season_to_analise = 'AMJ'
+season_to_analise = 'JAS'
 seasons_info = {'JFM': {'months' : [1, 2, 3],
                         'one_month': [1],
                         'long_name': 'January-February-March'},
@@ -20,3 +20,5 @@ seasons_info = {'JFM': {'months' : [1, 2, 3],
                         'long_name': 'October-November-December'}
                 }
 log_data=True
+colors_arctic_reg = ['k', 'r', 'm', 'pink', 'lightgreen', 'darkblue', 'orange',
+                 'brown', 'lightblue', 'y', 'gray']

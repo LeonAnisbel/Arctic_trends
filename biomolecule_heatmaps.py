@@ -287,7 +287,7 @@ def create_df_pivot(variables_info_yr, var_na_sw_aer, panel_names, col_name_oc):
 
 if __name__=='__main__':
     season = global_vars.season_to_analise
-    with open(f"TrendsDict_{season}.pkl", "rb") as myFile:
+    with open(f"TrendsDict_{season}_orig_data.pkl", "rb") as myFile:
         variables_info_yr = pickle.load(myFile)
 
     print('Biomolecules and OMF')
@@ -312,7 +312,7 @@ if __name__=='__main__':
                                                             var_na)
 
     reg_names = regions()
-    col_name_oc = 'Ocean concentration (mmol C ${m^{-3}}$ ${yr^{-1}}$)'
+    col_name_oc = 'Ocean concentration (mmol C m${^{-3}}$ yr${^{-1}}$)'
     var_na_sw_aer = ['PCHO$_{sw}$', 'DCAA$_{sw}$', 'PL$_{sw}$']  # , 'Total$_{sw}$']
     panel_names = ['PCHO', 'DCAA', 'PL']  # , 'DCAA','Biom_tot']
 
@@ -325,11 +325,11 @@ if __name__=='__main__':
                                                                       col_name_oc)
 #################################################################################################
     #OMF
-    col_name_omf = 'OMF (% ${yr^{-1}}$)'
+    col_name_omf = 'OMF (% yr${^{-1}}$)'
 
     var_na_sw_aer = ['PCHO$_{aer}$','DCAA$_{aer}$', 'PL$_{aer}$', ]  #   'DCAA$_{aer}$']
     panel_names = ['OMF_POL','OMF_PRO', 'OMF_LIP', ]  # , 'OMF_tot']
-    df_vals_piv_omf, df_omf_grid_percent, _ = create_df_pivot(variables_info_yr,
+    df_vals_piv_omf, df_omf_grid_percent, cmaps_omf = create_df_pivot(variables_info_yr,
                                                               var_na_sw_aer,
                                                               panel_names,
                                                               col_name_omf)
@@ -373,7 +373,7 @@ if __name__=='__main__':
                                   df_vals_piv_omf,
                                   df_omf_grid_percent,
                                   col_name_omf,
-                                  cmaps,
+                                  cmaps_omf,
                                   label2,
                                   font)
     plt.tight_layout()

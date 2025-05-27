@@ -1,3 +1,4 @@
+import os
 import pickle
 
 import global_vars
@@ -12,9 +13,9 @@ if __name__ == '__main__':
     with open(f"TrendsDict_{season}_orig_data.pkl", "rb") as myFile:
         variables_info_yr = pickle.load(myFile)
 
-    unit = '(Tg ${month^{-1}}$)'
+    unit = '(Tg season${^{-1}}$)'
     fig, axes = plt.subplots(3, 1,
-                             figsize=(8, 6), )
+                             figsize=(6, 7), )
     axs = axes.flatten()
     colors = ['darkblue', 'darkred']
 
@@ -23,17 +24,19 @@ if __name__ == '__main__':
     var_type = ['Biom_tot', 'biom', 'Biomolecule concentration']
     var_type = ['AER_tot', 'aer_conc', 'Aerosol concentration']
     var_type = ['AER_F_tot', 'aer_flux', 'Aerosol emission flux']
-    # var_type = ['AER_F_tot_anom', 'aer_flux_anom', 'Aerosol emission flux anomaly']
+    var_type = ['AER_F_tot_anom', 'aer_flux_anom', 'Aerosol emission flux anomaly']
 
     flux = variables_info_yr[var_type[0]]  # AER_LIP #AER_F_tot_yr
-    conc = variables_info_yr['AER_tot']  # AER_LIP #AER_F_tot_yr
-    region = {'Arctic':{'lims':[[4.3, 7.5], [0.1, 0.1]]},
-            'Kara Sea':{'lims':[[0., 0.6], [0.1, 0.1]]},
-            'Barents Sea':{'lims':[[0, 0.23], [0.1, 0.1]]}}
+    region = {'Arctic':{'lims':[[4.3, 7.5], [-0.7e-5, 0.7e-5]],
+                        'label': r'$\bf{(a)}$'},
+            'Beaufort Sea':{'lims':[[0., 0.6], [-0.7e-5, 0.7e-5]],
+                        'label': r'$\bf{(b)}$'},
+            'Barents Sea':{'lims':[[0, 0.23], [-2.5e-5, 2.5e-5]],
+                        'label': r'$\bf{(c)}$'}}
 
-    region = {'Arctic':{'lims':[[10, 7.5], [0.1, 0.1]]},
-            'Kara Sea':{'lims':[[0.7, 0.6], [0.1, 0.1]]},
-            'Barents Sea':{'lims':[[0.25, 0.23], [0.1, 0.1]]}}
+    # region = {'Arctic':{'lims':[[10, 7.5], [0.1, 0.1]]},
+    #         'Kara Sea':{'lims':[[0.7, 0.6], [0.1, 0.1]]},
+    #         'Barents Sea':{'lims':[[0.25, 0.23], [0.1, 0.1]]}}
 
 
     for idx, reg in enumerate(list(region.keys())):
@@ -45,8 +48,8 @@ if __name__ == '__main__':
                          var_type)
         leg = plots.plot_fit_trends(axs[idx],
                                     [seaice_lin[reg], flux[reg]],
-                                    [reg, r'$\bf{(a)}$'],
-                                    ['Sea Ice Area \n (millions of km$^{2}$)', f'PMOA emission mass \n flux {unit}'],
+                                    [reg, region[reg]['label']],
+                                    ['Sea Ice Area \n (millions of km$^{2}$)', f'PMOA emission \n anomalies {unit}'],
                                     # ['Sea ice \n Concentration ($million km^{2})$', 'Total biomolecule \n concentration'],
                                     # [[6, 10.5], [0.1, 0.1]],
                                     region[reg]['lims'],
@@ -59,35 +62,46 @@ if __name__ == '__main__':
                                     seaice=True,
                                     multipanel=True)
         if idx == 0:
-            plt.legend(handles=[leg[0], leg[2][0], leg[3][0], leg[1], leg[2][1], leg[3][1]], ncol=2,
-                       bbox_to_anchor=(0.3, 1.), loc='lower left', fontsize=8)
+            plt.legend(handles=[leg[0], leg[2][0], leg[1], leg[3][0]], ncol=2,
+                       bbox_to_anchor=(0.1, 1.), loc='lower left', fontsize=8)
         else:
-            plt.legend(handles=[leg[2][0], leg[3][0], leg[2][1], leg[3][1]], ncol=2,  # ncol=len(axs[0].lines),
-                       bbox_to_anchor=(0.3, 1.), loc='lower left', fontsize=8)
+            plt.legend(handles=[leg[2][0],  leg[3][0]], ncol=2,  # ncol=len(axs[0].lines),
+                       bbox_to_anchor=(0.1, 1.), loc='lower left', fontsize=8)
 
     plt.tight_layout()
     plt.savefig(f'./plots/{season}_multipanel_time_series.png', dpi=300)
+    exit()
 
+    flux = variables_info_yr['AER_F_tot_m']  # AER_LIP #AER_F_tot_yr
+    fluxss = variables_info_yr['AER_F_SS_m']  # AER_LIP #AER_F_tot_yr
+    biom = variables_info_yr['Biom_tot']  # AER_LIP #AER_F_tot_yr
+    conc = variables_info_yr['AER_tot']  # AER_LIP #AER_F_tot_yr
     region = utils.regions()
+    os.remove("Region_means_{season}.txt")
     for reg, idx in region.items():
         decades = ['1990-2004', '2005-2019']
         for idx, dec in enumerate(decades):
-            #weights = utils.get_weights(conc[reg][dec]['data_aver_reg'])
-
-            with open("Region_means.txt", "a") as f:
+            with open(f"Region_means_{season}.txt", "a") as f:
                 print(reg, dec,
                       'mean SIC',
-                      seaice_lin[reg][dec]['data_aver_reg'].mean(skipna=True).values,
-                      '\n',
-                      file=f)
-                print(reg, dec,
-                      'mean PMOA surface concentration',
-                      conc[reg][dec]['data_aver_reg'].mean(skipna=True).values,
+                      seaice_lin[reg][dec]['data_sum_reg'].mean(skipna=True).values,
                       '\n',
                       file=f)
                 print(reg, dec,
                       'mean PMOA emission flux',
-                      flux[reg][dec]['data_aver_reg'].mean(skipna=True).values,
+                      flux[reg][dec]['data_sum_reg'].mean(skipna=True).values,
+                      file=f)
+                print(reg, dec,
+                      'mean PMOA surface concentration',
+                      conc[reg][dec]['data_aver_reg'].mean(skipna=True).values,
+                      file=f)
+                print(reg, dec,
+                      'mean SS emission flux',
+                      fluxss[reg][dec]['data_sum_reg'].mean(skipna=True).values,
+                      file=f)
+                print(reg, dec,
+                      'mean biomolecule ocean concentration',
+                      fluxss[reg][dec]['data_aver_reg'].mean(skipna=True).values,
                       file=f)
                 print('\n\n',
                       file=f)

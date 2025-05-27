@@ -6,12 +6,13 @@ from cartopy.mpl.gridliner import LATITUDE_FORMATTER
 from matplotlib import ticker as mticker
 import matplotlib.path as mpath
 import matplotlib.colors as mcolors
-from scipy.stats import linregress
-from decimal import Decimal
+from matplotlib.ticker import FormatStrFormatter
 import pymannkendall as mk
 from statsmodels.tsa.stattools import acf
 import statsmodels.api as sm
-
+from cartopy.mpl.gridliner import LATITUDE_FORMATTER
+from matplotlib import ticker as mticker
+import global_vars
 
 
 def plot_fit(ax, t_ax, p_fit, eq, color, a):
@@ -22,7 +23,6 @@ def create_histogram(C, title, var_type):
     fig, ax = plt.subplots(1, 1,
                                figsize=(5, 4), )
     mu = np.nanmean(y)
-    print(mu, np.nanmedian(y))
     sigma = np.nanstd(y)
     plt.hist(y, bins='auto', density=True, alpha=0.6)
     x = np.linspace(y.min(), y.max(), 100)
@@ -64,9 +64,8 @@ def plot_fit_trends(ax, C, title, axis_label, vm, colors, leg, fig_name, var_typ
         fig, ax = plt.subplots(1, 1,
                                figsize=(8, 3), )
 
-    C_ice, C_biom = C[0]['1990-2019']['data_aver_reg'], C[1]['1990-2019']['data_aver_reg']
+    C_ice, C_biom = C[0]['1990-2019']['data_sum_reg'], C[1]['1990-2019']['data_aver_reg']
     t_ax = C_ice.time.values
-    print(C_ice, C_biom)
 
     ax2 = ax.twinx()
     new_line_color = colors[0]
@@ -74,10 +73,10 @@ def plot_fit_trends(ax, C, title, axis_label, vm, colors, leg, fig_name, var_typ
         new_line_color = 'lightblue'
         ax.fill_between(t_ax, 0, C_ice, alpha=0.2, color=new_line_color)
         p1, = ax.plot(t_ax, C_ice, new_line_color, label=leg[0], linewidth=1.)
-    ax.scatter(t_ax, C_ice, s=15, c=new_line_color)
+    ax.scatter(t_ax, C_ice, s=7, c=new_line_color)
 
     p2, = ax2.plot(t_ax, C_biom, colors[1], label=leg[1], linewidth=1.)
-    ax2.scatter(t_ax, C_biom, s=15, c=colors[1])
+    ax2.scatter(t_ax, C_biom, s=7, c=colors[1])
     ax2.axhline(y=0.0, c=colors[1], linewidth=0.5, alpha=0.2)
 
     decades = ['1990-1999', '2000-2009', '2010-2019']
@@ -85,23 +84,25 @@ def plot_fit_trends(ax, C, title, axis_label, vm, colors, leg, fig_name, var_typ
 
     a = [0.5, 1]
     f1_list, f2_list = [], []
-    for idx, dec in enumerate(decades):
+    # for idx, dec in enumerate(decades):
+    if global_vars.season_to_analise == 'JAS' or global_vars.season_to_analise == 'AMJ':
+        dec = '1990-2019'
+        idx = 1
+        t_ax = C[0][dec]['data_sum_reg'].time.values
 
-        t_ax = C[0][dec]['data_aver_reg'].time.values
-
-        C_ice = C[0][dec]['data_aver_reg'].values
-        model_sic = mk.hamed_rao_modification_test(C_ice)#linregress(t_ax, y)
+        C_ice = C[0][dec]['data_sum_reg'].values
+        model_sic = mk.original_test(C_ice)
 
         C_emi = C[1][dec]['data_aver_reg'].values
-        model_emi = mk.hamed_rao_modification_test(C_emi)
+        model_emi = mk.original_test(C_emi)
 
         sl = [model_sic.slope, model_emi.slope]
         itc = [model_sic.intercept, model_emi.intercept]
         significance = [model_sic.h, model_emi.h]
         trend = [model_sic.trend, model_emi.trend]
 
-        print('SIC ', C_ice, trend[0], significance[0])
-        print('Emission ', C_emi, trend[1], significance[1])
+        print('SIC TAU',C_ice, model_sic.Tau, '\n', C_ice.min().values, C_ice.max().values)
+        print('Emission TAU', C_emi, model_emi.Tau, '\n', C_emi.min().values, C_emi.max().values)
 
         p_fit = [p * sl[0] + itc[0] for p in np.arange(len(t_ax))]
         eq = f'{sl[0]:.1e}x + {itc[0]:.1e}'
@@ -129,11 +130,18 @@ def plot_fit_trends(ax, C, title, axis_label, vm, colors, leg, fig_name, var_typ
     ax2.tick_params(axis='y', colors=colors[1])
     ax2.yaxis.label.set_color(colors[1])
 
-    ax.set_title(title[0] + '\n', loc='right', fontsize=10)
+    if title[0] == 'Arctic':
+        tt = title[0] + '\n \n \n'
+    else:
+        tt = '\n '+ title[0] + '\n \n '
+
+    ax.set_title(tt, loc='center', fontsize=10)
     ax.set_title(title[1], loc='left', fontsize=10)
 
 
     ax.set_ylim(vm[0][0], None)
+    ax2.set_ylim(vm[1][0], vm[1][1])
+
     #ax.grid(linestyle='--', linewidth=0.4)
     ax.xaxis.set_tick_params(labelsize=8)
     ax.yaxis.set_tick_params(labelsize=8, color=colors[0])
@@ -141,6 +149,9 @@ def plot_fit_trends(ax, C, title, axis_label, vm, colors, leg, fig_name, var_typ
     ax.yaxis.label.set_color(colors[0])
 
     ax2.ticklabel_format(axis="y", useMathText=True, useLocale=True)
+
+    ax.yaxis.set_major_formatter(FormatStrFormatter('%.3g'))
+    ax2.yaxis.set_major_formatter(FormatStrFormatter('%.3g'))
 
     if echam_data:
         def format_func(value, tick_number):
@@ -213,6 +224,8 @@ def plot_trend(subfig, trend, ice, pval, lat, lon, titles, vlim, unit, cm, vlim0
                         orientation='horizontal',
                         fraction=0.05,
                         pad=0.07)
+    cbar.ax.xaxis.set_major_formatter(FormatStrFormatter('%.3g'))
+
     cbar.set_label(label=unit,
                    fontsize=12, )
     # weight='bold')

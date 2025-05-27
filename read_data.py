@@ -125,7 +125,7 @@ def read_each_aerosol_data(months, var_id, file_type, unit_factor, per_month=Fal
                         # calculate values as a conversion from yr to month
                         ds_gboxarea = ds.rename({'gboxarea': f'area_{var_id}'})
                         ds_emi = ds.rename({var_id: f'area_{var_id}'})
-                        ds_emi_gboxarea = ds_gboxarea * ds_emi
+                        ds_emi_gboxarea = ds_gboxarea * ds_emi * 86400
                         var_id_new = f'area_{var_id}'
                         v_m_yr.append(ds_emi_gboxarea.sum(dim='time', skipna=True))
                 else:
@@ -139,10 +139,10 @@ def read_each_aerosol_data(months, var_id, file_type, unit_factor, per_month=Fal
                 pass
         v_month = concat_months_selvar(v_yr, unit_factor, var_id, v_month)
         if two_dim and file_type == 'emi':
-            v_m_month = concat_months_selvar(v_m_yr, 1e-9 * 86400, var_id_new, v_m_month)
+            v_m_month = concat_months_selvar(v_m_yr, 1e-9, var_id_new, v_m_month)
 
     if two_dim and file_type == 'emi':
-        C_m = utils.tri_month_mean(v_m_month, months)
+        C_m = utils.tri_month_mean(v_m_month, months, two_dim=two_dim, file_type=file_type)
         # C_m_ds = xr.concat(v_m_month, dim='time')
         # C_m = utils.season_aver(C_m_ds, months)
 

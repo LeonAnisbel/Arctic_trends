@@ -36,14 +36,17 @@ def get_month(da,m):
     da_t = da_yr.where(da_yr.time.dt.month == m, drop=True)
     return da_t
 
-def tri_month_mean(v_month, months):
+def tri_month_mean(v_month, months, two_dim=False, file_type=None):
     da_tri_mean = []
     if len(months) > 1:
         for yr in range(len(v_month[0]['time'])):
             da_t_reg_m_list_yr = xr.concat([v_month[0].isel(time=yr),
                                             v_month[1].isel(time=yr),
                                             v_month[2].isel(time=yr)], dim='t')
-            da_tri_mean.append(da_t_reg_m_list_yr.mean(dim='t', skipna=True))
+            if two_dim and file_type == 'emi':
+                da_tri_mean.append(da_t_reg_m_list_yr.sum(dim='t', skipna=True)) # Tg/season
+            else:
+                da_tri_mean.append(da_t_reg_m_list_yr.mean(dim='t', skipna=True))
         da_tri_mean_yrs = xr.concat(da_tri_mean, dim='time')
 
     else:

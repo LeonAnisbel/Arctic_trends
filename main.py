@@ -58,16 +58,16 @@ if __name__ == '__main__':
                                                       two_dim=True)
         C_emi.append(emi)
         C_emi_m.append(emi_m)
-        C_emi_anomaly.append(calculate_anomaly(emi))
+        C_emi_anomaly.append(calculate_anomaly(emi_m))
 
     C_tot_emi = C_emi[0] + C_emi[1] + C_emi[2]
     C_emi_ssa = C_tot_emi +  C_emi[3]
 
-    C_tot_emi_anomaly = calculate_anomaly(C_tot_emi)
-    C_emi_ssa_anomaly = calculate_anomaly(C_emi_ssa)
-
     C_tot_emi_m = C_emi_m[0] + C_emi_m[1] + C_emi_m[2]
     C_ssa_emi_m =  C_tot_emi_m +  C_emi_m[3]
+
+    C_tot_emi_anomaly = calculate_anomaly(C_tot_emi_m)
+    C_emi_ssa_anomaly = calculate_anomaly(C_ssa_emi_m)
 
     print('Finished reading aerosol emission data')
 

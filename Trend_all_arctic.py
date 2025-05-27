@@ -33,14 +33,17 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
         data_ds = utils.create_ds(data_month_reg, lon)
         conditions = utils.get_conds(data_ds.lat, data_ds.lon)
         reg_sel_vals_whole = utils.get_var_reg(data_ds, conditions[idx])
-        reg_sel_gboxarea = utils.get_var_reg(gboxarea, conditions[idx])
 
         for dec_na, dec in enumerate(decades):
-            if var_type == 'AER':
+            if var_type == 'AER': # exclude variables for accumulated emission flux
 
                 reg_sel_vals = reg_sel_vals_whole.where((reg_sel_vals_whole.time >= decades_idx[dec_na][0])&
                                                   (reg_sel_vals_whole.time <= decades_idx[dec_na][1]),
                                                   drop=True)
+
+                gboxarea_ds = utils.create_ds(gboxarea, lon)
+                conditions = utils.get_conds(gboxarea_ds.lat, gboxarea_ds.lon)
+                reg_sel_gboxarea = utils.get_var_reg(gboxarea_ds, conditions[idx])
                 reg_sel_vals_gbx = reg_sel_gboxarea.where((reg_sel_gboxarea.time >= decades_idx[dec_na][0])&
                                                   (reg_sel_gboxarea.time <= decades_idx[dec_na][1]),
                                                   drop=True)
@@ -48,28 +51,34 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
                 reg_sel_vals = reg_sel_vals_whole.where((reg_sel_vals_whole.time >= dec[0])&
                                                   (reg_sel_vals_whole.time <= dec[1]),
                                                   drop=True)
-                reg_sel_vals_gbx = reg_sel_gboxarea.where((reg_sel_gboxarea.time >= dec[0])&
-                                                  (reg_sel_gboxarea.time <= dec[1]),
-                                                  drop=True)
 
-            if var_na == 'Sea_ice_area_px' or var_na=='AER_SIC_area_px':
+            if var_na == 'Sea_ice_area_px' or var_na == 'AER_SIC_area_px':
+                ff = 1e-6 # from km2 to millions of km2
+            elif var_na[-2:] == '_m':
+                ff = 1
+            print('REGION', reg_na)
+
+            if var_na == 'Sea_ice_area_px' or var_na=='AER_SIC_area_px' or var_na[-2:] == '_m': # exclude variables for accumulated emission flux:
                 data_month = reg_sel_vals['data_region'].sum(dim=['lat', 'lon'],
-                                                             skipna=True) * 1e-6 # from km2 to millions of km2
-                variables_info[var_na][reg_na][decades_na[dec_na]]['data_aver_reg'] = data_month
+                                                             skipna=True) * ff
+                data_type_mean_or_sum = 'data_sum_reg'
+                variables_info[var_na][reg_na][decades_na[dec_na]][data_type_mean_or_sum] = data_month
 
-                data_time_mean = data_month.mean(dim='time', skipna=True)
-                da_compute = data_month.compute()
-                data_time_median = da_compute.median(dim='time', skipna=True)
 
-            else:
+                data_latlon_mean = data_month
+            if var_na != 'Sea_ice_area_px' and var_na !='AER_SIC_area_px':
+                data_type_mean_or_sum = 'data_aver_reg'
                 data_month = reg_sel_vals['data_region']
+                if aer_conc:
+                    data_latlon_mean = utils.get_weighted_mean(reg_sel_vals_gbx['data_region'], data_month, aer_conc=aer_conc)
+                else:
+                    data_latlon_mean = utils.get_weighted_mean(None, data_month, aer_conc=aer_conc)
 
-                data_latlon_mean = utils.get_weighted_mean(reg_sel_vals_gbx, data_month, aer_conc=aer_conc)
-                variables_info[var_na][reg_na][decades_na[dec_na]]['data_aver_reg'] = data_latlon_mean
+                variables_info[var_na][reg_na][decades_na[dec_na]][data_type_mean_or_sum] = data_latlon_mean
 
-                data_time_mean = data_latlon_mean.mean(dim='time', skipna=True)
-                da_compute = data_latlon_mean.compute()
-                data_time_median = da_compute.median(dim='time', skipna=True)
+            data_time_mean = data_latlon_mean.mean(dim='time', skipna=True)
+            da_compute = data_latlon_mean.compute()
+            data_time_median = da_compute.median(dim='time', skipna=True)
 
             del da_compute
             variables_info[var_na][reg_na][decades_na[dec_na]]['data_time_mean'] = data_time_mean
@@ -97,7 +106,7 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
 
             else:
                 X = data_month.time.values
-                Y = variables_info[var_na][reg_na][decades_na[dec_na]]['data_aver_reg'].values
+                Y = variables_info[var_na][reg_na][decades_na[dec_na]][data_type_mean_or_sum].values
 
             X = X.astype(ftype)
             X = sm.add_constant(X)
@@ -127,12 +136,11 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
 
                 if result.h==False:
                     signif = np.nan
-                    intercept = np.nan
-                    slope = np.nan
                 else:
                     signif = 0.0001 # assign arbitrary small amount
-                    intercept = result.intercept
-                    slope = result.slope
+
+                intercept = result.intercept
+                slope = result.slope
             else:
                 slope = np.nan
                 p_value = np.nan

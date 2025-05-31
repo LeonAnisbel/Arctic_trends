@@ -236,7 +236,7 @@ if __name__ == '__main__':
 
     fig, axs = plt.subplots( 2, 1, figsize=(8, 9))
     axs.flatten()
-    limits = [[-3.5, 4.5, 1.5], [-1, 3.5, 1]]
+    limits = global_vars.seasons_info[global_vars.season_to_analise]['bar_plot_lims']
     var_list = [[['AER_F_SS_m'], ['AER_F_POL_m'], ['AER_F_PRO_m'], ['AER_F_LIP_m']],
                 [['AER_SS'], ['AER_POL'], ['AER_PRO'], ['AER_LIP']]]
 
@@ -271,7 +271,7 @@ if __name__ == '__main__':
             title = 'Aerosol concentration'
         each_panel_fig(data_df, names_var[0], ax, title, limits[a], upper_panel=panel)
         plt.tight_layout()
-        plt.savefig('plots/bar_plot.png', dpi=300)
+        plt.savefig(f'plots/bar_plot_{global_vars.season_to_analise}.png', dpi=300)
 
 ###############################
 ###############################

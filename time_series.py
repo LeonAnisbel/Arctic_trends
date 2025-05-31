@@ -70,14 +70,13 @@ if __name__ == '__main__':
 
     plt.tight_layout()
     plt.savefig(f'./plots/{season}_multipanel_time_series.png', dpi=300)
-    exit()
 
     flux = variables_info_yr['AER_F_tot_m']  # AER_LIP #AER_F_tot_yr
     fluxss = variables_info_yr['AER_F_SS_m']  # AER_LIP #AER_F_tot_yr
     biom = variables_info_yr['Biom_tot']  # AER_LIP #AER_F_tot_yr
     conc = variables_info_yr['AER_tot']  # AER_LIP #AER_F_tot_yr
     region = utils.regions()
-    os.remove("Region_means_{season}.txt")
+    os.remove(f"Region_means_{season}.txt")
     for reg, idx in region.items():
         decades = ['1990-2004', '2005-2019']
         for idx, dec in enumerate(decades):
@@ -85,23 +84,28 @@ if __name__ == '__main__':
                 print(reg, dec,
                       'mean SIC',
                       seaice_lin[reg][dec]['data_sum_reg'].mean(skipna=True).values,
+                      seaice_lin[reg][dec]['data_sum_reg'].std(skipna=True).values,
                       '\n',
                       file=f)
                 print(reg, dec,
                       'mean PMOA emission flux',
                       flux[reg][dec]['data_sum_reg'].mean(skipna=True).values,
+                      flux[reg][dec]['data_sum_reg'].std(skipna=True).values,
                       file=f)
                 print(reg, dec,
                       'mean PMOA surface concentration',
                       conc[reg][dec]['data_aver_reg'].mean(skipna=True).values,
+                      conc[reg][dec]['data_aver_reg'].std(skipna=True).values,
                       file=f)
                 print(reg, dec,
                       'mean SS emission flux',
                       fluxss[reg][dec]['data_sum_reg'].mean(skipna=True).values,
+                      fluxss[reg][dec]['data_sum_reg'].std(skipna=True).values,
                       file=f)
                 print(reg, dec,
                       'mean biomolecule ocean concentration',
                       fluxss[reg][dec]['data_aver_reg'].mean(skipna=True).values,
+                      fluxss[reg][dec]['data_aver_reg'].std(skipna=True).values,
                       file=f)
                 print('\n\n',
                       file=f)

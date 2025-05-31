@@ -1,6 +1,9 @@
 import xarray as xr
 import numpy as np
 
+import global_vars
+
+
 def create_var_info_dict():
     npp_din_u = 'mmol C m${^{-2}}$ d${^{-1}}$ '
     flux_u = 'ng m${^{-2}}$ s${^{-1}}$'
@@ -163,7 +166,7 @@ def get_weighted_mean(gboxarea_reg, data, aer_conc=False):
 
 
 def get_conds(lat,lon):
-    conditions = [[[lat, 63, 90]],
+    conditions = [[[lat, global_vars.lat_arctic_lim, 90]],
                   [[lat, 66, 82], [lon, 20, 60]],
                   [[lat, 66, 82], [lon, 60, 100]],
                   [[lat, 66, 82], [lon, 100, 140]],

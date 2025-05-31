@@ -50,7 +50,7 @@ def autocorrelation(C, title, var_type):
     plt.ylabel('ACF')
     plt.grid()
     r1 = acf_values
-    print(f"Lag-1 autocorrelation (r1): {r1}")
+    # print(f"Lag-1 autocorrelation (r1): {r1}")
     plt.title('Autocorrelation Function')
     plt.savefig(f'./plots/autocorrelation_{var_type[1]}_{title[0]}.png')
     plt.close()
@@ -101,8 +101,8 @@ def plot_fit_trends(ax, C, title, axis_label, vm, colors, leg, fig_name, var_typ
         significance = [model_sic.h, model_emi.h]
         trend = [model_sic.trend, model_emi.trend]
 
-        print('SIC TAU',C_ice, model_sic.Tau, '\n', C_ice.min().values, C_ice.max().values)
-        print('Emission TAU', C_emi, model_emi.Tau, '\n', C_emi.min().values, C_emi.max().values)
+        print('SIC TAU',C_ice, model_sic.Tau, '\n',min(C_ice), max(C_ice), '\n')
+        print('Emission TAU', C_emi, model_emi.Tau, '\n',min(C_emi), max(C_emi), '\n\n')
 
         p_fit = [p * sl[0] + itc[0] for p in np.arange(len(t_ax))]
         eq = f'{sl[0]:.1e}x + {itc[0]:.1e}'

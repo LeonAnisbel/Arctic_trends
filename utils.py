@@ -85,6 +85,7 @@ def pick_month_var_reg(data, months, aer_conc=False):
 
 
 def alloc_metadata(names, variables_info, trends=False, percent_increase=False, mk_method = True):
+    """ :returns datset of variables in names, their units and dataset of p-value """
     var_trend, var_pval, var_lim, var_unit = [], [], [], []
     for id in names:
         sl = variables_info[id]['slope']
@@ -104,6 +105,8 @@ def alloc_metadata(names, variables_info, trends=False, percent_increase=False, 
 
 
 def find_yr_min_ice(v_1month):
+    """ Finds the year of minimum sea ice
+    :return year"""
     list_mins, years = [], []
     for i in v_1month.time:
         list_mins.append(v_1month.where((v_1month.time == i), drop=True).values)
@@ -118,6 +121,8 @@ def find_max_lim(panel_var):
     return vlims
 
 def get_seaice_vals(variables_info, var_na, get_min_area=False):
+    """ This function contains the function calls to calculate sea ice minimum
+    :return datasets of minimum SIC for SIC>10, average seasonal SIC and minimum SIC """
     v_season = variables_info[var_na]['data_season_reg'].compute()
     if get_min_area:
         seaice_min = get_min_seaice(variables_info, var_na)
@@ -129,6 +134,8 @@ def get_seaice_vals(variables_info, var_na, get_min_area=False):
     return [seaice_min_10, seaice_mean, seaice_min]
 
 def get_min_seaice(variables_info, var_na):
+    """ Calculates the minimum sea ice over the 30 years for the selected season
+    :return dataset of minimum of SIC"""
     v_1month_area = variables_info[f'{var_na}_area_px_1m']['data_season_reg'].compute()
     v_1month_area_tot = v_1month_area.sum(dim=['lat', 'lon'],
                                  skipna=True) * 1e-6
@@ -166,6 +173,8 @@ def get_weighted_mean(gboxarea_reg, data, aer_conc=False):
 
 
 def get_conds(lat,lon):
+    """ Define the subregions limits
+    Returns list with region limits, latitude and longitude arrays from the model grid"""
     conditions = [[[lat, global_vars.lat_arctic_lim, 90]],
                   [[lat, 66, 82], [lon, 20, 60]],
                   [[lat, 66, 82], [lon, 60, 100]],
@@ -180,6 +189,8 @@ def get_conds(lat,lon):
 
     return conditions
 def regions():
+    """ This function defines a dictionary with Arctic subregions
+    Returns dictionary with regions"""
     reg_data = {'Arctic': {},
                 'Barents Sea': {},
                 'Kara Sea': {},
@@ -196,6 +207,9 @@ def regions():
 
 
 def get_var_reg(v, cond):
+    """ This function is used to select and filter certain regions according to the conditions variable (cond).
+    v is the variable dataset, cond is the dictionary containing the regions
+    Returns the variable dataset with the data filtered to meet each condition"""
     if len(cond) <= 1:
         v = v.where((cond[0][0] > cond[0][1]) &
                     (cond[0][0] < cond[0][2])

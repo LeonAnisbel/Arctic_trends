@@ -3,6 +3,8 @@ import utils
 
 
 def plot_trend(variables_info_yr, seaice, season):
+    """ Select data to plot related to marine quantities and calls the function to create the figure
+    :returns  None"""
     print('Trends of OMF and biom')
     panel_names = ['PCHO', 'PL', 'Biom_tot', 'OMF_tot']
     lat = variables_info_yr[panel_names[0]]['lat']
@@ -14,7 +16,7 @@ def plot_trend(variables_info_yr, seaice, season):
 
     # panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr, trends=True)
     # vlims = utils.find_max_lim(panel_var_trend)
-    # plots.plot_4_pannel_trend(panel_var_trend,
+    # plots.plot_4_panel_trend(panel_var_trend,
     #                           seaice,
     #                           panel_var_pval,
     #                           lat,
@@ -38,7 +40,7 @@ def plot_trend(variables_info_yr, seaice, season):
     panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
                                                                                   trends=True)
 
-    plots.plot_4_pannel_trend(panel_var_trend,
+    plots.plot_4_panel_trend(panel_var_trend,
                               seaice,
                               panel_var_pval,
                               lat,
@@ -85,7 +87,7 @@ def plot_trend(variables_info_yr, seaice, season):
     panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
                                                                                   trends=True)
 
-    plots.plot_6_2_pannel_trend(panel_var_trend,
+    plots.plot_6_2_panel_trend(panel_var_trend,
                                 seaice,
                                 panel_var_pval,
                                 lat,

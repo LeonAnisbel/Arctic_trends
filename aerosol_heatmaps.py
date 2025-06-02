@@ -25,7 +25,9 @@ def plot_heatmap(df_vals_piv, col_name, fig_title):
 
 
 def percent_icrease(variables_info_yr, vv, reg_na, decade, cond, tau_values=False):
-    pval = variables_info_yr[vv][reg_na][decade]['significance']
+    """ This function computes the percent of increase per year
+    :return an array containing only significant values when cond == 'significant'
+    and all values if cond != 'significant'"""
     pval = variables_info_yr[vv][reg_na][decade]['pval_aver_reg']
 
     if vv == 'Sea_ice_area_px' or vv == 'AER_SIC_area_px':
@@ -54,6 +56,8 @@ def percent_icrease(variables_info_yr, vv, reg_na, decade, cond, tau_values=Fals
 
 
 def cols_df(variables_info_yr, panel_names, var_na_title, decade, type):
+    """ This function selects the slope values for each variable
+    :return lists of slope values and percent of change when the trend is statistically significant"""
     panels = len(panel_names)
     columns = panels * [[]]
     for col in range(len(columns)):
@@ -84,6 +88,8 @@ def cols_df(variables_info_yr, panel_names, var_na_title, decade, type):
 
 def plot_heatmap_multipanel(variables_info, panel_names, var_na_aer, right_label_show, no_ylabel_show, col_name,
                             decade, type, label_loc, panel, settitle=False):
+    """ Creates multipanel figure of heatmap plots
+    :return None"""
     fig, axs = plt.subplots(panel[0][0], panel[0][1],
                             figsize=(panel[1][0], panel[1][1]))
     ax = axs.flatten()
@@ -116,11 +122,13 @@ def plot_heatmap_multipanel(variables_info, panel_names, var_na_aer, right_label
     plt.tight_layout()
     plt.savefig(f'./plots/{season}_heatmap_Emission_SIC_SST_Wind_{type}_{decade}.png', dpi=300)
     plt.close()
+    return None
 
 
 font = 12
 def each_panel_fig(data, names_var, ax, title, lims, upper_panel = False):
-    """ Create bar plots """
+    """ Create bar plots of percent of change per year for each Arctic subregion and marine aerosol specie
+    :return None"""
     pl = sns.barplot(data=data,
                      x='Regions',
                      y='% per year',

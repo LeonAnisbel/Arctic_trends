@@ -15,6 +15,12 @@ from matplotlib import ticker as mticker
 import global_vars
 
 
+def format_func(value, tick_number):
+    """ This function will create the year labels considering that 1990 is year 0, it returns 1
+    :returns value+1"""
+    N = int(value + 1990)
+    return N
+
 def plot_fit(ax, t_ax, p_fit, eq, color, a):
     return ax.plot(t_ax, p_fit, color, linestyle='dashed', label=eq, linewidth=1, alpha=a)
 
@@ -57,7 +63,8 @@ def autocorrelation(C, title, var_type):
 
 def plot_fit_trends(ax, C, title, axis_label, vm, colors, leg, fig_name, var_type,
                     echam_data=True, seaice=False, multipanel=False):
-
+    """ Plots yearly data of sea ice area and emission anomalies and calculates the 30-year trend
+    :returns subplot objects to later add the legend """
     if multipanel:
         pass
     else:
@@ -154,10 +161,6 @@ def plot_fit_trends(ax, C, title, axis_label, vm, colors, leg, fig_name, var_typ
     ax2.yaxis.set_major_formatter(FormatStrFormatter('%.3g'))
 
     if echam_data:
-        def format_func(value, tick_number):
-            N = int(value + 1990)
-            return N
-
         ax.xaxis.set_major_formatter(plt.FuncFormatter(format_func))
 
     if multipanel:
@@ -184,6 +187,8 @@ def add_ice_colorbar(fig, ic, ic2):
 
 def plot_trend(subfig, trend, ice, pval, lat, lon, titles, vlim, unit, cm, vlim0,
                not_aerosol=True, percent_increase=False, seaice_conc=False):
+    """ Plots each map of Arctic trends with statistically significant grid cells as hatched areas
+    :returns  """
     ax = subfig.subplots(nrows=1,
                          ncols=1,
                          sharex=True,
@@ -270,6 +275,8 @@ def plot_trend(subfig, trend, ice, pval, lat, lon, titles, vlim, unit, cm, vlim0
 def iterate_subfig(fig, subfigs, fig_name, trend_vars, ice_var,
                    pval_vars, lat, lon, vlim_vars, unit_vars, title_vars,
                    not_aerosol=True, percent_increase=False, seaice_conc=False):
+    """ Organize and Plots calls function to plot each map of Arctic trends
+    :returns  """
     if seaice_conc:
         cm, vlim0 = 'Blues_r', 0
         idx = 0
@@ -351,9 +358,11 @@ def plot_6_pannel_trend(trend_vars, seaice, pval_vars, lat, lon, vlim_vars, unit
                    not_aerosol=not_aerosol, percent_increase=percent_increase)
 
 
-def plot_2_pannel_trend(trend_vars, seaice, pval_vars, lat, lon, vlim_vars, unit_vars, title_vars, fig_name,
+def plot_2_panel_trend(trend_vars, seaice, pval_vars, lat, lon, vlim_vars, unit_vars, title_vars, fig_name,
                         not_aerosol=True,
                         percent_increase=False):
+    """ Creates a plot of the 2-panel trend
+    :returns  None"""
     fig = plt.figure(constrained_layout=True, figsize=(7, 4))
 
     (subfig1, subfig2) = fig.subfigures(nrows=1, ncols=2)
@@ -377,9 +386,11 @@ def plot_3_pannel_trend(trend_vars, seaice, pval_vars, lat, lon, vlim_vars, unit
                    not_aerosol=not_aerosol)
 
 
-def plot_4_pannel_trend(trend_vars, seaice, pval_vars, lat, lon, vlim_vars, unit_vars, title_vars, fig_name,
+def plot_4_panel_trend(trend_vars, seaice, pval_vars, lat, lon, vlim_vars, unit_vars, title_vars, fig_name,
                         not_aerosol=True,
                         percent_increase=False, seaice_conc=False):
+    """ Creates a plot of the 4-panel trend
+    :returns  None"""
     fig = plt.figure(constrained_layout=True, figsize=(7, 7))
 
     (subfig1, subfig2), (subfig3, subfig4) = fig.subfigures(nrows=2, ncols=2)
@@ -394,8 +405,10 @@ def plot_4_pannel_trend(trend_vars, seaice, pval_vars, lat, lon, vlim_vars, unit
                    percent_increase=percent_increase, seaice_conc=seaice_conc)
 
 
-def plot_6_2_pannel_trend(trend_vars, seaice, pval_vars, lat, lon, vlim_vars, unit_vars, title_vars, fig_name,
+def plot_6_2_panel_trend(trend_vars, seaice, pval_vars, lat, lon, vlim_vars, unit_vars, title_vars, fig_name,
                           not_aerosol=True, percent_increase=False, seaice_conc=False):
+    """ Creates a plot of the 6-panel trend
+    :returns  None"""
     fig = plt.figure(constrained_layout=True, figsize=(7, 10))
 
     (subfig1, subfig2), (subfig3, subfig4), (subfig5, subfig6) = fig.subfigures(nrows=3, ncols=2)

@@ -36,6 +36,8 @@ def plot_test_map(reg_sel_vals, var_na, reg_na):
 
 
 def scatter_plot(fig, axs, df, col_name, title, vm, font, no_left_labels=False, no_colorbar=False):
+    """ Creates scatter plots of grid fraction with significant, increasing and decreasing trend
+    :return None"""
     sc = axs.scatter(
         x=df['Variables'],
         y=df['Regions'],
@@ -67,8 +69,11 @@ def scatter_plot(fig, axs, df, col_name, title, vm, font, no_left_labels=False, 
         cbar.set_label(title[1],
                        fontsize=font-2
                        )
+    return None
 
 def create_df_plot_heatmap(col, col_name, return_colorbar=False):
+    """ This function creates a dataframe use to plot the heatmap
+    :return dataframe or dataframe, cmap and min and max values"""
     df_vals = pd.DataFrame({'Regions': col[0],
                             col_name: col[1],
                             'Values': col[2],
@@ -97,6 +102,8 @@ def create_df_plot_heatmap(col, col_name, return_colorbar=False):
 
 
 def plot_each_heatmap(ax, df_vals_piv, fig_title, cmap, no_ylabel=False, right_label=True):
+    """ plots each heatmap
+    :return None"""
     hm = sns.heatmap(df_vals_piv,
                      annot=True,
                      vmin=cmap[1],
@@ -114,6 +121,9 @@ def plot_each_heatmap(ax, df_vals_piv, fig_title, cmap, no_ylabel=False, right_l
 
 
 def reg_sel(lat, lon, data, var_na):
+    """ This function calculates the percent of grid with significant trend and what fraction
+     of it has an increasing and a decreasing trend
+    :return dictionary with this information """
     reg_data = regions()
     for idx, reg_na in enumerate(list(reg_data.keys())):
         data_ds = xr.Dataset(
@@ -178,6 +188,8 @@ def reg_sel(lat, lon, data, var_na):
     return reg_data
 
 def subplots_plot_heatmap_scatter(ax, df_vals_piv, df_grid_percent, col_name, cmaps, label, font):
+    """ Creates multipanel plot with heatmaps and scatter plots of fraction of grid with increasing trend
+    :return None"""
     ax[0].set_title(label[0]+ '\n ',
                     loc='left',
                     fontsize=font+2)
@@ -241,8 +253,12 @@ def subplots_plot_heatmap_scatter(ax, df_vals_piv, df_grid_percent, col_name, cm
     for a in ax[:3]:
         a.tick_params(axis='y',
                       labelsize=font,)
+    return None
 
 def create_df_pivot(variables_info_yr, var_na_sw_aer, panel_names, col_name_oc):
+    """ This function creates a dataframe use to plot the heatmap and scatter plot of percent
+    of grid with significant trend for ocean biomolecules and OMF
+    :return dataframes and cmap used to plotting"""
     columns = [[], [], []]
     columns1 = [[], [], []]
     for vidx, var_na in enumerate(panel_names):

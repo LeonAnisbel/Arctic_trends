@@ -4,6 +4,7 @@ import plots
 import utils
 
 def fill_with_nan(panel_var_trend):
+    """ :returns dataset with masked values """
     panel_var_trend = np.ma.masked_where(panel_var_trend > 0., panel_var_trend)
     panel_var_tren = panel_var_trend.filled(np.nan)
     return panel_var_tren
@@ -36,7 +37,8 @@ def percent_icrease(variables_info_yr, vv, decade):
 
 
 def plot_trend_emission(variables_info_seaice, variables_info_yr, seaice, season, decade):
-
+    """ Select data to plot related to aerosol quantities and calls the function to create the figure
+    :returns  None"""
     seaice_aer = utils.get_seaice_vals(variables_info_yr, 'AER_SIC')
     panel_names = ['AER_POL', 'AER_PRO', 'AER_LIP', 'AER_SS']
 
@@ -51,7 +53,7 @@ def plot_trend_emission(variables_info_seaice, variables_info_yr, seaice, season
                   ['SS$_{aer}$', r'$\bf{(d)}$']],
 
     percent_increase_yr, _ = utils.get_perc_increase(variables_info_yr, panel_names)
-    plots.plot_4_pannel_trend(percent_increase_yr,
+    plots.plot_4_panel_trend(percent_increase_yr,
                               seaice_aer,
                               panel_var_pval,
                               lat_aer,
@@ -82,7 +84,7 @@ def plot_trend_emission(variables_info_seaice, variables_info_yr, seaice, season
     #     tau = variables_info_yr[panel_names[i]]['tau']
     #     panel_var_trend_signif.append(np.ma.masked_where(tau < 0.1, perc_increase_mask))
     #
-    # plots.plot_4_pannel_trend(panel_var_trend_signif,#percent_increase_yr,
+    # plots.plot_4_panel_trend(panel_var_trend_signif,#percent_increase_yr,
     #                           seaice_aer,
     #                           panel_var_pval,
     #                           lat_aer,
@@ -103,7 +105,7 @@ def plot_trend_emission(variables_info_seaice, variables_info_yr, seaice, season
     # #     std = variables_info[i]['data_season_reg'].std(dim='time')
     # #     print(i, 'std max', std.max().values)
     # #     panel_std.append(std)
-    # # plots.plot_4_pannel_trend(panel_std,
+    # # plots.plot_4_panel_trend(panel_std,
     # #                           seaice_aer,
     # #                           panel_var_pval,
     # #                           lat_aer,
@@ -150,7 +152,7 @@ def plot_trend_emission(variables_info_seaice, variables_info_yr, seaice, season
     # for i, pval in enumerate(panel_var_pval_new):
     #     panel_var_trend_new_signif.append(np.ma.masked_where(np.isnan(pval), panel_var_trend_new[i]))
     #
-    # plots.plot_6_2_pannel_trend(panel_var_perc_incr_new,  # panel_var_trend_new,
+    # plots.plot_6_2_panel_trend(panel_var_perc_incr_new,  # panel_var_trend_new,
     #                             seaice,
     #                             panel_var_pval_new,
     #                             lat_aer,
@@ -171,7 +173,7 @@ def plot_trend_emission(variables_info_seaice, variables_info_yr, seaice, season
     for i, pval in enumerate(panel_var_pval):
         panel_var_trend_signif.append(np.ma.masked_where(np.isnan(pval), panel_var_trend[i]))
     #
-    plots.plot_2_pannel_trend(panel_var_trend,  # panel_var_trend_signif
+    plots.plot_2_panel_trend(panel_var_trend,  # panel_var_trend_signif
                               seaice,
                               panel_var_pval,
                               lat_aer,
@@ -213,7 +215,7 @@ def plot_trend_emission(variables_info_seaice, variables_info_yr, seaice, season
     vlims = utils.find_max_lim(panel_var_trend_new)
 
     #### UNCOMENt
-    plots.plot_6_2_pannel_trend(panel_var_trend_new,  # panel_var_trend_new_signif
+    plots.plot_6_2_panel_trend(panel_var_trend_new,  # panel_var_trend_new_signif
                                 seaice,
                                 panel_var_pval_new,
                                 lat_aer,
@@ -238,7 +240,7 @@ def plot_trend_aer_concentration(variables_info_yr, seaice, season):
     panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
                                                                                   trends=True)
 
-    plots.plot_4_pannel_trend(panel_var_trend,
+    plots.plot_4_panel_trend(panel_var_trend,
                               seaice,
                               panel_var_pval,
                               lat,

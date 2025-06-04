@@ -28,6 +28,34 @@ def plot_trend(variables_info_yr, seaice, season):
     #                           not_aerosol=True,
     #                           percent_increase=False)
 
+    panel_names = ['PCHO', 'DCAA', 'PL', 'OMF_tot', 'Sea_ice', 'NPP']
+    lat = variables_info_yr[panel_names[0]]['lat']
+    lon = variables_info_yr[panel_names[0]]['lon']
+    fig_titles = [[['PCHO$_{sw}$', r'$\bf{(a)}$'],
+                   ['DCAA$_{sw}$', r'$\bf{(b)}$'],
+                   ['PL$_{sw}$', r'$\bf{(c)}$'],
+                   ['Total OMF', r'$\bf{(d)}$'],
+                   ['SIC', r'$\bf{(e)}$'],
+                   ['NPP', r'$\bf{(f)}$']]]
+    vlims = [0.04, 0.01, 0.008, 0.2, 3, 1.]
+
+    panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
+                                                                                  trends=True)
+
+    plots.plot_6_pannel_trend(panel_var_trend,
+                            seaice,
+                            panel_var_pval,
+                            lat,
+                            lon,
+                            vlims,  #[0.05, 0.01, 0.005, 0.002, 0.008, 0.2],
+                            panel_unit,
+                            fig_titles,
+                   f'_{season}_Biom_OMF_SIC_NPP_trends',
+                            not_aerosol=True,
+                            percent_increase=False,)
+
+
+
 
     panel_names = ['PCHO', 'PL', 'Sea_ice', 'NPP']
     lat = variables_info_yr[panel_names[0]]['lat']
@@ -52,26 +80,6 @@ def plot_trend(variables_info_yr, seaice, season):
                               not_aerosol=True,
                               percent_increase=False,
                               )
-
-    panel_names = ['PCHO', 'DCAA', 'PL', 'OMF_POL', 'OMF_PRO', 'OMF_LIP']
-    fig_titles = [['PCHO$_{sw}$', r'$\bf{(a)}$'], ['DCAA$_{sw}$', r'$\bf{(b)}$'], ['PL$_{sw}$', r'$\bf{(c)}$'],
-                  ['PCHO$_{aer}$ OMF', r'$\bf{(d)}$'], ['DCAA$_{aer}$ OMF', r'$\bf{(e)}$'],
-                  ['PL$_{aer}$ OMF', r'$\bf{(f)}$']],
-    panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr)
-    vlims = utils.find_max_lim(panel_var_trend)
-
-    # plots.plot_6_pannel_trend(panel_var_trend,
-    #                         seaice,
-    #                        panel_var_pval,
-    ##                       lat,
-    #                     lon,
-    #                    [0.04, 0.01, 0.008, 0.002, 0.008, 0.2],  #[0.05, 0.01, 0.005, 0.002, 0.008, 0.2],
-    #                   panel_unit,
-    ##                  fig_titles,
-    #                f'_{season}_',
-    #               not_aerosol=True,
-    #              percent_increase=False,
-    #             )
 
 
     panel_names = ['PCHO', 'OMF_POL', 'PL', 'OMF_LIP', 'Sea_ice', 'NPP']

@@ -37,7 +37,7 @@ def plot_trend(variables_info_yr, seaice, season):
                    ['Total OMF', r'$\bf{(d)}$'],
                    ['SIC', r'$\bf{(e)}$'],
                    ['NPP', r'$\bf{(f)}$']]]
-    vlims = [0.04, 0.01, 0.008, 0.2, 3, 1.]
+    vlims = [0.04, 0.01, 0.008, 0.3, 3, 1.]
 
     panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
                                                                                   trends=True)

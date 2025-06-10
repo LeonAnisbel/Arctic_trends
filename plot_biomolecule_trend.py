@@ -27,6 +27,8 @@ def plot_trend(variables_info_yr, seaice, season):
     #                           f'{season}_Biom_OMF_trends_with_ice',
     #                           not_aerosol=True,
     #                           percent_increase=False)
+    ########################
+    ### Thesis ####
 
     panel_names = ['PCHO', 'DCAA', 'PL', 'OMF_tot', 'Sea_ice', 'NPP']
     lat = variables_info_yr[panel_names[0]]['lat']
@@ -54,7 +56,7 @@ def plot_trend(variables_info_yr, seaice, season):
                             not_aerosol=True,
                             percent_increase=False,)
 
-
+    ########################
 
 
     panel_names = ['PCHO', 'PL', 'Sea_ice', 'NPP']

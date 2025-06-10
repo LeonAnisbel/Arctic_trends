@@ -126,7 +126,7 @@ def plot_heatmap_multipanel(variables_info, panel_names, var_na_aer, right_label
 
 
 font = 12
-def each_panel_fig(data, names_var, ax, title, lims, upper_panel = False):
+def each_panel_fig(data, names_var, ax, title, lims, upper_panel = False, thesis_plot=False):
     """ Create bar plots of percent of change per year for each Arctic subregion and marine aerosol specie
     :return None"""
     pl = sns.barplot(data=data,
@@ -197,9 +197,9 @@ def each_panel_fig(data, names_var, ax, title, lims, upper_panel = False):
     ax.grid(linestyle='--',
             linewidth=0.4)
 
-    if upper_panel:
+    if upper_panel and not thesis_plot:
         ax.set_xticklabels([])
-    else:
+    elif not upper_panel and thesis_plot:
         ax.legend_.remove()
 
     # if title!= r'$\bf{(e)}$':
@@ -249,6 +249,8 @@ if __name__ == '__main__':
                 [['AER_SS'], ['AER_POL'], ['AER_PRO'], ['AER_LIP']]]
 
     # for cond in ['not significant', 'significant']:
+    data_df_list = []
+    title_list = []
     for a, ax in enumerate(axs):
         col_var = []
         col_reg = []
@@ -270,6 +272,7 @@ if __name__ == '__main__':
         data_dict['% per year']= col_perc
         data_dict['pval']= col_pval
         data_df = pd.DataFrame(data=data_dict)
+        data_df_list.append(data_df)
 
         if a == 0:
             panel = True
@@ -277,11 +280,25 @@ if __name__ == '__main__':
         else:
             panel = False
             title = 'Aerosol concentration'
+        title_list.append(title)
         each_panel_fig(data_df, names_var[0], ax, title, limits[a], upper_panel=panel)
         plt.tight_layout()
         plt.savefig(f'plots/bar_plot_{global_vars.season_to_analise}.png', dpi=300)
+    plt.close()
 
 ###############################
+    #thesis plots
+    fig, axs = plt.subplots( 1, 1, figsize=(8, 7))
+    each_panel_fig(data_df_list[0], names_var[0], axs, title_list[0], limits[0], upper_panel=True, thesis_plot=True)
+    plt.tight_layout()
+    plt.savefig(f'plots/bar_plot_emiss_{global_vars.season_to_analise}.png', dpi=300)
+    plt.close()
+
+    fig, axs = plt.subplots( 1, 1, figsize=(8, 7))
+    each_panel_fig(data_df_list[1], names_var[0], axs, title_list[1], limits[1], upper_panel=True, thesis_plot=True)
+    plt.tight_layout()
+    plt.savefig(f'plots/bar_plot_conc_{global_vars.season_to_analise}.png', dpi=300)
+    plt.close()
 ###############################
 
     panel_names_var = [[['AER_SIC_area_px'], ['AER_SST'], ['AER_F_SS_m'], ['AER_F_POL_m'], ['AER_F_PRO_m'], ['AER_F_LIP_m']],

@@ -117,7 +117,8 @@ def plot_each_heatmap(ax, df_vals_piv, fig_title, cmap, no_ylabel=False, right_l
     hm.xaxis.tick_top()
     if right_label:
         hm.set_title(fig_title,
-                     loc='right')
+                     loc='right',
+                     fontsize=font)
 
 
 def reg_sel(lat, lon, data, var_na):
@@ -190,7 +191,7 @@ def reg_sel(lat, lon, data, var_na):
 def subplots_plot_heatmap_scatter(ax, df_vals_piv, df_grid_percent, col_name, cmaps, label, font):
     """ Creates multipanel plot with heatmaps and scatter plots of fraction of grid with increasing trend
     :return None"""
-    ax[0].set_title(label[0]+ '\n ',
+    ax[0].set_title(label[0],
                     loc='left',
                     fontsize=font+2)
     plot_each_heatmap(ax[0],
@@ -202,25 +203,17 @@ def subplots_plot_heatmap_scatter(ax, df_vals_piv, df_grid_percent, col_name, cm
                       df_vals_piv[1],
                       col_name,
                       cmaps[1],
-                      no_ylabel=True, right_label=False)
+                      no_ylabel=True,
+                      right_label=False)
     plot_each_heatmap(ax[2],
                       df_vals_piv[2],
                       col_name,
                       cmaps[2],
                       no_ylabel=True)
 
-    scatter_plot(fig, ax[5],
-                 df_grid_percent,
-                 col_name_signif,
-                 ['', 'Grid fraction with \n significant trend (%)'],
-                 30,
-                 font,
-                 no_left_labels=True,
-                 no_colorbar=False)
-
     ax[3].set_title(label[1] + '\n ',
                     loc='left',
-                    fontsize=font+2)
+                    fontsize=font + 2)
     vm = 100
     scatter_plot(fig, ax[3],
                  df_grid_percent,
@@ -229,11 +222,8 @@ def subplots_plot_heatmap_scatter(ax, df_vals_piv, df_grid_percent, col_name, cm
                   'Grid fraction (%)'],
                  vm,
                  font,
-                 no_left_labels=True,
+                 no_left_labels=False,
                  no_colorbar=True)
-    ax[5].set_title(label[2] + '\n ',
-                    loc='left',
-                    fontsize=font+2)
 
     scatter_plot(fig, ax[4],
                  df_grid_percent,
@@ -244,6 +234,18 @@ def subplots_plot_heatmap_scatter(ax, df_vals_piv, df_grid_percent, col_name, cm
                  font,
                  no_left_labels=True,
                  no_colorbar=False)
+    scatter_plot(fig, ax[5],
+                 df_grid_percent,
+                 col_name_signif,
+                 ['', 'Grid fraction with \n significant trend (%)'],
+                 30,
+                 font,
+                 no_left_labels=True,
+                 no_colorbar=False)
+    ax[5].set_title(label[2] + '\n ',
+                    loc='left',
+                    fontsize=font + 2)
+
 
     for a in ax[3:]:
         a.tick_params(axis='x',
@@ -353,9 +355,9 @@ if __name__=='__main__':
 #################################
 
 #### plot figure with grid fracions of increasing or decreasing trend
-    fig, axs = plt.subplots(1, 6,
-                            figsize=(14, 4),)
-    plt.subplots_adjust(wspace=0.005)
+    fig, axs = plt.subplots(2, 3,
+                            figsize=(7, 7),)
+    plt.subplots_adjust(wspace=0.1)
     ax = axs.flatten()
 
     font = 10

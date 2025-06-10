@@ -195,7 +195,12 @@ def plot_trend(subfig, trend, ice, pval, lat, lon, titles, vlim, unit, cm, vlim0
                          subplot_kw={'projection': ccrs.NorthPolarStereo()}, )
     ax.set_extent([-180, 180, 60, 90],
                   ccrs.PlateCarree())
+    # if titles[0] == 'SIC' or titles[0] == 'SIC trend':
+    #     ax.set_title(titles[0], loc='center', fontsize=12)
+    # else:
     ax.set_title(titles[0], loc='right', fontsize=12)
+    ax.tick_params(axis='x', pad=8)
+
     ax.set_title(titles[1], loc='left', fontsize=12)
 
     cmap = plt.get_cmap(cm, 15)
@@ -243,13 +248,17 @@ def plot_trend(subfig, trend, ice, pval, lat, lon, titles, vlim, unit, cm, vlim0
     ax.set_boundary(circle, transform=ax.transAxes)
 
     ax.coastlines(color='darkgray')
-    gl = ax.gridlines(draw_labels=True, )
+    gl = ax.gridlines(draw_labels=True,
+                        x_inline=False,   # force labels to sit outside the map boundary
+                        y_inline=False,)
     gl.bottom_labels = False
     gl.left_labels = False
     gl.top_labels = False
     gl.right_labels = False
     gl.ylocator = mticker.FixedLocator([65, 75, 85])
     gl.yformatter = LATITUDE_FORMATTER
+    gl.xpadding = 8  # moves the lon labels (top & bottom) outward
+    gl.ypadding = 8
 
     if not_aerosol:
         orig_cmap = plt.get_cmap('Greys_r')

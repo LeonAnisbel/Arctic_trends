@@ -242,11 +242,12 @@ if __name__ == '__main__':
 
 
 
-    fig, axs = plt.subplots( 2, 1, figsize=(8, 9))
+    fig, axs = plt.subplots( 3, 1, figsize=(8, 9))
     axs.flatten()
     limits = global_vars.seasons_info[global_vars.season_to_analise]['bar_plot_lims']
     var_list = [[['AER_F_SS_m'], ['AER_F_POL_m'], ['AER_F_PRO_m'], ['AER_F_LIP_m']],
-                [['AER_SS'], ['AER_POL'], ['AER_PRO'], ['AER_LIP']]]
+                [['AER_SS'], ['AER_POL'], ['AER_PRO'], ['AER_LIP']],
+                [['AER_burden_SS'], ['AER_burden_POL'], ['AER_burden_PRO'], ['AER_burden_LIP']]]
 
     # for cond in ['not significant', 'significant']:
     data_df_list = []
@@ -281,9 +282,9 @@ if __name__ == '__main__':
             panel = False
             title = 'Aerosol concentration'
         title_list.append(title)
-        each_panel_fig(data_df, names_var[0], ax, title, limits[a], upper_panel=panel)
-        plt.tight_layout()
-        plt.savefig(f'plots/bar_plot_{global_vars.season_to_analise}.png', dpi=300)
+        # each_panel_fig(data_df, names_var[0], ax, title, limits[a], upper_panel=panel)
+        # plt.tight_layout()
+        # plt.savefig(f'plots/bar_plot_{global_vars.season_to_analise}.png', dpi=300)
     plt.close()
 
 ###############################
@@ -298,6 +299,13 @@ if __name__ == '__main__':
     each_panel_fig(data_df_list[1], names_var[0], axs, title_list[1], limits[1], upper_panel=True, thesis_plot=True)
     plt.tight_layout()
     plt.savefig(f'plots/bar_plot_conc_{global_vars.season_to_analise}.png', dpi=300)
+    plt.close()
+
+    fig, axs = plt.subplots( 1, 1, figsize=(8, 7))
+    each_panel_fig(data_df_list[2], names_var[0], axs, 'Accumulated atmospheric burden',
+                   limits[2], upper_panel=True, thesis_plot=True)
+    plt.tight_layout()
+    plt.savefig(f'plots/bar_plot_burden_{global_vars.season_to_analise}.png', dpi=300)
     plt.close()
 ###############################
 
@@ -333,7 +341,7 @@ if __name__ == '__main__':
             plot_heatmap_multipanel(variables_info_yr, panel_names, var_na_aer, right_label_show, no_ylabel_show,
                                     col_name_ic, dec, type, label_loc, [[2, 3], [8, 8]])
 
-        ###############################
+###############################
     panel_names_var = [
         [['AER_SIC'], ['AER_F_POL_m'], ['AER_F_PRO_m'], ['AER_F_LIP_m'], ['AER_F_SS_m']],
         [['AER_SIC'], ['AER_POL'], ['AER_PRO'], ['AER_LIP'], ['AER_SS']]]

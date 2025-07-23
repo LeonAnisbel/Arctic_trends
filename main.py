@@ -71,6 +71,21 @@ if __name__ == '__main__':
 
     print('Finished reading aerosol emission data')
 
+# Read in aerosol burden
+    C_burden = []
+    var_ids = ['burden_POL', 'burden_PRO', 'burden_LIP', 'burden_SS']
+    for c_elem in range(len(var_ids)):
+        burden, _ = read_data.read_each_aerosol_data(months,
+                                                      var_ids[c_elem],
+                                                      'burden',
+                                                      1e6,
+                                                      two_dim=True)
+        C_burden.append(burden)
+
+    C_tot_burden = C_burden[0] + C_burden[1] + C_burden[2]
+    C_burden_ssa = C_tot_burden +  C_burden[3]
+
+
 # Read in emission drivers
     sst_aer, _ = read_data.read_each_aerosol_data(months,
                                                   'tsw',
@@ -95,7 +110,23 @@ if __name__ == '__main__':
                                                     1,
                                                     two_dim=True)
     C_ice_aer_area_px = seaice_aer * gbox_area * 1.e-6  # from m2 to km2
+
+    # Read in aerosol burden
+    C_burden = []
+    var_ids = ['burden_POL', 'burden_PRO', 'burden_LIP', 'burden_SS']
+    for c_elem in range(len(var_ids)):
+        burden, _ = read_data.read_each_aerosol_data(months,
+                                                     var_ids[c_elem],
+                                                     'burden',
+                                                     1e6,
+                                                     two_dim=True)
+        C_burden.append(burden)
+
+    C_tot_burden = C_burden[0] + C_burden[1] + C_burden[2]
+    C_burden_ssa = C_tot_burden + C_burden[3]
+
     print('Finished reading aerosol emission drivers')
+
 
 # Read in aerosol organic mass fraction (OMF)
     data_omf = read_data.read_omf_data() * 100
@@ -113,6 +144,7 @@ if __name__ == '__main__':
     print('Finished reading biomolecule concentration and SIC from FESOm-REcoM data')
 
     list_variables = [
+        C_burden[0], C_burden[1], C_burden[2], C_tot_burden, C_burden[3], C_burden_ssa,
         C_emi[0], C_emi[1], C_emi[2], C_tot_emi, C_emi[3], C_emi_ssa,
         C_emi_anomaly[0], C_emi_anomaly[1], C_emi_anomaly[2], C_tot_emi_anomaly, C_emi_anomaly[3], C_emi_ssa_anomaly,
         C_emi_m[0], C_emi_m[1], C_emi_m[2], C_tot_emi_m, C_emi_m[3], C_ssa_emi_m,

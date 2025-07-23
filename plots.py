@@ -13,7 +13,11 @@ import statsmodels.api as sm
 from cartopy.mpl.gridliner import LATITUDE_FORMATTER
 from matplotlib import ticker as mticker
 import global_vars
+from matplotlib.colors import LinearSegmentedColormap
 
+def truncate_colormap(cmap, minval=0.0, maxval=0.5, n=256):
+    new_colors = cmap(np.linspace(minval, maxval, n))
+    return LinearSegmentedColormap.from_list(f"{cmap.name}_truncated", new_colors)
 
 def format_func(value, tick_number):
     """ This function will create the year labels considering that 1990 is year 0, it returns 1
@@ -195,15 +199,19 @@ def plot_trend(subfig, trend, ice, pval, lat, lon, titles, vlim, unit, cm, vlim0
                          subplot_kw={'projection': ccrs.NorthPolarStereo()}, )
     ax.set_extent([-180, 180, 60, 90],
                   ccrs.PlateCarree())
-    # if titles[0] == 'SIC' or titles[0] == 'SIC trend':
-    #     ax.set_title(titles[0], loc='center', fontsize=12)
-    # else:
-    ax.set_title(titles[0], loc='right', fontsize=12)
-    ax.tick_params(axis='x', pad=8)
+    if titles[0] == 'SIC' or titles[0] == 'SIC trend':
+        ax.set_title(titles[0], loc='center', fontsize=12)
+    else:
+        ax.set_title(titles[0], loc='right', fontsize=12)
 
     ax.set_title(titles[1], loc='left', fontsize=12)
 
     cmap = plt.get_cmap(cm, 15)
+    if titles[0][-16:] == ' per unit of SIC':
+        vlim = 0
+        cmap_original = plt.cm.coolwarm
+        cmap = truncate_colormap(cmap_original, 0.0, 0.5)
+
     cb = ax.pcolormesh(lon,
                        lat,
                        trend,
@@ -233,6 +241,7 @@ def plot_trend(subfig, trend, ice, pval, lat, lon, titles, vlim, unit, cm, vlim0
                         extend='both',
                         orientation='horizontal',
                         fraction=0.05,
+                        # format='%.0e',
                         pad=0.07)
     cbar.ax.xaxis.set_major_formatter(FormatStrFormatter('%.3g'))
 

@@ -115,6 +115,7 @@ def plot_each_heatmap(ax, df_vals_piv, fig_title, cmap, no_ylabel=False, right_l
         ax.tick_params(left=False, bottom=False)
     hm.set(ylabel="", xlabel="")
     hm.xaxis.tick_top()
+    font = 12
     if right_label:
         hm.set_title(fig_title,
                      loc='right',

@@ -54,11 +54,15 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
 
             if var_na == 'Sea_ice_area_px' or var_na == 'AER_SIC_area_px':
                 ff = 1e-6 # from km2 to millions of km2
-            elif var_na[-2:] == '_m':
+            elif var_na[-2:] == '_m' or var_na[:10] == 'AER_burden':
                 ff = 1
             print('REGION', reg_na)
 
-            if var_na == 'Sea_ice_area_px' or var_na=='AER_SIC_area_px' or var_na[-2:] == '_m': # exclude variables for accumulated emission flux:
+            if (var_na == 'Sea_ice_area_px' or var_na=='AER_SIC_area_px'
+                    or var_na[-2:] == '_m' or var_na[:10] == 'AER_burden'): # exclude variables for accumulated emission flux:
+                if var_na[:10] == 'AER_burden':
+                    # convert from mg/m2 to mg
+                    reg_sel_vals['data_region'] = reg_sel_vals['data_region'] * reg_sel_vals_gbx['data_region']
                 data_month = reg_sel_vals['data_region'].sum(dim=['lat', 'lon'],
                                                              skipna=True) * ff
                 data_type_mean_or_sum = 'data_sum_reg'
@@ -70,6 +74,7 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
                 data_type_mean_or_sum = 'data_aver_reg'
                 data_month = reg_sel_vals['data_region']
                 if aer_conc:
+                    print('aer_conc ENTERED condition',reg_sel_vals_gbx['data_region'])
                     data_latlon_mean = utils.get_weighted_mean(reg_sel_vals_gbx['data_region'], data_month, aer_conc=aer_conc)
                 else:
                     data_latlon_mean = utils.get_weighted_mean(None, data_month, aer_conc=aer_conc)

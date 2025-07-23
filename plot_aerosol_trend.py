@@ -288,7 +288,7 @@ def plot_trend_emission(variables_info_seaice, variables_info_yr, seaice, season
                                 panel_var_pval_new,
                                 lat_aer,
                                 lon_aer,
-                                [100, 1.8, 0.5, 0.0002, 0.03, 0.8],  # [100,  1.5,  0.02, 0.8, 0.3, 10],
+                                [100, 1.8, 0.5, 0.00018, 0.03, 0.8],  # [100,  1.5,  0.02, 0.8, 0.3, 10],
                                 panel_unit_new,
                                 fig_titles,
                                 f'{season}_SeaIce_Emission_flux_trends_and_per_ice',
@@ -317,6 +317,30 @@ def plot_trend_aer_concentration(variables_info_yr, seaice, season):
                               panel_unit,
                               fig_titles,
                               f'{season}_concentration_trends',
+                              not_aerosol=False,
+                              percent_increase=False,
+                              )
+
+    panel_names = ['AER_burden_POL', 'AER_burden_PRO', 'AER_burden_LIP', 'AER_burden_SS']
+    lat = variables_info_yr[panel_names[0]]['lat']
+    lon = variables_info_yr[panel_names[0]]['lon']
+    fig_titles = [[['PCHO$_{aer}$', r'$\bf{(a)}$'],
+                   ['DCAA$_{aer}$', r'$\bf{(c)}$'],
+                   ['PL$_{aer}$', r'$\bf{(b)}$'],
+                   ['SS', r'$\bf{(d)}$']]]
+    vlims = [0.0001, 0.0004, 0.02, 0.5]
+    panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
+                                                                                  trends=True)
+
+    plots.plot_4_panel_trend(panel_var_trend,
+                              seaice,
+                              panel_var_pval,
+                              lat,
+                              lon,
+                              vlims,
+                              ['mg m$^{-2}$ yr$^{-1}$', 'mg m$^{-2}$ yr$^{-1}$', 'mg m$^{-2}$ yr$^{-1}$', 'mg m$^{-2}$ yr$^{-1}$'],
+                              fig_titles,
+                              f'{season}_burden_trends',
                               not_aerosol=False,
                               percent_increase=False,
                               )

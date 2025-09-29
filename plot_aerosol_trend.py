@@ -318,6 +318,32 @@ def plot_trend_emission(variables_info_seaice, variables_info_yr, seaice, season
                                 seaice_conc=True)
 
 
+def plot_inp_burden(variables_info_yr, seaice, season):
+    panel_names = ['AER_INP_POL', 'AER_INP_POL', 'AER_INP_POL', 'AER_INP_POL']
+    lat = variables_info_yr[panel_names[0]]['lat']
+    lon = variables_info_yr[panel_names[0]]['lon']
+    fig_titles = [[['PCHO$_{aer}$', r'$\bf{(a)}$'],
+                   ['DCAA$_{aer}$', r'$\bf{(c)}$'],
+                   ['PL$_{aer}$', r'$\bf{(b)}$'],
+                   ['SS', r'$\bf{(d)}$']]]
+    vlims = [0.0065, 0.03, 1, 4]
+    panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
+                                                                                  trends=True)
+    print(panel_var_trend[0].max().values)
+
+    plots.plot_4_panel_trend(panel_var_trend,
+                              seaice,
+                              panel_var_pval,
+                              lat,
+                              lon,
+                              vlims,
+                              panel_unit,
+                              fig_titles,
+                              f'{season}_poly_inp_burden_trends',
+                              not_aerosol=False,
+                              percent_increase=False,
+                              )
+
 def plot_trend_aer_concentration(variables_info_yr, seaice, season):
     panel_names = ['AER_POL', 'AER_PRO', 'AER_LIP', 'AER_SS']
     lat = variables_info_yr[panel_names[0]]['lat']

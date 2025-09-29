@@ -12,7 +12,9 @@ def create_var_info_dict():
     sic_u = '% '
     conc_u = 'ng m${^{-3}}$ '
     conc_biom_u = 'mmol C m${^{-3}}$ '
-    vars_names = [['AER_burden_POL', burden_u], ['AER_burden_PRO', burden_u], ['AER_burden_LIP', burden_u],
+    vars_names = [
+                  ['AER_INP_POL', 'm$^{-2}$'],
+                  ['AER_burden_POL', burden_u], ['AER_burden_PRO', burden_u], ['AER_burden_LIP', burden_u],
                   ['AER_burden_tot', burden_u], ['AER_burden_SS', burden_u], ['AER_burden_SSA', burden_u],
                   ['AER_F_POL', flux_u], ['AER_F_PRO', flux_u], ['AER_F_LIP', flux_u],
                   ['AER_F_tot', flux_u], ['AER_F_SS', flux_u], ['AER_F_SSA', flux_u],

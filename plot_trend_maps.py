@@ -21,3 +21,4 @@ if __name__ == '__main__':
     plot_biomolecule_trend.plot_trend(variables_info_yr, seaice, season)
     plot_aerosol_trend.plot_trend_emission(variables_info_seaice, variables_info_yr, seaice, season, decade)
     plot_aerosol_trend.plot_trend_aer_concentration(variables_info_yr, seaice, season)
+    plot_aerosol_trend.plot_inp_burden(variables_info_yr, seaice, season)

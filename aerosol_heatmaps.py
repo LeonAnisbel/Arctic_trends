@@ -247,7 +247,9 @@ if __name__ == '__main__':
     limits = global_vars.seasons_info[global_vars.season_to_analise]['bar_plot_lims']
     var_list = [[['AER_SIC_area_px'], ['AER_F_POL_m'], ['AER_F_PRO_m'], ['AER_F_LIP_m']],
                 [['AER_SS'], ['AER_POL'], ['AER_PRO'], ['AER_LIP']],
-                [['AER_burden_SS'], ['AER_burden_POL'], ['AER_burden_PRO'], ['AER_burden_LIP']]]
+                [['AER_burden_SS'], ['AER_burden_POL'], ['AER_burden_PRO'], ['AER_burden_LIP']],
+                [['AER_INP_POL'], ['AER_INP_POL'], ['AER_INP_POL'], ['AER_INP_POL']]
+                ]
 
     # for cond in ['not significant', 'significant']:
     data_df_list = []

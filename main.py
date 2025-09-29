@@ -134,7 +134,16 @@ if __name__ == '__main__':
                data_omf['OMF_LIP'] +
                data_omf['OMF_PRO'])
     print('Finished reading OMF  data')
-    print(data_omf['OMF_POL'])
+
+    # Read in INP burden
+    pcho_inp_burden, _ = read_data.read_each_aerosol_data(months,
+                                                 'INP_burden',
+                                                 'inp_marine_burden_flux',
+                                                 1,
+                                                 two_dim=True)
+    pcho_inp_burden = pcho_inp_burden.assign_coords(lat=gbox_area.lat)
+    print('Finished reading INP data')
+
 
 # Read in biomolecule ocean concentration and other biogeochemical indicators from the BGC model (FESOM-REcoM)
     C_pcho, C_dcaa, C_pl, C_ice, C_temp, C_NPP, C_DIN = read_data.read_ocean_data()
@@ -144,6 +153,7 @@ if __name__ == '__main__':
     print('Finished reading biomolecule concentration and SIC from FESOm-REcoM data')
 
     list_variables = [
+        pcho_inp_burden,
         C_burden[0], C_burden[1], C_burden[2], C_tot_burden, C_burden[3], C_burden_ssa,
         C_emi[0], C_emi[1], C_emi[2], C_tot_emi, C_emi[3], C_emi_ssa,
         C_emi_anomaly[0], C_emi_anomaly[1], C_emi_anomaly[2], C_tot_emi_anomaly, C_emi_anomaly[3], C_emi_ssa_anomaly,

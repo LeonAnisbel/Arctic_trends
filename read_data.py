@@ -101,6 +101,8 @@ def concat_months_selvar(v_yr, unit_factor, var_id, v_month):
 
 def read_each_aerosol_data(months, var_id, file_type, unit_factor, per_month=False, two_dim=False):
     aer_dir = global_vars.aer_dir_path
+    if file_type == 'inp_marine_burden_flux':
+        aer_dir = global_vars.inp_dir_path
     C_m = []
     v_month = []
     v_m_month = []
@@ -116,6 +118,8 @@ def read_each_aerosol_data(months, var_id, file_type, unit_factor, per_month=Fal
 
         for yr in np.arange(1990, 2020):
             files = f'{aer_dir}_{yr}{mo_str}.01_{file_type}.nc'
+            if file_type == 'inp_marine_burden_flux':
+                files = f'{aer_dir}_{yr}{mo_str}_{file_type}.nc'
             if os.path.isfile(files):
                 if two_dim:
                     # calculate values per season without conversion from year to month

@@ -89,7 +89,7 @@ if __name__ == '__main__':
 # Read in emission drivers
     sst_aer, _ = read_data.read_each_aerosol_data(months,
                                                   'tsw',
-                                                  'echam',
+                                                  'vphysc',
                                                   1,
                                                   two_dim=True)
     sst_aer_K = sst_aer - 273.16

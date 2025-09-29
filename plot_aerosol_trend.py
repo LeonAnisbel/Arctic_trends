@@ -179,6 +179,28 @@ def plot_trend_emission(variables_info_seaice, variables_info_yr, seaice, season
 
     panel_var_trend_new = [seaice_aer[1], panel_var_trend_tr[0],
                            panel_var_trend_tr[1], panel_var_trend_tr[2]]
+    for i,var in enumerate(panel_var_trend_new[1:]):
+        # print(var)
+        var1 = var[:13, :]
+        print(len(var), len(var[0]))
+        min_val = np.nanmin(var1)
+        min_val_in = np.where(var==min_val)
+        pval1 = panel_var_pval_new[i+1][:13, :]
+        pval = pval1[min_val_in[0], min_val_in[1]]
+        lat1 = lat_aer[:13]
+        print(panel_names[i],min_val,'+ pval: ',  pval,'lat lon' ,lat1[min_val_in[0]], lon_aer[min_val_in[1]], '\n')
+
+    print('\n NOW thye MAXX \n \n \n')
+    for i,var in enumerate(panel_var_trend_new[1:]):
+        # print(var)
+        var1 = var[:12, :]
+        min_val = np.nanmax(var1)
+        min_val_in = np.where(var==min_val)
+        pval1 = panel_var_pval_new[i+1][:12, :]
+        pval = pval1[min_val_in[0], min_val_in[1]]
+        lat1 = lat_aer[:12]
+        print(panel_names[i],min_val,'+ pval: ',  pval,'lat lon' ,lat1[min_val_in[0]], lon_aer[min_val_in[1]], '\n')
+
     plots.plot_4_panel_trend(panel_var_trend_new,
                              seaice,
                              panel_var_pval_new,
@@ -304,7 +326,7 @@ def plot_trend_aer_concentration(variables_info_yr, seaice, season):
                    ['DCAA$_{aer}$', r'$\bf{(c)}$'],
                    ['PL$_{aer}$', r'$\bf{(b)}$'],
                    ['SS', r'$\bf{(d)}$']]]
-    vlims = [0.0065, 0.03, 1, 4]
+    vlims = [0.0065, 0.03, 1, 5]
     panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
                                                                                   trends=True)
 
@@ -329,10 +351,33 @@ def plot_trend_aer_concentration(variables_info_yr, seaice, season):
                    ['PL$_{aer}$', r'$\bf{(b)}$'],
                    ['SS', r'$\bf{(d)}$']]]
     vlims = [0.0001, 0.0004, 0.02, 0.5]
-    panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
-                                                                                  trends=True)
+    vlims = [3.5, 3.5, 3.5, 3.5]
 
-    plots.plot_4_panel_trend(panel_var_trend,
+    panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
+                                                                       percent_increase=True,
+                                                                                  trends=True)
+    for i,var in enumerate(panel_var_trend):
+        var1 = var[:13, :] # index 13, >63 degrees north, quick assumption
+        pval1 = panel_var_pval[i][:13, :]
+        data_mask1 = np.ma.masked_where(var1 < 0, # focus only on min positive vals
+                                        var1)
+        data_mask11 = data_mask1.filled(np.nan)
+
+        # data_mask2 = np.ma.masked_where(pval1 != 0.001,
+        #                                 data_mask11)
+        # data_mask = data_mask2.filled(np.nan)
+
+        keep_p = np.isfinite(pval1) & np.isclose(pval1, 0.001, atol=1e-8)
+        data_mask2 = np.ma.masked_where(~keep_p, data_mask1)
+        data_mask = data_mask2.filled(np.nan)
+
+        min_val = np.nanmin(data_mask)
+        min_val_in = np.where(var==min_val)
+        pval = pval1[min_val_in[0], min_val_in[1]]
+        lat1 = lat[:13]
+        print(panel_names[i],min_val,'+ pval: ',  pval,'lat lon' ,lat1[min_val_in[0]], lon[min_val_in[1]], '\n')
+
+    plots.plot_4_panel_trend_burden(panel_var_trend,
                               seaice,
                               panel_var_pval,
                               lat,

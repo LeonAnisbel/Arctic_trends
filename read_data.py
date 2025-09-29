@@ -130,7 +130,6 @@ def read_each_aerosol_data(months, var_id, file_type, unit_factor, per_month=Fal
                         v_m_yr.append(ds_emi_gboxarea.sum(dim='time', skipna=True))
                 else:
                     files_dens = f'{aer_dir}_{yr}{mo_str}.01_vphysc.nc'
-                    print(files_dens)
                     ds_dens = read_files_data(files_dens).isel(lev=46).rename({'rhoam1': f'{var_id}'})
                     ds_conc = read_files_data(files).isel(lev=46)
                     ds_conc_ng_m3 = ds_dens*ds_conc

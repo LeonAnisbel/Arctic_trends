@@ -30,7 +30,7 @@ def percent_icrease(variables_info_yr, vv, reg_na, decade, cond, tau_values=Fals
     and all values if cond != 'significant'"""
     pval = variables_info_yr[vv][reg_na][decade]['pval_aver_reg']
 
-    if vv == 'Sea_ice_area_px' or vv == 'AER_SIC_area_px':
+    if vv == 'Sea_ice_area_px' or vv == 'AER_SIC_area_px' or vv[-2:] == '_m' or vv[:10] == 'AER_burden':
         data_type_mean_or_sum = 'data_sum_reg'
     else:
         data_type_mean_or_sum = 'data_aver_reg'
@@ -245,7 +245,7 @@ if __name__ == '__main__':
     fig, axs = plt.subplots( 3, 1, figsize=(8, 9))
     axs.flatten()
     limits = global_vars.seasons_info[global_vars.season_to_analise]['bar_plot_lims']
-    var_list = [[['AER_F_SS_m'], ['AER_F_POL_m'], ['AER_F_PRO_m'], ['AER_F_LIP_m']],
+    var_list = [[['AER_SIC_area_px'], ['AER_F_POL_m'], ['AER_F_PRO_m'], ['AER_F_LIP_m']],
                 [['AER_SS'], ['AER_POL'], ['AER_PRO'], ['AER_LIP']],
                 [['AER_burden_SS'], ['AER_burden_POL'], ['AER_burden_PRO'], ['AER_burden_LIP']]]
 
@@ -307,6 +307,13 @@ if __name__ == '__main__':
     plt.tight_layout()
     plt.savefig(f'plots/bar_plot_burden_{global_vars.season_to_analise}.png', dpi=300)
     plt.close()
+
+    # fig, axs = plt.subplots( 1, 1, figsize=(8, 7))
+    # each_panel_fig(data_df_list[3], names_var[0], axs, 'Average INP burden',
+    #                limits[2], upper_panel=True, thesis_plot=True)
+    # plt.tight_layout()
+    # plt.savefig(f'plots/bar_plot_inp_burden_{global_vars.season_to_analise}.png', dpi=300)
+    # plt.close()
 ###############################
 
     panel_names_var = [[['AER_SIC_area_px'], ['AER_SST'], ['AER_F_SS_m'], ['AER_F_POL_m'], ['AER_F_PRO_m'], ['AER_F_LIP_m']],

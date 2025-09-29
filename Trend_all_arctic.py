@@ -15,10 +15,6 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
     else:
         lon = lon_360
 
-    decades = [[1990,1999], [2000, 2009], [2010, 2019], [1990, 2019]]
-    decades_idx = [[0,9], [10,19], [20,29], [0,29]]
-    decades_na = ['1990-1999', '2000-2009', '2010-2019', '1990-2019']
-
     decades = [[1990,2004], [2005, 2019], [1990, 2019]]
     decades_idx = [[0,14], [15,29], [0,29]]
     decades_na = ['1990-2004', '2005-2019', '1990-2019']
@@ -70,11 +66,11 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
 
 
                 data_latlon_mean = data_month
-            if var_na != 'Sea_ice_area_px' and var_na !='AER_SIC_area_px':
+            # if var_na != 'Sea_ice_area_px' and var_na !='AER_SIC_area_px':
+            else:
                 data_type_mean_or_sum = 'data_aver_reg'
                 data_month = reg_sel_vals['data_region']
                 if aer_conc:
-                    print('aer_conc ENTERED condition',reg_sel_vals_gbx['data_region'])
                     data_latlon_mean = utils.get_weighted_mean(reg_sel_vals_gbx['data_region'], data_month, aer_conc=aer_conc)
                 else:
                     data_latlon_mean = utils.get_weighted_mean(None, data_month, aer_conc=aer_conc)

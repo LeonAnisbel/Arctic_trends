@@ -190,7 +190,7 @@ def add_ice_colorbar(fig, ic, ic2):
 
 
 def plot_trend(subfig, trend, ice, pval, lat, lon, titles, vlim, unit, cm, vlim0,
-               not_aerosol=True, percent_increase=False, seaice_conc=False):
+               not_aerosol=True, percent_increase=False, seaice_conc=False, burden=False):
     """ Plots each map of Arctic trends with statistically significant grid cells as hatched areas
     :returns  """
     ax = subfig.subplots(nrows=1,
@@ -199,7 +199,7 @@ def plot_trend(subfig, trend, ice, pval, lat, lon, titles, vlim, unit, cm, vlim0
                          subplot_kw={'projection': ccrs.NorthPolarStereo()}, )
     ax.set_extent([-180, 180, 60, 90],
                   ccrs.PlateCarree())
-    if titles[0] == 'SIC' or titles[0] == 'SIC trend':
+    if titles[0] == 'SIC' or titles[0] == 'SIC trend' and global_vars.lat_arctic_lim==66:
         ax.set_title(titles[0], loc='center', fontsize=12)
     else:
         ax.set_title(titles[0], loc='right', fontsize=12)
@@ -269,6 +269,10 @@ def plot_trend(subfig, trend, ice, pval, lat, lon, titles, vlim, unit, cm, vlim0
     gl.xpadding = 8  # moves the lon labels (top & bottom) outward
     gl.ypadding = 8
 
+    if burden:
+        cbar.remove()  # later, remove it
+        return cb
+
     if not_aerosol:
         orig_cmap = plt.get_cmap('Greys_r')
         colors = orig_cmap(np.linspace(0.1, 1, 4))
@@ -288,6 +292,8 @@ def plot_trend(subfig, trend, ice, pval, lat, lon, titles, vlim, unit, cm, vlim0
         return [ic, ic2]
     else:
         return
+
+
 
 
 def iterate_subfig(fig, subfigs, fig_name, trend_vars, ice_var,
@@ -421,6 +427,56 @@ def plot_4_panel_trend(trend_vars, seaice, pval_vars, lat, lon, vlim_vars, unit_
                    unit_vars, title_vars,
                    not_aerosol=not_aerosol,
                    percent_increase=percent_increase, seaice_conc=seaice_conc)
+
+
+def plot_4_panel_trend_burden(trend_vars, seaice, pval_vars, lat, lon, vlim_vars, unit_vars, title_vars, fig_name,
+                        not_aerosol=True,
+                        percent_increase=False, seaice_conc=False):
+    """ Creates a plot of the 4-panel trend
+    :returns  None"""
+    fig = plt.figure(constrained_layout=True, figsize=(7, 7))
+
+    (subfig1, subfig2), (subfig3, subfig4) = fig.subfigures(nrows=2, ncols=2)
+
+    fig_name = f'four_panel_{fig_name}.png'
+    print(title_vars[0][0])
+
+    subfigs = [subfig1, subfig2, subfig3, subfig4]
+    fig_name = f'four_panel_{fig_name}.png'
+    print(title_vars[0][0])
+
+    for idx  in range(len(trend_vars)):
+        cm, vlim0 = 'coolwarm', -vlim_vars[idx]
+        print('fig2-', idx, title_vars[0])
+        cb = plot_trend(subfigs[idx],
+                        trend_vars[idx],
+                        seaice,
+                        pval_vars[idx],
+                        lat,
+                        lon,
+                        title_vars[0][idx],
+                        vlim_vars[idx],
+                        unit_vars[idx],
+                        cm, vlim0,
+                        percent_increase=percent_increase,
+                        not_aerosol=not_aerosol,
+                        seaice_conc=seaice_conc,
+                        burden=True)
+
+    cbar_ax = fig.add_axes([0.05, -0.05, 0.9, 0.03])  # (left, bottom, width, height)
+
+    cbar = plt.colorbar(cb,
+                        cax=cbar_ax,
+                        extend='both',
+                        orientation='horizontal',
+                        fraction=0.05,
+                        # format='%.0e',
+                        pad=0.12)
+    # cbar.ax.xaxis.set_major_formatter(FormatStrFormatter('%.3g'))
+    cbar.set_label(label='% yr$^{-1}$',
+                   fontsize=14, )
+    cbar.ax.tick_params(labelsize=14)
+    plt.savefig(f'./plots/{fig_name}', dpi=200, bbox_inches="tight")
 
 
 def plot_6_2_panel_trend(trend_vars, seaice, pval_vars, lat, lon, vlim_vars, unit_vars, title_vars, fig_name,

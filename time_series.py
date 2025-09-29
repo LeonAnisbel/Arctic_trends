@@ -88,7 +88,7 @@ if __name__ == '__main__':
                       '\n',
                       file=f)
                 print(reg, dec,
-                      'mean PMOA emission flux',
+                      'Total PMOA emission flux',
                       flux[reg][dec]['data_sum_reg'].mean(skipna=True).values,
                       flux[reg][dec]['data_sum_reg'].std(skipna=True).values,
                       file=f)
@@ -98,7 +98,7 @@ if __name__ == '__main__':
                       conc[reg][dec]['data_aver_reg'].std(skipna=True).values,
                       file=f)
                 print(reg, dec,
-                      'mean SS emission flux',
+                      'Total SS emission flux',
                       fluxss[reg][dec]['data_sum_reg'].mean(skipna=True).values,
                       fluxss[reg][dec]['data_sum_reg'].std(skipna=True).values,
                       file=f)

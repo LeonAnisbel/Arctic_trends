@@ -92,7 +92,7 @@ def alloc_metadata(names, variables_info, trends=False, percent_increase=False, 
     for id in names:
         sl = variables_info[id]['slope']
         if percent_increase:
-            sl = sl * 100
+            sl = np.divide(sl, variables_info[id]['data_time_mean']) * 100
         var_trend.append(sl)
         if mk_method:
             p = 'significance'

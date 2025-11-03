@@ -126,7 +126,7 @@ def plot_heatmap_multipanel(variables_info, panel_names, var_na_aer, right_label
 
 
 font = 12
-def each_panel_fig(data, names_var, ax, title, lims, upper_panel = False, thesis_plot=False):
+def each_panel_fig(data, names_var, ax, title, lims, upper_panel = False, thesis_plot=False, one_biom=False):
     """ Create bar plots of percent of change per year for each Arctic subregion and marine aerosol specie
     :return None"""
     pl = sns.barplot(data=data,
@@ -153,7 +153,6 @@ def each_panel_fig(data, names_var, ax, title, lims, upper_panel = False, thesis
     hue_col = data["Regions"].unique()
     labels = [[], [], [], []]
     for col in hue_col:
-        print(col, data['% per year'])
         for i, var in enumerate(names_var):
             data_reg = data[data["Regions"] == col]
             pval = data_reg[data_reg["variables"]==var]['% per year'].values[0]
@@ -168,7 +167,8 @@ def each_panel_fig(data, names_var, ax, title, lims, upper_panel = False, thesis
         ax.margins(y=0.1)
 
 
-    for bars, hatch, legend_handle in zip(ax.containers, ['////', '----', '....', 'xxxx'], pl.legend_.legend_handles):
+    list_hatch = ['////', '----', '....', 'xxxx']
+    for bars, hatch, legend_handle in zip(ax.containers, list_hatch, pl.legend_.legend_handles):
         for bar, color in zip(bars, palette):
             bar.set_facecolor(color)
             bar.set_hatch(hatch)
@@ -245,7 +245,7 @@ if __name__ == '__main__':
     fig, axs = plt.subplots( 3, 1, figsize=(8, 9))
     axs.flatten()
     limits = global_vars.seasons_info[global_vars.season_to_analise]['bar_plot_lims']
-    var_list = [[['AER_SIC_area_px'], ['AER_F_POL_m'], ['AER_F_PRO_m'], ['AER_F_LIP_m']],
+    var_list = [[['AER_F_SS_m'], ['AER_F_POL_m'], ['AER_F_PRO_m'], ['AER_F_LIP_m']],
                 [['AER_SS'], ['AER_POL'], ['AER_PRO'], ['AER_LIP']],
                 [['AER_burden_SS'], ['AER_burden_POL'], ['AER_burden_PRO'], ['AER_burden_LIP']],
                 [['AER_INP_POL'], ['AER_INP_POL'], ['AER_INP_POL'], ['AER_INP_POL']]
@@ -318,13 +318,13 @@ if __name__ == '__main__':
     # plt.close()
 ###############################
 
-    panel_names_var = [[['AER_SIC_area_px'], ['AER_SST'], ['AER_F_SS_m'], ['AER_F_POL_m'], ['AER_F_PRO_m'], ['AER_F_LIP_m']],
+    panel_names_var = [[['AER_SIC_area_px'], ['AER_SST'], ['AER_F_SS'], ['AER_F_POL'], ['AER_F_PRO'], ['AER_F_LIP']],
                        [['AER_SIC_area_px'], ['AER_SST'], ['AER_SS'], ['AER_POL'], ['AER_PRO'], ['AER_LIP']]]
     for j, panel_names in enumerate(panel_names_var):
         var_na_aer = [['Sea Ice \n area'], ['SST'], ['SS$_{aer}$'], ['PCHO$_{aer}$'], ['DCAA$_{aer}$'], ['PL$_{aer}$']]
         right_label_show = [True, True, True, False, False, True]
         no_ylabel_show = [False, True, True, False, True, True]
-        col_emi_name_sl = 4 * [' Emission flux \n (10$^{-6}$ Tg season$^{-1}$ yr$^{-1}$) \n']
+        col_emi_name_sl = 4 * [' Emission mass flux \n (10$^{-2}$ ng m$^{-2}$ s$^{-1}$ yr$^{-1}$) \n']
 
         col_name_sl = ['\n Sea Ice area \n (10$^{6}$ m${^{3}}$ yr${^{-1}}$) \n',
                        '\n SST \n (C$^{o}$ yr${^{-1}}$)']
@@ -352,7 +352,7 @@ if __name__ == '__main__':
 
 ###############################
     panel_names_var = [
-        [['AER_SIC'], ['AER_F_POL_m'], ['AER_F_PRO_m'], ['AER_F_LIP_m'], ['AER_F_SS_m']],
+        [['AER_SIC'], ['AER_F_POL'], ['AER_F_PRO'], ['AER_F_LIP'], ['AER_F_SS']],
         [['AER_SIC'], ['AER_POL'], ['AER_PRO'], ['AER_LIP'], ['AER_SS']]]
     fig_title = ['flux', 'concentration']
 
@@ -373,6 +373,7 @@ if __name__ == '__main__':
                       r'$\bf{(d)}$',
                       r'$\bf{(e)}$']]
 
+        decades = ['1990-2019']
         for dec in decades:
             type = 'slope_emi_only_'+fig_title[j]
             plot_heatmap_multipanel(variables_info_yr, panel_names, var_na_aer, right_label_show, no_ylabel_show,

@@ -8,7 +8,7 @@ ocean_dir_path = root_dir+"MOA_DATA_ECHAM/regular_grid_interp/"
 lat_arctic_lim = 66
 thesis_plot=False
 
-factor_eim_heatmaps = 1.e6
+factor_eim_heatmaps = 1.e2
 factor_sic_heatmaps = 1.
 data_type = 'orig_data'#'log_data'#
 season_to_analise = 'JAS'

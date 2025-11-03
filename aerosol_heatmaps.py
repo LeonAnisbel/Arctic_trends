@@ -68,6 +68,8 @@ def cols_df(variables_info_yr, panel_names, var_na_title, decade, type):
             factor = global_vars.factor_eim_heatmaps
         elif type[:5] == 'slope' and var_na[:7]=='AER_SIC':
             factor = global_vars.factor_sic_heatmaps
+        elif type[:5] == 'slope' and var_na[-2:]=='_m':
+            factor = global_vars.factor_eim_tot_heatmaps
         else:
             factor = 1.
         for reg_na in reg_names:
@@ -383,3 +385,24 @@ if __name__ == '__main__':
             plot_heatmap_multipanel(variables_info_yr, panel_names, var_na_aer, right_label_show, no_ylabel_show,
                                     col_name_ic, dec, type, label_loc, [[1, 5], [10, 4]], settitle=True)
     ###############################
+    panel_names_var = [['AER_F_POL_m'], ['AER_F_PRO_m'], ['AER_F_LIP_m'], ['AER_F_SS_m']]
+    fig_title = ['flux', 'concentration']
+
+    var_na_aer = [['PCHO$_{aer}$'], ['DCAA$_{aer}$'], ['PL$_{aer}$'], ['SS$_{aer}$']]
+    right_label_show = [False, False, False, True]
+    no_ylabel_show = [False, True, True, True]
+    col_emi_name_sl = 4 * [' Total emission mass flux \n (10$^{-3}$ Tg season$^{-1}$ yr$^{-1}$) \n']
+
+
+    label_loc = [[0, 1, 2, 3],
+                 [r'$\bf{(a)}$',
+                  r'$\bf{(b)}$',
+                  r'$\bf{(c)}$',
+                  r'$\bf{(d)}$']]
+
+    decades = ['1990-2019']
+    for dec in decades:
+        type = 'slope_tot_emi_only_'+fig_title[j]
+        plot_heatmap_multipanel(variables_info_yr, panel_names, var_na_aer, right_label_show, no_ylabel_show,
+                                col_emi_name_sl, dec, type, label_loc, [[1, 4], [9, 4]])
+

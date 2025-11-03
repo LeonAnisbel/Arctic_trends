@@ -82,6 +82,198 @@ def autocorrelation(C, title, var_type):
     plt.savefig(f'./plots/autocorrelation_{var_type[1]}_{title[0]}.png')
     plt.close()
 
+def correlation_plots(ax, C, title, axis_label, vm, colors, leg, fig_name, var_type,
+                    echam_data=True, seaice=False, multipanel=False):
+    font = 10
+    if multipanel:
+        pass
+    else:
+        fig, ax = plt.subplots(1, 1,
+                               figsize=(8, 3), )
+    ax2 = ax.twinx()
+    ax3 = ax.twinx()
+    ax3.spines.right.set_position(("axes", 1.2))
+
+    C_ice, C_sst, C_u10, C_omf, C_biom = (C[0]['1990-2019']['data_sum_reg'].values,
+                                C[1]['1990-2019']['data_aver_reg'].values,
+                                C[2]['1990-2019']['data_aver_reg'].values,
+                                C[3]['1990-2019']['data_aver_reg'].values,
+                                C[4]['1990-2019']['data_aver_reg'].values)
+
+    colors = ['b', 'r', 'g']
+
+    ax.scatter(C_biom, C_ice, c ='b', s=7)
+    ax2.scatter(C_biom, C_sst, c ='r', s=7)
+    ax3.scatter(C_biom, C_u10, c ='g', s=7)
+
+    # p2, = ax2.plot(t_ax, C_biom, colors[1], label=leg[1], linewidth=1.)
+
+    a = [0.5, 1]
+    f1_list, f2_list, f3_list = [], [], []
+    # for idx, dec in enumerate(decades):
+    if global_vars.season_to_analise == 'JAS' or global_vars.season_to_analise == 'AMJ':
+        dec = '1990-2019'
+        idx = 1
+
+        sl, itc, significance, rval = get_lin_regression(C_biom, [C_ice, C_sst, C_u10, C_omf])
+
+        p_fit, eq = get_lin_fit(sl[0], itc[0], C_biom)
+        if significance[0]<0.05:
+            f1, = plot_fit(ax, C_biom, p_fit, eq, colors[0], a[idx], 'solid')
+            f1_list.append(f1)
+            n = f'r = {rval[0]}'
+            print('sic', n)
+            ax.text(-0.25, 0.8, n,
+                    color=colors[0],
+                    horizontalalignment='right',
+                    transform=ax.transAxes,
+                    fontsize='medium',
+                    bbox={'facecolor': colors[0], 'boxstyle': 'round',
+                          'pad': 0.1, 'alpha': 0.1})
+
+        else:
+            print('sic no significant correlation')
+
+        p_fit, eq = get_lin_fit(sl[1], itc[1], C_biom)
+        if significance[1]<0.05:
+            f2, = plot_fit(ax2, C_biom, p_fit, eq, colors[1], a[idx], 'solid')
+            f2_list.append(f2)
+            n = f'r = {rval[1], 1}'
+            print('sst', n)
+            ax.text(-0.25, 0.6, n,
+                    color=colors[1],
+                    horizontalalignment='right',
+                    transform=ax.transAxes,
+                    fontsize='medium',
+                    bbox={'facecolor': colors[1], 'boxstyle': 'round',
+                          'pad': 0.1, 'alpha': 0.1})
+        else:
+            print('sst no significant correlation')
+
+        p_fit, eq = get_lin_fit(sl[2], itc[2], C_biom)
+        if significance[2]<0.05:
+            f3, = plot_fit(ax3, C_biom, p_fit, eq, colors[2], a[idx], 'solid')
+            f3_list.append(f3)
+            n = f'r = {rval[2]}'
+            print('u10', n)
+            ax.text(-0.25, 0.4, n,
+                    color=colors[2],
+                    horizontalalignment='right',
+                    transform=ax.transAxes,
+                    fontsize='medium',
+                    bbox={'facecolor': colors[2], 'boxstyle': 'round',
+                          'pad': 0.1, 'alpha': 0.1})
+        else:
+            print('u10 no significant correlation')
+
+
+        if significance[3]<0.05:
+            n = f'r = {rval[3]}'
+            print('omf', n)
+        else:
+            print('omf no significant correlation')
+
+
+    ax.set_xlabel(axis_label[0], fontsize=font)
+    ax.set_ylabel(axis_label[1], fontsize=font)
+    ax2.set_ylabel(axis_label[2], fontsize=font)
+    ax3.set_ylabel(axis_label[3], fontsize=font)
+
+    ax.tick_params(axis='x')
+    ax.grid(linestyle='--', linewidth=0.3)
+
+    ax.yaxis.get_label().set_fontsize(font)
+    ax.yaxis.set_tick_params(labelsize=font)
+    ax2.yaxis.set_tick_params(labelsize=font, color=colors[1])
+    ax2.tick_params(axis='y', colors=colors[1])
+    ax2.yaxis.label.set_color(colors[1])
+
+
+    ax3.yaxis.set_tick_params(labelsize=font, color=colors[2])
+    ax3.tick_params(axis='y', colors=colors[2])
+    ax3.yaxis.label.set_color(colors[2])
+
+
+    if title[0] == 'Arctic':
+        tt = title[0] + '\n \n \n'
+    else:
+        tt = '\n ' + title[0] + '\n \n \n'
+
+    ax.set_title(tt, loc='center', fontsize=10)
+    ax.set_title(title[1], loc='left', fontsize=10)
+
+    # ax.set_ylim(vm[0][0], None)
+    # ax2.set_ylim(vm[1][0], vm[1][1])
+
+    # ax.grid(linestyle='--', linewidth=0.4)
+    ax.xaxis.set_tick_params(labelsize=font)
+    ax.yaxis.set_tick_params(labelsize=font, color=colors[0])
+    ax.tick_params(axis='y', colors=colors[0])
+    ax.yaxis.label.set_color(colors[0])
+
+    ax2.ticklabel_format(axis="y", useMathText=True, useLocale=True)
+
+    ax.yaxis.set_major_formatter(FormatStrFormatter('%.3g'))
+    ax2.yaxis.set_major_formatter(FormatStrFormatter('%.3g'))
+
+    if multipanel:
+        pass
+    else:
+        plt.savefig(f'./plots/{fig_name}.png', dpi=200)
+    return [f1_list, f2_list, f3_list]
+
+
+def plot_fit_trends_sst(ax, C, title, axis_label, colors):
+    """ Plots yearly data of sea ice area and emission anomalies and calculates the 30-year trend
+    :returns subplot objects to later add the legend """
+    C_sst = C['1990-2019']['data_aver_reg']
+    f = 15
+
+    t_ax = C_sst.time.values
+
+    new_line_color = colors[0]
+    if global_vars.season_to_analise == 'JAS' or global_vars.season_to_analise == 'AMJ':
+        dec = '1990-2019'
+        model_sst = mk.original_test(C_sst)
+
+        sl = model_sst.slope
+        itc = model_sst.intercept
+        significance = model_sst.h
+
+        ax.plot(t_ax, C_sst, colors, label='SST', linewidth=1.7)
+        ax.scatter(t_ax, C_sst, s=8, c=colors)
+
+        p_fit = [p * sl + itc for p in np.arange(len(t_ax))]
+        eq = f'{sl:.1e}x + {itc:.1e}'
+        f3_list=[]
+        if significance:
+            f3, = plot_fit(ax, t_ax, p_fit, eq, colors, 1, 'dashed')
+        ax.legend(handles=[f3], loc='lower right', fontsize=f)
+
+    ax.set_ylabel(axis_label, fontsize=f)
+    ax.tick_params(axis='x')
+
+    ax.yaxis.get_label().set_fontsize(f)
+    ax.yaxis.set_tick_params(labelsize=f)
+    ax.set_ylabel(axis_label, fontsize=f)
+    ax.yaxis.set_tick_params(labelsize=f, color=colors)
+    ax.tick_params(axis='y', colors=colors)
+    ax.yaxis.label.set_color(colors)
+
+    #ax.grid(linestyle='--', linewidth=0.4)
+    ax.xaxis.set_tick_params(labelsize=f)
+    ax.yaxis.set_tick_params(labelsize=f, color=colors)
+    ax.tick_params(axis='y', colors=colors)
+    ax.yaxis.label.set_color(colors)
+    ax.grid(linestyle='--', linewidth=0.3)
+
+
+    ax.yaxis.set_major_formatter(FormatStrFormatter('%.3g'))
+
+    ax.xaxis.set_major_formatter(plt.FuncFormatter(format_func))
+
+
+
 def plot_fit_trends(ax, C, title, axis_label, vm, colors, leg, fig_name, var_type,
                     echam_data=True, seaice=False, multipanel=False,
                     thesis_plot=False):

@@ -101,7 +101,7 @@ def concat_months_selvar(v_yr, unit_factor, var_id, v_month):
 
 def read_each_aerosol_data(months, var_id, file_type, unit_factor, per_month=False, two_dim=False):
     aer_dir = global_vars.aer_dir_path
-    if file_type == 'inp_marine_burden_flux':
+    if file_type == 'B24bend_poly_only_inp_marine_concentration':
         aer_dir = global_vars.inp_dir_path
     C_m = []
     v_month = []
@@ -118,7 +118,7 @@ def read_each_aerosol_data(months, var_id, file_type, unit_factor, per_month=Fal
 
         for yr in np.arange(1990, 2020):
             files = f'{aer_dir}_{yr}{mo_str}.01_{file_type}.nc'
-            if file_type == 'inp_marine_burden_flux':
+            if file_type == 'B24bend_poly_only_inp_marine_concentration':
                 files = f'{aer_dir}_{yr}{mo_str}_{file_type}.nc'
             if os.path.isfile(files):
                 if two_dim:
@@ -129,7 +129,7 @@ def read_each_aerosol_data(months, var_id, file_type, unit_factor, per_month=Fal
                         # calculate values as a conversion from yr to month
                         ds_gboxarea = ds.rename({'gboxarea': f'area_{var_id}'})
                         ds_emi = ds.rename({var_id: f'area_{var_id}'})
-                        ds_emi_gboxarea = ds_gboxarea * ds_emi * 86400
+                        ds_emi_gboxarea = ds_gboxarea * ds_emi * 86400  # 86400 seconds in a day
                         var_id_new = f'area_{var_id}'
                         v_m_yr.append(ds_emi_gboxarea.sum(dim='time', skipna=True))
                 else:

@@ -71,20 +71,6 @@ if __name__ == '__main__':
 
     print('Finished reading aerosol emission data')
 
-# Read in aerosol burden
-    C_burden = []
-    var_ids = ['burden_POL', 'burden_PRO', 'burden_LIP', 'burden_SS']
-    for c_elem in range(len(var_ids)):
-        burden, _ = read_data.read_each_aerosol_data(months,
-                                                      var_ids[c_elem],
-                                                      'burden',
-                                                      1e6,
-                                                      two_dim=True)
-        C_burden.append(burden)
-
-    C_tot_burden = C_burden[0] + C_burden[1] + C_burden[2]
-    C_burden_ssa = C_tot_burden +  C_burden[3]
-
 
 # Read in emission drivers
     sst_aer, _ = read_data.read_each_aerosol_data(months,
@@ -125,10 +111,11 @@ if __name__ == '__main__':
     C_tot_burden = C_burden[0] + C_burden[1] + C_burden[2]
     C_burden_ssa = C_tot_burden + C_burden[3]
 
+
     print('Finished reading aerosol emission drivers')
 
-
-# Read in aerosol organic mass fraction (OMF)
+#
+# # Read in aerosol organic mass fraction (OMF)
     data_omf = read_data.read_omf_data() * 100
     tot_omf = (data_omf['OMF_POL'] +
                data_omf['OMF_LIP'] +
@@ -137,11 +124,12 @@ if __name__ == '__main__':
 
     # Read in INP burden
     pcho_inp_burden, _ = read_data.read_each_aerosol_data(months,
-                                                 'INP_burden',
-                                                 'inp_marine_burden_flux',
+                                                 'INP_concentration',
+                                                 'B24bend_poly_only_inp_marine_concentration',
                                                  1,
                                                  two_dim=True)
     pcho_inp_burden = pcho_inp_burden.assign_coords(lat=gbox_area.lat)
+    pcho_inp_burden_15 = pcho_inp_burden.sel(temperature = -15.)
     print('Finished reading INP data')
 
 
@@ -153,7 +141,7 @@ if __name__ == '__main__':
     print('Finished reading biomolecule concentration and SIC from FESOm-REcoM data')
 
     list_variables = [
-        pcho_inp_burden,
+        pcho_inp_burden_15,
         C_burden[0], C_burden[1], C_burden[2], C_tot_burden, C_burden[3], C_burden_ssa,
         C_emi[0], C_emi[1], C_emi[2], C_tot_emi, C_emi[3], C_emi_ssa,
         C_emi_anomaly[0], C_emi_anomaly[1], C_emi_anomaly[2], C_tot_emi_anomaly, C_emi_anomaly[3], C_emi_ssa_anomaly,

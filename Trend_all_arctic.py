@@ -52,7 +52,7 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
                 ff = 1e-6 # from km2 to millions of km2
             elif var_na[-2:] == '_m' or var_na[:10] == 'AER_burden':
                 ff = 1
-            print('REGION', reg_na)
+            # print('REGION', reg_na)
 
             if (var_na == 'Sea_ice_area_px' or var_na=='AER_SIC_area_px'
                     or var_na[-2:] == '_m' or var_na[:10] == 'AER_burden'): # exclude variables for accumulated emission flux:

@@ -323,13 +323,16 @@ def plot_inp_burden(variables_info_yr, seaice, season):
     lat = variables_info_yr[panel_names[0]]['lat']
     lon = variables_info_yr[panel_names[0]]['lon']
     fig_titles = [[['PCHO$_{aer}$', r'$\bf{(a)}$'],
-                   ['DCAA$_{aer}$', r'$\bf{(c)}$'],
-                   ['PL$_{aer}$', r'$\bf{(b)}$'],
-                   ['SS', r'$\bf{(d)}$']]]
-    vlims = [0.0065, 0.03, 1, 4]
+                   ['PCHO$_{aer}$', r'$\bf{(c)}$'],
+                   ['PCHO$_{aer}$', r'$\bf{(b)}$'],
+                   ['PCHO', r'$\bf{(d)}$']]]
+    vlims = [1e-7, 1e-6, 1e-5, 1e-4]
     panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
                                                                                   trends=True)
-    print(panel_var_trend[0].max().values)
+
+    print(panel_var_trend[0])
+    # print(panel_var_pval)
+    print(np.max(panel_var_trend[0]))
 
     plots.plot_4_panel_trend(panel_var_trend,
                               seaice,
@@ -337,9 +340,30 @@ def plot_inp_burden(variables_info_yr, seaice, season):
                               lat,
                               lon,
                               vlims,
-                              panel_unit,
+                              ['m$^{-3}$ yr$^{-1}$', 'm$^{-3}$ yr$^{-1}$', 'm$^{-3}$ yr$^{-1}$', 'm$^{-3}$ yr$^{-1}$'],
                               fig_titles,
-                              f'{season}_poly_inp_burden_trends',
+                              f'{season}_poly_inp_trends',
+                              not_aerosol=False,
+                              percent_increase=False,
+                              )
+
+    vlims = [6., 5., 4., 3.5]
+    panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
+                                                                                  percent_increase = True,
+                                                                                  trends=True)
+    print(panel_var_trend[0])
+    # print(panel_var_pval)
+    print(np.max(panel_var_trend[0]))
+
+    plots.plot_4_panel_trend(panel_var_trend,
+                              seaice,
+                              panel_var_pval,
+                              lat,
+                              lon,
+                              vlims,
+                              ['% yr$^{-1}$', '% yr$^{-1}$', '% yr$^{-1}$', '% yr$^{-1}$'],
+                              fig_titles,
+                              f'{season}_poly_inp_trends_percent_increase',
                               not_aerosol=False,
                               percent_increase=False,
                               )

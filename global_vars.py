@@ -2,10 +2,11 @@ root_dir= '/work/bb1005/b381361/'
 main_new = '/work/bb1178/b324073/'
 
 aer_dir_path = main_new+'ac3_arctic/ac3_arctic'
-inp_dir_path = 'work/bb1005/b383238/INP/Marine'
+inp_dir_path = root_dir+'echam_postproc/cloud_analysis_plots/immersed_droplets/INP/Marine/ac3_arctic'
 omf_dir_path = root_dir+"MOA_DATA_ECHAM/OMF_data/fesom_recon_oceanfilms_no_icemask/fesom_recon_oceanfilms_omf_*"
 ocean_dir_path = root_dir+"MOA_DATA_ECHAM/regular_grid_interp/"
-lat_arctic_lim = 63
+lat_arctic_lim = 66
+thesis_plot=False
 
 factor_eim_heatmaps = 1.e6
 factor_sic_heatmaps = 1.

@@ -2,7 +2,6 @@ import gc
 import numpy as np
 import statsmodels.api as sm
 import pickle
-
 import xarray as xr
 import Trend_all_arctic
 import global_vars

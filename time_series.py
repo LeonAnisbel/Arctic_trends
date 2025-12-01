@@ -4,7 +4,7 @@ import pickle
 import global_vars
 import plots, utils
 import matplotlib.pyplot as plt
-
+from scipy import stats
 from global_vars import thesis_plot
 from utils import regions
 
@@ -123,12 +123,12 @@ if __name__ == '__main__':
     #                     'label': r'$\bf{(c)}$'}}
 
 
-
+    var_type = ['AER_F_tot', 'aer_flux', 'Aerosol emission flux']
     sst = variables_info_yr['AER_SST']
     omf = variables_info_yr['OMF_tot']
     u10 = variables_info_yr['AER_U10']
     seaice_lin = variables_info_yr['AER_SIC']
-    var_type = ['AER_F_tot', 'aer_flux', 'Aerosol emission flux']
+    flux = variables_info_yr[var_type[0]]  # AER_LIP #AER_F_tot_yr
 
     names = ['SIC', 'SST', 'u10', 'OMF']
     for idx, reg in enumerate(list(utils.regions().keys())):
@@ -136,12 +136,15 @@ if __name__ == '__main__':
         variables.append(100-seaice_lin[reg]['1990-2019']['data_aver_reg'].values)
         for i in [sst, u10, omf, flux]:
             variables.append(i[reg]['1990-2019']['data_aver_reg'].values)
-        sl, itc, significance, rval = plots.get_lin_regression(variables[-1], variables[:-1],)
+        # sl, itc, significance, rval = plots.get_lin_regression(variables[-1], variables[:-1],)
+        rsval, pval = plots.get_spearman_corr(variables[-1], variables[:-1])
         print('\n', reg, ' correlation with ', var_type[-1])
-        for sdx, s in enumerate(significance):
+        for sdx, s in enumerate(pval):
             if s < 0.05:
-                n = f'r = {rval[sdx]}'
-                print(names[sdx], n)
+                n = f'r = {rsval[sdx]}'
+            else:
+                n = f'correlation no significant'
+            print(names[sdx], n)
 
 
     for idx, reg in enumerate(list(region.keys())):

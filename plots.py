@@ -8,7 +8,6 @@ import matplotlib.path as mpath
 import matplotlib.colors as mcolors
 from matplotlib.ticker import FormatStrFormatter
 import pymannkendall as mk
-from scipy.stats import alpha
 from statsmodels.tsa.stattools import acf
 import statsmodels.api as sm
 from cartopy.mpl.gridliner import LATITUDE_FORMATTER
@@ -44,6 +43,14 @@ def get_lin_regression(C, variables):
         signf.append(model.pvalue)
         rval.append(round(model.rvalue, 1))
     return sl, itc, signf, rval
+
+def get_spearman_corr(C, variables):
+    rsval, signf = [], []
+    for var in variables:
+        model = stats.spearmanr(C, var)
+        signf.append(model.pvalue)
+        rsval.append(round(model.statistic, 2))
+    return rsval, signf
 
 def create_histogram(C, title, var_type):
     y = C[1]['1990-2019']['data_aver_reg'].values

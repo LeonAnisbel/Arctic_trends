@@ -165,6 +165,15 @@ def get_perc_increase(variables_info, panel_names):
 
 
 def get_weighted_mean(gboxarea_reg, data, aer_conc=False):
+    """
+    Computes weighted mean of ds considering the grid area for ECHAM-HAM data or the weights calculated here for
+    FESOM-REcoM data
+    :var data: datarray-like object
+    :var gboxarea_reg: grid box area from ECHAM-HAM model
+    :param aer_conc: boolean to determine whether the data is from ECHAM-HAM (True) or FESOM-REcoM (False)
+    (False)
+    :return: datarray as averaged weighted mean
+    """
     if aer_conc:
         weights = gboxarea_reg / gboxarea_reg.sum(dim=('lat', 'lon'))
     else:
@@ -177,8 +186,12 @@ def get_weighted_mean(gboxarea_reg, data, aer_conc=False):
 
 
 def get_conds(lat,lon):
-    """ Define the subregions limits
-    Returns list with region limits, latitude and longitude arrays from the model grid"""
+    """
+    Define the subregions limits
+    :param lat: list of latitude values
+    :param lon: list of longitudes values
+    :return: list with region limits, latitude and longitude arrays from the model grid
+    """
     conditions = [[[lat, global_vars.lat_arctic_lim, 90]],
                   [[lat, 66, 82], [lon, 20, 60]],
                   [[lat, 66, 82], [lon, 60, 100]],
@@ -193,8 +206,10 @@ def get_conds(lat,lon):
 
     return conditions
 def regions():
-    """ This function defines a dictionary with Arctic subregions
-    Returns dictionary with regions"""
+    """
+    This function defines a dictionary with Arctic subregions
+    :return: dictionary with regions as keys
+    """
     reg_data = {'Arctic': {},
                 'Barents Sea': {},
                 'Kara Sea': {},
@@ -211,9 +226,12 @@ def regions():
 
 
 def get_var_reg(v, cond):
-    """ This function is used to select and filter certain regions according to the conditions variable (cond).
-    v is the variable dataset, cond is the dictionary containing the regions
-    Returns the variable dataset with the data filtered to meet each condition"""
+    """
+    This function is used to select and filter certain regions according to the conditions variable (cond).
+    :var v: variable dataset
+    :var cond: dictionary containing the regions lat and lon limits
+    :return: variable dataset with the data filtered to meet each condition
+    """
     if len(cond) <= 1:
         v = v.where((cond[0][0] > cond[0][1]) &
                     (cond[0][0] < cond[0][2])
@@ -228,6 +246,12 @@ def get_var_reg(v, cond):
 
 
 def create_ds(data_month_reg, lon):
+    """
+    Creates a dataset based on the datarray passed
+    :var data_month_reg: datarray containing especially time and lat dimension
+    :var lon: list of longitude dimension
+    :return: a dataset with time, lat and lon dimensions
+    """
     data_ds = xr.Dataset(
         data_vars=dict(
             data_region=(["time", "lat", "lon"], data_month_reg.data),
@@ -244,6 +268,12 @@ def create_ds(data_month_reg, lon):
 
 
 def create_ds2(data_array, data_month_reg):
+    """
+    Creates a dataset based on the data_month_reg dimensions
+    :var data_array: with coordinates to redefine
+    :var data_month_reg: datarray
+    :return: a dataset with time, lat and lon dimensions taken from data_month_reg
+    """
     data_ds = xr.Dataset(
         data_vars=dict(
             data_region=(["time", "lat", "lon"],data_array.data),
@@ -265,6 +295,11 @@ def compute_seaice_area_px(C_ice):
     return C_ice_area_px
 
 def calculate_anomaly(conc):
+    """
+    Computes the anomalies of conc based on the conc climatology
+    :var conc: dataset
+    :return: conc anomaly
+    """
     conc_climatology = conc.mean(dim='time',
                                  skipna=True)
     conc_anomaly = conc - conc_climatology

@@ -1,8 +1,4 @@
 import pickle
-
-import numpy as np
-from xarray.util.generate_aggregations import skipna
-
 import global_vars
 import read_data, utils
 import numpy as np
@@ -14,9 +10,7 @@ ftype = np.float64
 
 
 def compute_corr_matrix(emi_var, sic_aer, sst_aer, u10_aer, C_tot_omf_day):
-    emi_name = ['emission flux', 'emission flux anomaly']
-    # for idx, reg in enumerate(list(utils.regions().keys())):
-    variables = []
+    """Computes the correlation of the emission and emission drivers over a 30-yr period for each grid point"""
 
     lat_vals = sic_aer.lat.values
     lon_vals = sic_aer.lon.values
@@ -41,7 +35,6 @@ def compute_corr_matrix(emi_var, sic_aer, sst_aer, u10_aer, C_tot_omf_day):
             i_val_omf = apply_sic_mask(i_val_sic, i_val_omf)
             i_val_sic = apply_sic_mask(i_val_sic, i_val_sic)
 
-
             matrix_sic = compute_corr_fill_matrix(i_val_emi,i_val_sic, laid, loid, matrix_sic)
             matrix_sst = compute_corr_fill_matrix(i_val_emi,i_val_sst, laid, loid, matrix_sst)
             matrix_omf = compute_corr_fill_matrix(i_val_emi,i_val_omf, laid, loid, matrix_omf)
@@ -65,11 +58,13 @@ def compute_corr_matrix(emi_var, sic_aer, sst_aer, u10_aer, C_tot_omf_day):
         pickle.dump(data_ds, myFile)
 
 def get_reg_da(v, idx):
+    """Extracts a subgrid given a predefine region definition """
     conditions = utils.get_conds(v.lat, v.lon)
     reg_sel_vals_driver = utils.get_var_reg(v, conditions[idx])
     return reg_sel_vals_driver
 
 def get_spearman(emi, driver):
+    """Computes Spearman correlation and returns pvalue"""
     model = stats.spearmanr(emi, driver)
     pval = model.pvalue
     rsval = round(model.statistic, 2)
@@ -78,6 +73,8 @@ def get_spearman(emi, driver):
     return rsval
 
 def compute_corr_per_reg(variables, var_names, emi):
+    """Extract grid data for predefined Arctic regions and computes the correlation of the spatially averaged values of
+     emission and the emission drivers over a 30-yr period."""
     oof_aer, sic_aer, sst_aer, u10_aer, omf_aer = variables[0], variables[1], variables[2], variables[3], variables[4]
     dict_regions = utils.regions()
     dict_var_regions = {}
@@ -93,41 +90,12 @@ def compute_corr_per_reg(variables, var_names, emi):
         reg_sel_vals_omf = get_reg_da(omf_aer, idx)
         reg_sel_vals_oof = get_reg_da(oof_aer, idx)
 
-        # C_emi_tot_dict_anom = calculate_anomaly(C_tot_emi_day)
-
-        reg_sel_vals_sic = reg_sel_vals_sic.mean(dim=['lat','lon'], skipna=True).values#.tolist()
-        reg_sel_vals_sst = reg_sel_vals_sst.mean(dim=['lat','lon'], skipna=True).values#.tolist()
-        reg_sel_vals_u10 = reg_sel_vals_u10.mean(dim=['lat','lon'], skipna=True).values#.tolist()
-        reg_sel_vals_omf = reg_sel_vals_omf.mean(dim=['lat','lon'], skipna=True).values#.tolist()
-        reg_sel_vals_emi = reg_sel_vals_emi.sum(dim=['lat','lon'], skipna=True).values#.tolist()\
-        reg_sel_vals_oof = reg_sel_vals_oof.mean(dim=['lat','lon'], skipna=True).values#.tolist()
-        print(min(reg_sel_vals_oof), max(reg_sel_vals_oof))
-
-        # reg_sel_vals_sic_list = []
-        # reg_sel_vals_sst_list = []
-        # reg_sel_vals_u10_list = []
-        # reg_sel_vals_omf_list = []
-        # reg_sel_vals_emi_list = []
-
-        # print(len(reg_sel_vals_sic), len(reg_sel_vals_sic[0]))
-        # for ii in range(len(reg_sel_vals_sic)):
-        #     # for jj in range(len(reg_sel_vals_sic[0])):
-        #     reg_sel_vals_sic_list.append(sum(reg_sel_vals_sic[ii], []))
-        #     reg_sel_vals_sst_list.append(sum(reg_sel_vals_sst[ii], []))
-        #     reg_sel_vals_omf_list.append(sum(reg_sel_vals_omf[ii], []))
-        #     reg_sel_vals_u10_list.append(sum(reg_sel_vals_u10[ii], []))
-        #     reg_sel_vals_emi_list.append(sum(reg_sel_vals_emi[ii], []))
-        #
-        # reg_sel_vals_sic_list = sum(reg_sel_vals_sic_list, [])
-        # reg_sel_vals_sst_list = sum(reg_sel_vals_sst_list, [])
-        # reg_sel_vals_omf_list = sum(reg_sel_vals_omf_list, [])
-        # reg_sel_vals_u10_list = sum(reg_sel_vals_u10_list, [])
-        # reg_sel_vals_emi_list = sum(reg_sel_vals_emi_list, [])
-
-        # dict_var_regions['SST'][reg_na] = get_spearman(reg_sel_vals_emi_list, reg_sel_vals_sst_list)
-        # dict_var_regions['SIC'][reg_na] = get_spearman(reg_sel_vals_emi_list, reg_sel_vals_sic_list)
-        # dict_var_regions['OMF'][reg_na] = get_spearman(reg_sel_vals_emi_list, reg_sel_vals_omf_list)
-        # dict_var_regions['u10'][reg_na] = get_spearman(reg_sel_vals_emi_list, reg_sel_vals_u10_list)
+        reg_sel_vals_sic = reg_sel_vals_sic.mean(dim=['lat','lon'], skipna=True).values
+        reg_sel_vals_sst = reg_sel_vals_sst.mean(dim=['lat','lon'], skipna=True).values
+        reg_sel_vals_u10 = reg_sel_vals_u10.mean(dim=['lat','lon'], skipna=True).values
+        reg_sel_vals_omf = reg_sel_vals_omf.mean(dim=['lat','lon'], skipna=True).values
+        reg_sel_vals_emi = reg_sel_vals_emi.sum(dim=['lat','lon'], skipna=True).values
+        reg_sel_vals_oof = reg_sel_vals_oof.mean(dim=['lat','lon'], skipna=True).values
 
         dict_var_regions['SST'][reg_na] = get_spearman(reg_sel_vals_emi, reg_sel_vals_sst)
         dict_var_regions['SIC'][reg_na] = get_spearman(reg_sel_vals_emi, reg_sel_vals_sic)
@@ -141,8 +109,10 @@ def compute_corr_per_reg(variables, var_names, emi):
         pickle.dump(dict_var_regions, myFile)
 
 
-
 def compute_corr_fill_matrix(i_val_x, i_val_y, laid, loid, matrix):
+    """
+    Compute spearman correlation for each grid cell over time
+    """
     model = stats.spearmanr(i_val_x, i_val_y)
     pval = model.pvalue
     rsval = round(model.statistic, 2)
@@ -179,8 +149,6 @@ if __name__ == '__main__':
 
         C_emi_day.append(emi_day_reg)
 
-        # C_emi_dict_anom = utils.regions()
-        # for r_na in list(emi_day_reg.keys()):
         C_emi_dict_anom = calculate_anomaly(emi_day_reg)
         C_emi_anomaly.append(C_emi_dict_anom)
 
@@ -214,19 +182,13 @@ if __name__ == '__main__':
                                                       two_dim=True)
         C_omf_day.append(omf_day_reg)
 
-    # C_emi_tot_dict_anom = utils.regions()
-    # C_tot_emi_day = utils.regions()
-    # C_tot_omf_day = utils.regions()
-    # sst_aer_K = utils.regions()
-    # openocean_aer = utils.regions()
-    # for r_na in list(C_emi_tot_dict_anom.keys()):
+
     C_tot_emi_day = C_emi_day[0] + C_emi_day[1] + C_emi_day[2]
     C_emi_tot_dict_anom = calculate_anomaly(C_tot_emi_day)
     C_tot_omf_day = C_omf_day[0] + C_omf_day[1] + C_omf_day[2]
-        # sst_aer_K[r_na] = sst_aer[r_na] - 273.16
     openocean_aer = 1 - sic_aer
 
     compute_corr_per_reg([openocean_aer, sic_aer, sst_aer, u10_aer, C_tot_omf_day],
                          ['Open Ocean fraction', 'SIC','SST', 'u10', 'OMF'],
                          C_tot_emi_day, )
-    # compute_corr_matrix(C_tot_emi_day, sic_aer, sst_aer, u10_aer, C_tot_omf_day)
+    compute_corr_matrix(C_tot_emi_day, sic_aer, sst_aer, u10_aer, C_tot_omf_day)

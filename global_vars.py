@@ -23,7 +23,7 @@ seasons_info = {'JFM': {'months' : [1, 2, 3],
                 'JAS': {'months': [7, 8, 9],
                         'one_month': [9],
                         'long_name': 'July-August-September',
-                        'bar_plot_lims': [[-3.5, 4.5, 1.5], [-1, 3.5, 1], [-3.5, 4.5, 1.5]]},
+                        'bar_plot_lims': [[-4.5, 4.5, 1.5], [-1, 3.5, 1], [-4.5, 4.5, 1.5]]},
                 'OND': {'months' : [10, 11, 12],
                         'one_month': [10],
                         'long_name': 'October-November-December'}

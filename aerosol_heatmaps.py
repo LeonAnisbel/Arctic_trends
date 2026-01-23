@@ -281,7 +281,7 @@ if __name__ == '__main__':
 
         if a == 0:
             panel = True
-            title = 'Emission mass flux'
+            title = 'Total emission mass flux'
         else:
             panel = False
             title = 'Aerosol concentration'

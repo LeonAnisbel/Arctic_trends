@@ -189,12 +189,10 @@ def reg_sel(lat, lon, data, var_na):
             reg_data[reg_na]['fraction_grid_negat'] = np.nan
     return reg_data
 
-def subplots_plot_heatmap_scatter(ax, df_vals_piv, df_grid_percent, col_name, cmaps, label, font):
+def subplots_plot_heatmap_scatter(ax, df_vals_piv, df_grid_percent, col_name, cmaps, label, font, percent=True):
     """ Creates multipanel plot with heatmaps and scatter plots of fraction of grid with increasing trend
     :return None"""
-    ax[0].set_title(label[0],
-                    loc='left',
-                    fontsize=font+2)
+
     plot_each_heatmap(ax[0],
                       df_vals_piv[0],
                       col_name,
@@ -212,50 +210,60 @@ def subplots_plot_heatmap_scatter(ax, df_vals_piv, df_grid_percent, col_name, cm
                       cmaps[2],
                       no_ylabel=True)
 
-    ax[3].set_title(label[1] + '\n ',
-                    loc='left',
-                    fontsize=font + 2)
-    vm = 100
-    scatter_plot(fig, ax[3],
-                 df_grid_percent,
-                 col_name_grid_pos,
-                 ['Fraction with \n increasing trend',
-                  'Grid fraction (%)'],
-                 vm,
-                 font,
-                 no_left_labels=False,
-                 no_colorbar=True)
+    if percent:
+        ax[3].set_title(label[1] + '\n ',
+                        loc='left',
+                        fontsize=font + 2)
+        vm = 100
+        scatter_plot(fig, ax[3],
+                     df_grid_percent,
+                     col_name_grid_pos,
+                     ['Fraction with \n increasing trend',
+                      'Grid fraction (%)'],
+                     vm,
+                     font,
+                     no_left_labels=False,
+                     no_colorbar=True)
 
-    scatter_plot(fig, ax[4],
-                 df_grid_percent,
-                 col_name_grid_neg,
-                 ['Fraction with \n decreasing trend',
-                  'Grid fraction (%)'],
-                 vm,
-                 font,
-                 no_left_labels=True,
-                 no_colorbar=False)
-    scatter_plot(fig, ax[5],
-                 df_grid_percent,
-                 col_name_signif,
-                 ['', 'Grid fraction with \n significant trend (%)'],
-                 30,
-                 font,
-                 no_left_labels=True,
-                 no_colorbar=False)
-    ax[5].set_title(label[2] + '\n ',
-                    loc='left',
-                    fontsize=font + 2)
+        scatter_plot(fig, ax[4],
+                     df_grid_percent,
+                     col_name_grid_neg,
+                     ['Fraction with \n decreasing trend',
+                      'Grid fraction (%)'],
+                     vm,
+                     font,
+                     no_left_labels=True,
+                     no_colorbar=False)
+        scatter_plot(fig, ax[5],
+                     df_grid_percent,
+                     col_name_signif,
+                     ['', 'Grid fraction with \n significant trend (%)'],
+                     30,
+                     font,
+                     no_left_labels=True,
+                     no_colorbar=False)
+        ax[5].set_title(label[2] + '\n ',
+                        loc='left',
+                        fontsize=font + 2)
+        for a in ax[3:]:
+            a.tick_params(axis='x',
+                              rotation=45)
 
-
-    for a in ax[3:]:
-        a.tick_params(axis='x',
-                          rotation=45)
     ax[0].tick_params(axis='y',
                   labelsize=font,)
-    for a in ax[:3]:
-        a.tick_params(axis='y',
-                      labelsize=font,)
+    ax[0].set_title(label[0],
+                    loc='left',
+                    fontsize=font)
+    if percent:
+        for a in ax[:3]:
+            a.tick_params(axis='y',
+                          labelsize=font, )
+        ax[0].set_title(label[0],
+                        loc='left',
+                        fontsize=font + 2)
+    else:
+        ax[0].tick_params(axis='y',
+                          labelsize=font+2, )
     return None
 
 def create_df_pivot(variables_info_yr, var_na_sw_aer, panel_names, col_name_oc):
@@ -354,8 +362,27 @@ if __name__=='__main__':
                                                               col_name_omf)
 
 #################################
+#### plot figure with absolute maximum trends only
+    fig, axs = plt.subplots(1, 3,
+                            figsize=(8, 4), )
+    plt.subplots_adjust(wspace=0.1)
+    ax = axs.flatten()
 
-#### plot figure with grid fracions of increasing or decreasing trend
+    font = 8
+    label = [r'', r'' + '\n', r'' + '\n']
+    subplots_plot_heatmap_scatter(ax,
+                                  df_vals_piv_ocean,
+                                  df_ocean_grid_percent,
+                                  col_name_oc,
+                                  cmaps,
+                                  label,
+                                  font,
+                                  percent=False)
+    plt.tight_layout()
+    plt.savefig(f'./plots/{season}_heatmap_scatter_max_abs_biomolcules.png', dpi=300)
+    plt.close()
+
+#### plot figure of absolute maximum trends with grid fracions of increasing or decreasing trend
     fig, axs = plt.subplots(2, 3,
                             figsize=(7, 7),)
     plt.subplots_adjust(wspace=0.1)
@@ -374,6 +401,8 @@ if __name__=='__main__':
     plt.savefig(f'./plots/{season}_heatmap_scatter_plots_grid_fraction_biomolcules.png', dpi=300)
     plt.close()
 
+#### plot figure of absolute maximum trends with grid fractions of increasing or decreasing trend for both ocean
+# concentration and OMF
     fig, axs = plt.subplots(2, 6, figsize=(14, 8))#14, 10
     plt.subplots_adjust(wspace=0.005)
     ax = axs.flatten()

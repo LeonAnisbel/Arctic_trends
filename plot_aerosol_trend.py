@@ -54,39 +54,8 @@ def plot_trend_emission(variables_info_seaice, variables_info_yr, seaice, season
                   ['PL$_{aer}$', r'$\bf{(c)}$'],
                   ['SS$_{aer}$', r'$\bf{(d)}$']],
 
-    percent_increase_yr, _ = utils.get_perc_increase(variables_info_yr, panel_names)
-    plots.plot_4_panel_trend(percent_increase_yr,
-                              seaice_aer,
-                              panel_var_pval,
-                              lat_aer,
-                              lon_aer,
-                              panel_lim,
-                              panel_unit,
-                              fig_titles,
-                              f'{season}_Aerosol_conc_percent_trend_with_mean',
-                              not_aerosol=False,
-                              percent_increase=False)
-
-    # panel_names = ['AER_F_POL', 'AER_F_PRO', 'AER_F_LIP', 'AER_F_SS']
-    #
-    # lat_aer = variables_info_yr[panel_names[0]]['lat']
-    # lon_aer = variables_info_yr[panel_names[0]]['lon']
-    #
-    # panel_lim = [1.5, 1.5, 1.5, 1.5]
-    # panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr)
-    # _, panel_unit = utils.get_perc_increase(variables_info_yr, panel_names)
-    #
-    # fig_titles = [['PCHO$_{aer}$', r'$\bf{(a)}$'], ['DCAA$_{aer}$', r'$\bf{(b)}$'], ['PL$_{aer}$', r'$\bf{(c)}$'],
-    #               ['SS$_{aer}$', r'$\bf{(d)}$']],
-    #
     # percent_increase_yr, _ = utils.get_perc_increase(variables_info_yr, panel_names)
-    # panel_var_trend_signif = []
-    # for i, pval in enumerate(panel_var_pval):
-    #     perc_increase_mask = np.ma.masked_where(np.isnan(pval), percent_increase_yr[i])
-    #     tau = variables_info_yr[panel_names[i]]['tau']
-    #     panel_var_trend_signif.append(np.ma.masked_where(tau < 0.1, perc_increase_mask))
-    #
-    # plots.plot_4_panel_trend(panel_var_trend_signif,#percent_increase_yr,
+    # plots.plot_4_panel_trend(percent_increase_yr,
     #                           seaice_aer,
     #                           panel_var_pval,
     #                           lat_aer,
@@ -94,186 +63,217 @@ def plot_trend_emission(variables_info_seaice, variables_info_yr, seaice, season
     #                           panel_lim,
     #                           panel_unit,
     #                           fig_titles,
-    #                           f'{season}_Aerosol_flux_percent_trend_with_mean',
+    #                           f'{season}_Aerosol_conc_percent_trend_with_mean',
     #                           not_aerosol=False,
-    #                           percent_increase=True)
+    #                           percent_increase=False)
+    #
     # # panel_names = ['AER_F_POL', 'AER_F_PRO', 'AER_F_LIP', 'AER_F_SS']
-    # # lat_aer = variables_info[panel_names[0]]['lat']
-    # # lon_aer = variables_info[panel_names[0]]['lon']
-    # # fig_titles = [['PCHO', r'$\bf{(a)}$'], ['DCAA', r'$\bf{(b)}$'], ['PL', r'$\bf{(c)}$'], ['SS', r'$\bf{(d)}$']],
-    # # panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info)
-    # # panel_std = []
-    # # for i in panel_names:
-    # #     std = variables_info[i]['data_season_reg'].std(dim='time')
-    # #     print(i, 'std max', std.max().values)
-    # #     panel_std.append(std)
-    # # plots.plot_4_panel_trend(panel_std,
+    # #
+    # # lat_aer = variables_info_yr[panel_names[0]]['lat']
+    # # lon_aer = variables_info_yr[panel_names[0]]['lon']
+    # #
+    # # panel_lim = [1.5, 1.5, 1.5, 1.5]
+    # # panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr)
+    # # _, panel_unit = utils.get_perc_increase(variables_info_yr, panel_names)
+    # #
+    # # fig_titles = [['PCHO$_{aer}$', r'$\bf{(a)}$'], ['DCAA$_{aer}$', r'$\bf{(b)}$'], ['PL$_{aer}$', r'$\bf{(c)}$'],
+    # #               ['SS$_{aer}$', r'$\bf{(d)}$']],
+    # #
+    # # percent_increase_yr, _ = utils.get_perc_increase(variables_info_yr, panel_names)
+    # # panel_var_trend_signif = []
+    # # for i, pval in enumerate(panel_var_pval):
+    # #     perc_increase_mask = np.ma.masked_where(np.isnan(pval), percent_increase_yr[i])
+    # #     tau = variables_info_yr[panel_names[i]]['tau']
+    # #     panel_var_trend_signif.append(np.ma.masked_where(tau < 0.1, perc_increase_mask))
+    # #
+    # # plots.plot_4_panel_trend(panel_var_trend_signif,#percent_increase_yr,
     # #                           seaice_aer,
     # #                           panel_var_pval,
     # #                           lat_aer,
     # #                           lon_aer,
-    # #                           [0.005, 0.02, 0.9, 18],
+    # #                           panel_lim,
     # #                           panel_unit,
     # #                           fig_titles,
-    # #                           'Emission_flux_std')
-    #
+    # #                           f'{season}_Aerosol_flux_percent_trend_with_mean',
+    # #                           not_aerosol=False,
+    # #                           percent_increase=True)
+    # # # panel_names = ['AER_F_POL', 'AER_F_PRO', 'AER_F_LIP', 'AER_F_SS']
+    # # # lat_aer = variables_info[panel_names[0]]['lat']
+    # # # lon_aer = variables_info[panel_names[0]]['lon']
+    # # # fig_titles = [['PCHO', r'$\bf{(a)}$'], ['DCAA', r'$\bf{(b)}$'], ['PL', r'$\bf{(c)}$'], ['SS', r'$\bf{(d)}$']],
+    # # # panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info)
+    # # # panel_std = []
+    # # # for i in panel_names:
+    # # #     std = variables_info[i]['data_season_reg'].std(dim='time')
+    # # #     print(i, 'std max', std.max().values)
+    # # #     panel_std.append(std)
+    # # # plots.plot_4_panel_trend(panel_std,
+    # # #                           seaice_aer,
+    # # #                           panel_var_pval,
+    # # #                           lat_aer,
+    # # #                           lon_aer,
+    # # #                           [0.005, 0.02, 0.9, 18],
+    # # #                           panel_unit,
+    # # #                           fig_titles,
+    # # #                           'Emission_flux_std')
     # #
-    # print('Plot all PMOA emission trend and emission per SIC')
-    # panel_names = ['AER_F_POL', 'AER_F_PRO', 'AER_F_LIP']
-    # panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names,
-    #                                                                     variables_info_seaice,
-    #                                                                    mk_method=False)
-    #
-    # panel_var_perc_incr = []
-    # for vv in panel_names:
-    #     panel_var_perc_incr.append(percent_icrease(variables_info_yr, vv, decade))
-    #
+    # # #
+    # # print('Plot all PMOA emission trend and emission per SIC')
+    # # panel_names = ['AER_F_POL', 'AER_F_PRO', 'AER_F_LIP']
+    # # panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names,
+    # #                                                                     variables_info_seaice,
+    # #                                                                    mk_method=False)
+    # #
+    # # panel_var_perc_incr = []
+    # # for vv in panel_names:
+    # #     panel_var_perc_incr.append(percent_icrease(variables_info_yr, vv, decade))
+    # #
+    # # panel_var_trend_tr, panel_var_pval_tr, panel_unit_tr = utils.alloc_metadata(panel_names,
+    # #                                                                               variables_info_yr,
+    # #                                                                               trends=True)
+    # #
+    # # fig_titles = [[['PCHO$_{aer}$ emission trend', r'$\bf{(a)}$'], ['PCHO$_{aer}$  per unit SIC', r'$\bf{(b)}$'],
+    # #                ['DCAA$_{aer}$ emission trend', r'$\bf{(c)}$'], ['DCAA$_{aer}$  per unit SIC', r'$\bf{(d)}$'],
+    # #                ['PL$_{aer}$  emission trend', r'$\bf{(e)}$'], ['PL$_{aer}$  per unit of SIC', r'$\bf{(f)}$']]]
+    # #
+    # # panel_var_trend_new = [panel_var_trend_tr[0], fill_with_nan(panel_var_trend[0]),
+    # #                        panel_var_trend_tr[1], fill_with_nan(panel_var_trend[1]),
+    # #                        panel_var_trend_tr[2], fill_with_nan(panel_var_trend[2])]
+    # #
+    # # panel_var_perc_incr_new = [panel_var_perc_incr[0], fill_with_nan(panel_var_trend[0]),
+    # #                            panel_var_perc_incr[1], fill_with_nan(panel_var_trend[1]),
+    # #                            panel_var_perc_incr[2], fill_with_nan(panel_var_trend[2])]
+    # #
+    # # panel_unit_new = [panel_unit_tr[0], panel_unit[0],
+    # #                   panel_unit_tr[1], panel_unit[1],
+    # #                   panel_unit_tr[2], panel_unit[2]]
+    # # panel_var_pval_new = [panel_var_pval_tr[0], panel_var_pval[0],
+    # #                       panel_var_pval_tr[1], panel_var_pval[1],
+    # #                       panel_var_pval_tr[2], panel_var_pval[2]]
+    # # panel_var_trend_new_signif = []
+    # # for i, pval in enumerate(panel_var_pval_new):
+    # #     panel_var_trend_new_signif.append(np.ma.masked_where(np.isnan(pval), panel_var_trend_new[i]))
+    # #
+    # # plots.plot_6_2_panel_trend(panel_var_perc_incr_new,  # panel_var_trend_new,
+    # #                             seaice,
+    # #                             panel_var_pval_new,
+    # #                             lat_aer,
+    # #                             lon_aer,
+    # #                             [7, 0.003, 7, 0.03, 7, 0.8],  # [0.00015, 0.003, 0.0007, 0.03, 0.03, 0.8],
+    # #                             panel_unit_new,
+    # #                             fig_titles,
+    # #                             f'{season}_all_Emission_flux_trends_and_per_ice',
+    # #                             not_aerosol=False, )
+    # #########################
+    # ### Thesis ####
+    # panel_names = ['AER_SIC', 'AER_U10', 'AER_SST']
     # panel_var_trend_tr, panel_var_pval_tr, panel_unit_tr = utils.alloc_metadata(panel_names,
-    #                                                                               variables_info_yr,
+    #                                                                           variables_info_yr,
+    #                                                                           trends=True)
+    # panel_unit_new = ['%', panel_unit_tr[0], panel_unit_tr[1], panel_unit_tr[2]]
+    # panel_var_pval_new = [0, panel_var_pval_tr[0], panel_var_pval_tr[1], panel_var_pval_tr[2]]
+    # fig_titles = [[['SIC', r'$\bf{(a)}$'],
+    #                ['SIC trend', r'$\bf{(b)}$'],
+    #                ['Wind', r'$\bf{(c)}$'],
+    #                ['SST', r'$\bf{(d)}$']]]
+    #
+    # panel_var_trend_new = [seaice_aer[1], panel_var_trend_tr[0],
+    #                        panel_var_trend_tr[1], panel_var_trend_tr[2]]
+    # for i,var in enumerate(panel_var_trend_new[1:]):
+    #     # print(var)
+    #     var1 = var[:13, :]
+    #     print(len(var), len(var[0]))
+    #     min_val = np.nanmin(var1)
+    #     min_val_in = np.where(var==min_val)
+    #     pval1 = panel_var_pval_new[i+1][:13, :]
+    #     pval = pval1[min_val_in[0], min_val_in[1]]
+    #     lat1 = lat_aer[:13]
+    #     print(panel_names[i],min_val,'+ pval: ',  pval,'lat lon' ,lat1[min_val_in[0]], lon_aer[min_val_in[1]], '\n')
+    #
+    # print('\n NOW thye MAXX \n \n \n')
+    # for i,var in enumerate(panel_var_trend_new[1:]):
+    #     # print(var)
+    #     var1 = var[:12, :]
+    #     min_val = np.nanmax(var1)
+    #     min_val_in = np.where(var==min_val)
+    #     pval1 = panel_var_pval_new[i+1][:12, :]
+    #     pval = pval1[min_val_in[0], min_val_in[1]]
+    #     lat1 = lat_aer[:12]
+    #     print(panel_names[i],min_val,'+ pval: ',  pval,'lat lon' ,lat1[min_val_in[0]], lon_aer[min_val_in[1]], '\n')
+    #
+    # plots.plot_4_panel_trend(panel_var_trend_new,
+    #                          seaice,
+    #                          panel_var_pval_new,
+    #                          lat_aer,
+    #                          lon_aer,
+    #                          [100, 1.8, 0.05, 0.1],
+    #                          panel_unit_new,
+    #                          fig_titles,
+    #                          f'{season}_drivers_trends',
+    #                          not_aerosol=False,
+    #                          seaice_conc=True,
+    #                          )
+    #
+    # #########
+    # panel_names = ['AER_F_SS', 'AER_F_LIP']
+    # panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names,
+    #                                                                    variables_info_seaice,
+    #                                                                    mk_method=False)
+    # panel_names = ['AER_F_POL', 'AER_F_PRO', 'AER_F_LIP', 'AER_F_SS']
+    # fig_titles = [[['PCHO$_{aer}$', r'$\bf{(a)}$'],
+    #                ['DCAA$_{aer}$', r'$\bf{(b)}$'],
+    #                ['PL$_{aer}$', r'$\bf{(c)}$'],
+    #                ['SS', r'$\bf{(d)}$'],
+    #                ['SS per unit of SIC', r'$\bf{(e)}$'],
+    #                ['PL$_{aer}$ per unit of SIC', r'$\bf{(f)}$']]]
+    # panel_var_trend_tr, panel_var_pval_tr, panel_unit_tr = utils.alloc_metadata(panel_names,
+    #                                                                           variables_info_yr,
+    #                                                                           trends=True)
+    #
+    # panel_var_trend_new = [panel_var_trend_tr[0],
+    #                        panel_var_trend_tr[1],
+    #                        panel_var_trend_tr[2],
+    #                        panel_var_trend_tr[3],
+    #                        fill_with_nan(panel_var_trend[0]),
+    #                        fill_with_nan(panel_var_trend[1])]
+    # panel_unit_new = [panel_unit_tr[0], panel_unit_tr[1], panel_unit_tr[2],
+    #                   panel_unit_tr[3], panel_unit[0], panel_unit[1]]
+    # panel_var_pval_new = [panel_var_pval_tr[0], panel_var_pval_tr[1], panel_var_pval_tr[2], panel_var_pval_tr[3],
+    #                       panel_var_pval[0], panel_var_pval[1]]
+    #
+    # plots.plot_6_pannel_trend(panel_var_trend_new,
+    #                         seaice,
+    #                         panel_var_pval_new,
+    #                         lat_aer,
+    #                         lon_aer,
+    #                         [0.00018, 0.001, 0.03, 0.5, 10, 1],
+    #                         panel_unit_new,
+    #                         fig_titles,
+    #                f'_{season}_emiss_per_SIC_trends',
+    #                         not_aerosol=False,)
+    #
+    # #######################
+    # print('Plot 10 m wind and SSt trend')
+    # panel_names = ['AER_U10', 'AER_SST']
+    # fig_titles = [['Wind', r'$\bf{(a)}$'], ['SST', r'$\bf{(b)}$']],
+    # panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
     #                                                                               trends=True)
-    #
-    # fig_titles = [[['PCHO$_{aer}$ emission trend', r'$\bf{(a)}$'], ['PCHO$_{aer}$  per unit SIC', r'$\bf{(b)}$'],
-    #                ['DCAA$_{aer}$ emission trend', r'$\bf{(c)}$'], ['DCAA$_{aer}$  per unit SIC', r'$\bf{(d)}$'],
-    #                ['PL$_{aer}$  emission trend', r'$\bf{(e)}$'], ['PL$_{aer}$  per unit of SIC', r'$\bf{(f)}$']]]
-    #
-    # panel_var_trend_new = [panel_var_trend_tr[0], fill_with_nan(panel_var_trend[0]),
-    #                        panel_var_trend_tr[1], fill_with_nan(panel_var_trend[1]),
-    #                        panel_var_trend_tr[2], fill_with_nan(panel_var_trend[2])]
-    #
-    # panel_var_perc_incr_new = [panel_var_perc_incr[0], fill_with_nan(panel_var_trend[0]),
-    #                            panel_var_perc_incr[1], fill_with_nan(panel_var_trend[1]),
-    #                            panel_var_perc_incr[2], fill_with_nan(panel_var_trend[2])]
-    #
-    # panel_unit_new = [panel_unit_tr[0], panel_unit[0],
-    #                   panel_unit_tr[1], panel_unit[1],
-    #                   panel_unit_tr[2], panel_unit[2]]
-    # panel_var_pval_new = [panel_var_pval_tr[0], panel_var_pval[0],
-    #                       panel_var_pval_tr[1], panel_var_pval[1],
-    #                       panel_var_pval_tr[2], panel_var_pval[2]]
-    # panel_var_trend_new_signif = []
-    # for i, pval in enumerate(panel_var_pval_new):
-    #     panel_var_trend_new_signif.append(np.ma.masked_where(np.isnan(pval), panel_var_trend_new[i]))
-    #
-    # plots.plot_6_2_panel_trend(panel_var_perc_incr_new,  # panel_var_trend_new,
-    #                             seaice,
-    #                             panel_var_pval_new,
-    #                             lat_aer,
-    #                             lon_aer,
-    #                             [7, 0.003, 7, 0.03, 7, 0.8],  # [0.00015, 0.003, 0.0007, 0.03, 0.03, 0.8],
-    #                             panel_unit_new,
-    #                             fig_titles,
-    #                             f'{season}_all_Emission_flux_trends_and_per_ice',
-    #                             not_aerosol=False, )
-    #########################
-    ### Thesis ####
-    panel_names = ['AER_SIC', 'AER_U10', 'AER_SST']
-    panel_var_trend_tr, panel_var_pval_tr, panel_unit_tr = utils.alloc_metadata(panel_names,
-                                                                              variables_info_yr,
-                                                                              trends=True)
-    panel_unit_new = ['%', panel_unit_tr[0], panel_unit_tr[1], panel_unit_tr[2]]
-    panel_var_pval_new = [0, panel_var_pval_tr[0], panel_var_pval_tr[1], panel_var_pval_tr[2]]
-    fig_titles = [[['SIC', r'$\bf{(a)}$'],
-                   ['SIC trend', r'$\bf{(b)}$'],
-                   ['Wind', r'$\bf{(c)}$'],
-                   ['SST', r'$\bf{(d)}$']]]
-
-    panel_var_trend_new = [seaice_aer[1], panel_var_trend_tr[0],
-                           panel_var_trend_tr[1], panel_var_trend_tr[2]]
-    for i,var in enumerate(panel_var_trend_new[1:]):
-        # print(var)
-        var1 = var[:13, :]
-        print(len(var), len(var[0]))
-        min_val = np.nanmin(var1)
-        min_val_in = np.where(var==min_val)
-        pval1 = panel_var_pval_new[i+1][:13, :]
-        pval = pval1[min_val_in[0], min_val_in[1]]
-        lat1 = lat_aer[:13]
-        print(panel_names[i],min_val,'+ pval: ',  pval,'lat lon' ,lat1[min_val_in[0]], lon_aer[min_val_in[1]], '\n')
-
-    print('\n NOW thye MAXX \n \n \n')
-    for i,var in enumerate(panel_var_trend_new[1:]):
-        # print(var)
-        var1 = var[:12, :]
-        min_val = np.nanmax(var1)
-        min_val_in = np.where(var==min_val)
-        pval1 = panel_var_pval_new[i+1][:12, :]
-        pval = pval1[min_val_in[0], min_val_in[1]]
-        lat1 = lat_aer[:12]
-        print(panel_names[i],min_val,'+ pval: ',  pval,'lat lon' ,lat1[min_val_in[0]], lon_aer[min_val_in[1]], '\n')
-
-    plots.plot_4_panel_trend(panel_var_trend_new,
-                             seaice,
-                             panel_var_pval_new,
-                             lat_aer,
-                             lon_aer,
-                             [100, 1.8, 0.05, 0.1],
-                             panel_unit_new,
-                             fig_titles,
-                             f'{season}_drivers_trends',
-                             not_aerosol=False,
-                             seaice_conc=True,
-                             )
-
-    #########
-    panel_names = ['AER_F_SS', 'AER_F_LIP']
-    panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names,
-                                                                       variables_info_seaice,
-                                                                       mk_method=False)
-    panel_names = ['AER_F_POL', 'AER_F_PRO', 'AER_F_LIP', 'AER_F_SS']
-    fig_titles = [[['PCHO$_{aer}$', r'$\bf{(a)}$'],
-                   ['DCAA$_{aer}$', r'$\bf{(b)}$'],
-                   ['PL$_{aer}$', r'$\bf{(c)}$'],
-                   ['SS', r'$\bf{(d)}$'],
-                   ['SS per unit of SIC', r'$\bf{(e)}$'],
-                   ['PL$_{aer}$ per unit of SIC', r'$\bf{(f)}$']]]
-    panel_var_trend_tr, panel_var_pval_tr, panel_unit_tr = utils.alloc_metadata(panel_names,
-                                                                              variables_info_yr,
-                                                                              trends=True)
-
-    panel_var_trend_new = [panel_var_trend_tr[0],
-                           panel_var_trend_tr[1],
-                           panel_var_trend_tr[2],
-                           panel_var_trend_tr[3],
-                           fill_with_nan(panel_var_trend[0]),
-                           fill_with_nan(panel_var_trend[1])]
-    panel_unit_new = [panel_unit_tr[0], panel_unit_tr[1], panel_unit_tr[2],
-                      panel_unit_tr[3], panel_unit[0], panel_unit[1]]
-    panel_var_pval_new = [panel_var_pval_tr[0], panel_var_pval_tr[1], panel_var_pval_tr[2], panel_var_pval_tr[3],
-                          panel_var_pval[0], panel_var_pval[1]]
-
-    plots.plot_6_pannel_trend(panel_var_trend_new,
-                            seaice,
-                            panel_var_pval_new,
-                            lat_aer,
-                            lon_aer,
-                            [0.00018, 0.001, 0.03, 0.5, 10, 1],
-                            panel_unit_new,
-                            fig_titles,
-                   f'_{season}_emiss_per_SIC_trends',
-                            not_aerosol=False,)
-
-    #######################
-    print('Plot 10 m wind and SSt trend')
-    panel_names = ['AER_U10', 'AER_SST']
-    fig_titles = [['Wind', r'$\bf{(a)}$'], ['SST', r'$\bf{(b)}$']],
-    panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
-                                                                                  trends=True)
-    panel_var_trend_signif = []
-    for i, pval in enumerate(panel_var_pval):
-        panel_var_trend_signif.append(np.ma.masked_where(np.isnan(pval), panel_var_trend[i]))
-    #
-    plots.plot_2_panel_trend(panel_var_trend,  # panel_var_trend_signif
-                              seaice,
-                              panel_var_pval,
-                              lat_aer,
-                              lon_aer,
-                              [0.05, 0.1],
-                              panel_unit,
-                              fig_titles,
-                              'wind_sst_Arctic',
-                              not_aerosol=False,
-                              #                          percent_increase=True,
-                              )
+    # panel_var_trend_signif = []
+    # for i, pval in enumerate(panel_var_pval):
+    #     panel_var_trend_signif.append(np.ma.masked_where(np.isnan(pval), panel_var_trend[i]))
+    # #
+    # # plots.plot_2_panel_trend(panel_var_trend,  # panel_var_trend_signif
+    # #                           seaice,
+    # #                           panel_var_pval,
+    # #                           lat_aer,
+    # #                           lon_aer,
+    # #                           [0.05, 0.1],
+    # #                           panel_unit,
+    # #                           fig_titles,
+    # #                           'wind_sst_Arctic',
+    # #                           not_aerosol=False,
+    # #                           #                          percent_increase=True,
+    # #                           )
     #######################
 
     print('')
@@ -380,28 +380,27 @@ def plot_trend_aer_concentration(variables_info_yr, seaice, season):
     panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
                                                                                   trends=True)
 
-    plots.plot_4_panel_trend(panel_var_trend,
-                              seaice,
-                              panel_var_pval,
-                              lat,
-                              lon,
-                              vlims,
-                              panel_unit,
-                              fig_titles,
-                              f'{season}_concentration_trends',
-                              not_aerosol=False,
-                              percent_increase=False,
-                              )
+    # plots.plot_4_panel_trend(panel_var_trend,
+    #                           seaice,
+    #                           panel_var_pval,
+    #                           lat,
+    #                           lon,
+    #                           vlims,
+    #                           panel_unit,
+    #                           fig_titles,
+    #                           f'{season}_concentration_trends',
+    #                           not_aerosol=False,
+    #                           percent_increase=False,
+    #                           )
 
-    panel_names = ['AER_burden_POL', 'AER_burden_PRO', 'AER_burden_LIP', 'AER_burden_SS']
+    panel_names = ['AER_F_POL', 'AER_F_PRO', 'AER_F_LIP', 'AER_F_SS']
     lat = variables_info_yr[panel_names[0]]['lat']
     lon = variables_info_yr[panel_names[0]]['lon']
     fig_titles = [[['PCHO$_{aer}$', r'$\bf{(a)}$'],
-                   ['DCAA$_{aer}$', r'$\bf{(c)}$'],
-                   ['PL$_{aer}$', r'$\bf{(b)}$'],
+                   ['DCAA$_{aer}$', r'$\bf{(b)}$'],
+                   ['PL$_{aer}$', r'$\bf{(c)}$'],
                    ['SS', r'$\bf{(d)}$']]]
     vlims = [0.0001, 0.0004, 0.02, 0.5]
-    vlims = [3.5, 3.5, 3.5, 3.5]
 
     panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
                                                                        percent_increase=True,
@@ -427,6 +426,21 @@ def plot_trend_aer_concentration(variables_info_yr, seaice, season):
         lat1 = lat[:13]
         print(panel_names[i],min_val,'+ pval: ',  pval,'lat lon' ,lat1[min_val_in[0]], lon[min_val_in[1]], '\n')
 
+    vlims = [2.5, 2.5, 2.5, 2.5]
+    plots.plot_4_panel_trend_burden(panel_var_trend,
+                              seaice,
+                              panel_var_pval,
+                              lat,
+                              lon,
+                              vlims,
+                              ['mg m$^{-2}$ yr$^{-1}$', 'mg m$^{-2}$ yr$^{-1}$', 'mg m$^{-2}$ yr$^{-1}$', 'mg m$^{-2}$ yr$^{-1}$'],
+                              fig_titles,
+                              f'{season}_burden_trends_three_panel',
+                              not_aerosol=False,
+                              percent_increase=False,
+                              three_panel=True
+                              )
+    vlims = [3.5, 3.5, 3.5, 3.5]
     plots.plot_4_panel_trend_burden(panel_var_trend,
                               seaice,
                               panel_var_pval,

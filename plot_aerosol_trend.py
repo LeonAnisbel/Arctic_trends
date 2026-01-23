@@ -439,3 +439,45 @@ def plot_trend_aer_concentration(variables_info_yr, seaice, season):
                               not_aerosol=False,
                               percent_increase=False,
                               )
+
+
+#for paper
+def plot_dcaa_spring_summer():
+    with open(f"TrendsDict_JAS_orig_data.pkl", "rb") as myFile:
+        variables_info_yr_JAS = pickle.load(myFile)
+    seaice_JAS = utils.get_seaice_vals(variables_info_yr_JAS,
+                                       'Sea_ice',
+                                       get_min_area=True)
+
+    with open(f"TrendsDict_AMJ_orig_data.pkl", "rb") as myFile:
+        variables_info_yr_AMJ = pickle.load(myFile)
+    seaice_AMJ = utils.get_seaice_vals(variables_info_yr_AMJ,
+                                       'Sea_ice',
+                                       get_min_area=True)
+
+    panel_names = ['AER_F_PRO']
+    lat = variables_info_yr_JAS[panel_names[0]]['lat']
+    lon = variables_info_yr_JAS[panel_names[0]]['lon']
+    fig_titles = [[['DCAA$_{aer}$ (April-May-June)', ''],
+                   ['DCAA$_{aer}$ (July-August-September)', ''],]]
+    vlims = [0.001, 0.001]
+
+    panel_var_trend_JAS, panel_var_pval_JAS, panel_unit = utils.alloc_metadata(panel_names,
+                                                                               variables_info_yr_JAS,
+                                                                                trends=True)
+    panel_var_trend_AMJ, panel_var_pval_AMJ, panel_unit = utils.alloc_metadata(panel_names,
+                                                                               variables_info_yr_AMJ,
+                                                                                trends=True)
+    plots.plot_2_panel_trend([panel_var_trend_AMJ[0], panel_var_trend_JAS[0]],
+                            [seaice_AMJ, seaice_JAS],
+                            [panel_var_pval_AMJ[0], panel_var_pval_JAS[0]],
+                            lat,
+                            lon,
+                            vlims,  #[0.05, 0.01, 0.005, 0.002, 0.008, 0.2],
+                            [panel_unit[0], panel_unit[0]],
+                            fig_titles,
+                            f'_AMJ_JAS_DCAA_emiss_trends',
+                            not_aerosol=False,
+                             dcaa_plot=True)
+
+

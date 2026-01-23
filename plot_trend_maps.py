@@ -18,6 +18,8 @@ if __name__ == '__main__':
 
     decade = '1990-2019'
 
+    plot_aerosol_trend.plot_dcaa_spring_summer()
+    plot_biomolecule_trend.plot_dcaa_spring_summer()
     plot_biomolecule_trend.plot_trend(variables_info_yr, seaice, season)
     plot_aerosol_trend.plot_trend_emission(variables_info_seaice, variables_info_yr, seaice, season, decade)
     plot_aerosol_trend.plot_trend_aer_concentration(variables_info_yr, seaice, season)

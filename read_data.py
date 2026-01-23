@@ -154,3 +154,49 @@ def read_each_aerosol_data(months, var_id, file_type, unit_factor, per_month=Fal
     # C = utils.season_aver(C_ds, months)
 
     return C, C_m
+
+
+def read_daily_data(months, var_id, file_type, unit_factor, emi_gridbox=False, two_dim=False):
+    aer_dir = global_vars.aer_dir_path
+    v_m_month = []
+    v_m_yr = []
+
+    for mo in months:
+        if mo < 10:
+            mo_str = f'0{mo}'
+        else:
+            mo_str = f'{mo}'
+
+        for yr in np.arange(1990, 2020):
+            files = f'{aer_dir}_{yr}{mo_str}.01_{file_type}.nc'
+            if two_dim:
+                ds = read_files_data(files)
+                ds_var = ds
+                var_id_new = f'{var_id}'
+                if emi_gridbox:
+                    # calculate values considering the grid cell size
+                    ds_gboxarea = ds.rename({'gboxarea': f'area_{var_id}'})
+                    ds_emi = ds.rename({var_id: f'area_{var_id}'})
+                    ds_emi_gboxarea = ds_gboxarea * ds_emi * 86400  # kg/day, 86400 seconds in a day (model values are given as daily quantities)
+                    var_id_new = f'area_{var_id}'
+                    ds_var = ds_emi_gboxarea
+                ds_daily = ds_var.groupby('time.day').mean(skipna=True)
+                v_m_yr.append(ds_daily[var_id_new])
+                # print(var_id, ds_daily.sizes, ds_daily.dims)
+
+    v_m_month = xr.concat(v_m_yr, dim='day') * unit_factor
+    print(var_id, v_m_month.sizes)
+    lon_360 = ((v_m_month.lon.values + 180) % 360) - 180
+
+    data_ds = xr.Dataset(
+        data_vars=dict(
+            data_region=(["time", "lat", "lon"], v_m_month.values),
+        ),
+        coords=dict(
+            time=("time", v_m_month.day.values),
+            lon=("lon", lon_360),
+            lat=("lat", v_m_month.lat.values),
+        ),
+    )
+
+    return data_ds['data_region']

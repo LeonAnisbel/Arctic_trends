@@ -2,18 +2,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
-from cartopy.mpl.gridliner import LATITUDE_FORMATTER
-from matplotlib import ticker as mticker
 import matplotlib.path as mpath
 import matplotlib.colors as mcolors
 from matplotlib.ticker import FormatStrFormatter
 import pymannkendall as mk
-from scipy.stats import alpha
 from statsmodels.tsa.stattools import acf
 import statsmodels.api as sm
 from cartopy.mpl.gridliner import LATITUDE_FORMATTER
 from matplotlib import ticker as mticker
-import global_vars
+from Utils_functions import global_vars
 from matplotlib.colors import LinearSegmentedColormap
 from scipy import stats
 

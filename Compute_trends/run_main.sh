@@ -20,4 +20,3 @@ echo "Start python script execution at $(date)"
 
 python -u main.py
 #python -u main_trend_per_ice.py
-#python -u plot_main_dict.py

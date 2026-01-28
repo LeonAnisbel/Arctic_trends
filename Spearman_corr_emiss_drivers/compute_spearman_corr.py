@@ -1,8 +1,7 @@
 import pickle
-import global_vars
-import read_data, utils
+from Utils_functions import read_data, utils, global_vars
 import numpy as np
-from utils import calculate_anomaly
+from Utils_functions.utils import calculate_anomaly
 import xarray as xr
 from scipy import stats
 
@@ -10,7 +9,8 @@ ftype = np.float64
 
 
 def compute_corr_matrix(emi_var, sic_aer, sst_aer, u10_aer, C_tot_omf_day):
-    """Computes the correlation of the emission and emission drivers over a 30-yr period for each grid point"""
+    """Computes the correlation of the emission and emission drivers over a 30-yr period for each grid point
+    :return None"""
 
     lat_vals = sic_aer.lat.values
     lon_vals = sic_aer.lon.values
@@ -103,8 +103,6 @@ def compute_corr_per_reg(variables, var_names, emi):
         dict_var_regions['u10'][reg_na] = get_spearman(reg_sel_vals_emi, reg_sel_vals_u10)
         dict_var_regions['Open Ocean fraction'][reg_na] = get_spearman(reg_sel_vals_emi, reg_sel_vals_oof)
 
-
-    print(dict_var_regions)
     with open(f"Spearman_corr_emiss_drivers_reg_{season}.pkl", "wb") as myFile:
         pickle.dump(dict_var_regions, myFile)
 
@@ -125,7 +123,8 @@ def compute_corr_fill_matrix(i_val_x, i_val_y, laid, loid, matrix):
 
 def apply_sic_mask(i_val_sic, panel_var):
     # Exclude regions potentially fully covered by ice
-    panel_var = np.ma.masked_where(i_val_sic.values > 0.99, panel_var.values)
+    panel_var = np.ma.masked_where(i_val_sic.values > 0.99,
+                                   panel_var.values)
     panel_var_nan = panel_var.filled(np.nan)
     return panel_var_nan
 
@@ -141,11 +140,11 @@ if __name__ == '__main__':
     var_ids_emi = ['emi_POL', 'emi_PRO', 'emi_LIP', 'emi_SS']
     for c_elem in range(len(var_ids_emi)):
         emi_day_reg = read_data.read_daily_data(months,
-                                                      var_ids_emi[c_elem],
+                                                var_ids_emi[c_elem],
                                                       'emi',
-                                                      1e12,
-                                                      emi_gridbox=True,
-                                                      two_dim=True)
+                                                1e12,
+                                                emi_gridbox=True,
+                                                two_dim=True)
 
         C_emi_day.append(emi_day_reg)
 
@@ -159,27 +158,27 @@ if __name__ == '__main__':
     sst_aer = read_data.read_daily_data(months,
                                                   'tsw',
                                                   'vphysc',
-                                                  1,
-                                                  two_dim=True)
+                                        1,
+                                        two_dim=True)
     u10_aer = read_data.read_daily_data(months,
                                               'velo10m',
                                               'vphysc',
-                                              1,
-                                              two_dim=True)
+                                        1,
+                                        two_dim=True)
     sic_aer = read_data.read_daily_data(months,
                                                      'seaice',
                                                      'echam',
-                                                     1,
-                                                     two_dim=True)
+                                        1,
+                                        two_dim=True)
 
     C_omf_day = []
     var_ids_omf = ['OMF_POL', 'OMF_PRO', 'OMF_LIP']
     for c_elem in range(len(var_ids_omf)):
         omf_day_reg = read_data.read_daily_data(months,
-                                                      var_ids_omf[c_elem],
+                                                var_ids_omf[c_elem],
                                                       'ham',
-                                                      1,
-                                                      two_dim=True)
+                                                1,
+                                                two_dim=True)
         C_omf_day.append(omf_day_reg)
 
 
@@ -188,7 +187,10 @@ if __name__ == '__main__':
     C_tot_omf_day = C_omf_day[0] + C_omf_day[1] + C_omf_day[2]
     openocean_aer = 1 - sic_aer
 
+    # computes the correlation of the spatially averaged values
     compute_corr_per_reg([openocean_aer, sic_aer, sst_aer, u10_aer, C_tot_omf_day],
                          ['Open Ocean fraction', 'SIC','SST', 'u10', 'OMF'],
                          C_tot_emi_day, )
+
+    # computes the correlation over the whole grid
     compute_corr_matrix(C_tot_emi_day, sic_aer, sst_aer, u10_aer, C_tot_omf_day)

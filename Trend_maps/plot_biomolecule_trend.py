@@ -1,7 +1,7 @@
 import pickle
 
-import plots
-import utils
+from Trend_time_series import plots
+from Utils_functions import utils
 
 
 def plot_trend(variables_info_yr, seaice, season):
@@ -44,19 +44,19 @@ def plot_trend(variables_info_yr, seaice, season):
     vlims = [0.04, 0.01, 0.008, 0.3, 3, 1.]
 
     panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
-                                                                                  trends=True)
+                                                                       trends=True)
 
     plots.plot_6_pannel_trend(panel_var_trend,
-                            seaice,
-                            panel_var_pval,
-                            lat,
-                            lon,
-                            vlims,  #[0.05, 0.01, 0.005, 0.002, 0.008, 0.2],
-                            panel_unit,
-                            fig_titles,
+                              seaice,
+                              panel_var_pval,
+                              lat,
+                              lon,
+                              vlims,  #[0.05, 0.01, 0.005, 0.002, 0.008, 0.2],
+                              panel_unit,
+                              fig_titles,
                    f'_{season}_Biom_OMF_SIC_NPP_trends',
-                            not_aerosol=True,
-                            percent_increase=False,)
+                              not_aerosol=True,
+                              percent_increase=False, )
 
     ########################
 
@@ -70,20 +70,20 @@ def plot_trend(variables_info_yr, seaice, season):
                    ['NPP', r'$\bf{(d)}$']]]
     vlims = [0.04, 0.008, 3, 1.]
     panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
-                                                                                  trends=True)
+                                                                       trends=True)
 
     plots.plot_4_panel_trend(panel_var_trend,
-                              seaice,
-                              panel_var_pval,
-                              lat,
-                              lon,
-                              vlims,
-                              panel_unit,
-                              fig_titles,
+                             seaice,
+                             panel_var_pval,
+                             lat,
+                             lon,
+                             vlims,
+                             panel_unit,
+                             fig_titles,
                               f'{season}_Biom_SIC_NPP_trends',
-                              not_aerosol=True,
-                              percent_increase=False,
-                              )
+                             not_aerosol=True,
+                             percent_increase=False,
+                             )
 
 
     panel_names = ['PCHO', 'OMF_POL', 'PL', 'OMF_LIP', 'Sea_ice', 'NPP']
@@ -97,19 +97,19 @@ def plot_trend(variables_info_yr, seaice, season):
                    ['NPP', r'$\bf{(f)}$']]]
     vlims = [0.04, 0.002, 0.008, 0.25, 3, 1.]
     panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
-                                                                                  trends=True)
+                                                                       trends=True)
 
     plots.plot_6_2_panel_trend(panel_var_trend,
-                                seaice,
-                                panel_var_pval,
-                                lat,
-                                lon,
-                                vlims,
-                                panel_unit,
-                                fig_titles,
+                               seaice,
+                               panel_var_pval,
+                               lat,
+                               lon,
+                               vlims,
+                               panel_unit,
+                               fig_titles,
                                 f'{season}_Biom_OMF_SIC_NPP_trends',
-                                not_aerosol=True,
-                                percent_increase=False, )
+                               not_aerosol=True,
+                               percent_increase=False, )
 
     print('finish now with OMF and biom')
 
@@ -120,7 +120,7 @@ def plot_trend(variables_info_yr, seaice, season):
     lat = variables_info_yr[panel_names[0]]['lat']
     lon = variables_info_yr[panel_names[0]]['lon']
     panel_var_trend, panel_var_pval, panel_unit = utils.alloc_metadata(panel_names, variables_info_yr,
-                                                                                  trends=True)
+                                                                       trends=True)
     plots.plot_3_pannel_trend(panel_var_trend,
                               seaice,
                               panel_var_pval,
@@ -134,6 +134,8 @@ def plot_trend(variables_info_yr, seaice, season):
 
 #for paper
 def plot_dcaa_spring_summer():
+    """ read data and plot map trends of marine DCAA
+    :returns  None"""
     with open(f"TrendsDict_JAS_orig_data.pkl", "rb") as myFile:
         variables_info_yr_JAS = pickle.load(myFile)
     seaice_JAS = utils.get_seaice_vals(variables_info_yr_JAS,
@@ -155,19 +157,19 @@ def plot_dcaa_spring_summer():
 
     panel_var_trend_JAS, panel_var_pval_JAS, panel_unit = utils.alloc_metadata(panel_names,
                                                                                variables_info_yr_JAS,
-                                                                                trends=True)
+                                                                               trends=True)
     panel_var_trend_AMJ, panel_var_pval_AMJ, panel_unit = utils.alloc_metadata(panel_names,
                                                                                variables_info_yr_AMJ,
-                                                                                trends=True)
+                                                                               trends=True)
     plots.plot_2_panel_trend([panel_var_trend_AMJ[0], panel_var_trend_JAS[0]],
-                            [seaice_AMJ, seaice_JAS],
-                            [panel_var_pval_AMJ[0], panel_var_pval_JAS[0]],
-                            lat,
-                            lon,
-                            vlims,  #[0.05, 0.01, 0.005, 0.002, 0.008, 0.2],
-                            [panel_unit[0], panel_unit[0]],
-                            fig_titles,
+                             [seaice_AMJ, seaice_JAS],
+                             [panel_var_pval_AMJ[0], panel_var_pval_JAS[0]],
+                             lat,
+                             lon,
+                             vlims,  #[0.05, 0.01, 0.005, 0.002, 0.008, 0.2],
+                             [panel_unit[0], panel_unit[0]],
+                             fig_titles,
                             f'_AMJ_JAS_Biom_OMF_SIC_NPP_trends',
-                            not_aerosol=True,
-                            percent_increase=False,
+                             not_aerosol=True,
+                             percent_increase=False,
                              dcaa_plot=True)

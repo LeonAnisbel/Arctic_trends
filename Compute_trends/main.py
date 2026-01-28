@@ -2,17 +2,12 @@ import gc
 import numpy as np
 import statsmodels.api as sm
 import pickle
-
-import xarray as xr
 import Trend_all_arctic
-import global_vars
 from process_statsmodels import process_array_slope
-import read_data, utils
-import plots
-from utils import calculate_anomaly
+from Utils_functions import read_data, utils, global_vars
+from Utils_functions.utils import calculate_anomaly
 
 ftype = np.float64
-
 
 def initialize_array():
     return np.empty((x_lat, y_lon), dtype=ftype)
@@ -126,8 +121,8 @@ if __name__ == '__main__':
     pcho_inp_burden, _ = read_data.read_each_aerosol_data(months,
                                                  'INP_concentration',
                                                  'B24bend_poly_only_inp_marine_concentration',
-                                                 1,
-                                                 two_dim=True)
+                                                          1,
+                                                          two_dim=True)
     pcho_inp_burden = pcho_inp_burden.assign_coords(lat=gbox_area.lat)
     pcho_inp_burden_15 = pcho_inp_burden.sel(temperature = -15.)
     print('Finished reading INP data')
@@ -140,6 +135,7 @@ if __name__ == '__main__':
     C_NPP_anomaly = calculate_anomaly(C_NPP)
     print('Finished reading biomolecule concentration and SIC from FESOm-REcoM data')
 
+# group variables in a list in the same order of the predefined names in utils.create_var_info_dict
     list_variables = [
         pcho_inp_burden_15,
         C_burden[0], C_burden[1], C_burden[2], C_tot_burden, C_burden[3], C_burden_ssa,
@@ -155,19 +151,20 @@ if __name__ == '__main__':
         C_ice * 100, C_ice * 100, C_ice_area_px,  C_ice_area_px,
         C_temp, C_NPP, C_NPP_anomaly, C_DIN,
         ]
+# load metadata info as a dictionary
     variables_info = utils.create_var_info_dict()
 
     da_type = global_vars.data_type
     file_name = da_type
-    print(da_type)
     for idx, var_na in enumerate(list(variables_info.keys())):
-        variables_info[var_na]['orig_data'] = list_variables[idx]
+        variables_info[var_na]['orig_data'] = list_variables[idx]  # save data in the dictionary as is
 
+# compute trends for each variable
     for var_na, dict_var in variables_info.items():
         # var_na = list(variables_info['var_names'].keys())[i]
         print('Computing ' + var_na + ' trend')
 
-        aer_conc = False
+        aer_conc = False # id used for ECHAM-HAM model output that has a different spatial resolution to FESOM-REcoM
         if var_na[:3] == 'AER':
             aer_conc = True
             if da_type == 'log_data':
@@ -177,11 +174,12 @@ if __name__ == '__main__':
         else:
             da_type = 'orig_data'
 
+# compute 3-month average over predefined months of gbox_area
         gbox_area_arctic = utils.pick_month_var_reg(gbox_area,
                                                     months,
                                                     aer_conc=True)
 
-
+# compute 3-month average over if it is not sea icea area
         if var_na == 'Sea_ice_1m' or var_na == 'Sea_ice_area_px_1m' :#or var_na == 'AER_SIC_1m':
             data_reg = dict_var[da_type].where(dict_var[da_type].lat > 60,
                                                drop=True)
@@ -191,21 +189,21 @@ if __name__ == '__main__':
             variables_info[var_na]['data_season_reg'] = da_months
         else:
             data_month_arctic, lat, lon = utils.pick_month_var_reg(dict_var[da_type],
-                                                                months,
-                                                                aer_conc=aer_conc)
+                                                                   months,
+                                                                   aer_conc=aer_conc)
 
+# save in dictionary 3-month average data
             variables_info[var_na]['data_season_reg'] = data_month_arctic
             variables_info[var_na]['data_time_mean'] = data_month_arctic.mean('time',
                                                                            skipna=True)
-
             da_compute = data_month_arctic.compute()
             variables_info[var_na]['data_time_median'] = da_compute.median('time',
                                                                            skipna=True)
             del da_compute
-
             variables_info[var_na]['lat'] = lat
             variables_info[var_na]['lon'] = lon
 
+# adapt variable type to compute trends
             X = data_month_arctic.time.values.astype(ftype)  # dt.year.
             X = sm.add_constant(X)
             Y = data_month_arctic.values.astype(ftype)
@@ -219,6 +217,7 @@ if __name__ == '__main__':
             tau = initialize_array()
             significance = initialize_array()
 
+# call cython script to compute trend
             process_array_slope(Y,
                                 X,
                                 slope,
@@ -227,7 +226,7 @@ if __name__ == '__main__':
                                 trend,
                                 tau,
                                 significance)
-
+# safe variables
             variables_info[var_na]['slope'] = slope
             variables_info[var_na]['pval'] = p_value
             variables_info[var_na]['intercept'] = intercept
@@ -235,6 +234,7 @@ if __name__ == '__main__':
             variables_info[var_na]['tau'] = tau
             variables_info[var_na]['significance'] = significance
 
+# compute trends across subregions
             Trend_all_arctic.trend_aver_per_reg(variables_info,
                                                 var_na,
                                                 data_month_arctic,
@@ -243,9 +243,8 @@ if __name__ == '__main__':
                                                 gbox_area_arctic[0],
                                                 per_unit_sic=False,
                                                 aer_conc=aer_conc)
-
-
             gc.collect()
 
+# save dictionary with all info
     with open(f"TrendsDict_{season}_{file_name}.pkl", "wb") as myFile:
         pickle.dump(variables_info, myFile)

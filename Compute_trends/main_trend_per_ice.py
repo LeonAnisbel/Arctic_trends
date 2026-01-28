@@ -1,10 +1,10 @@
 import numpy as np
 import pickle
-import global_vars
 from process_statsmodels import process_array_slope_per_ice
-import read_data, utils
+from Utils_functions import read_data, utils, global_vars
 
 ftype = np.float64
+# computes the trends of emissions per unit of sea ice
 if __name__ == '__main__':
     season = global_vars.season_to_analise
     season_dict = global_vars.seasons_info[season]
@@ -22,10 +22,10 @@ if __name__ == '__main__':
     var_ids = ['emi_POL', 'emi_PRO', 'emi_LIP', 'emi_SS']
     for c_elem in range(len(var_ids)):
         emi, _ = read_data.read_each_aerosol_data(months,
-                                                      var_ids[c_elem],
+                                                  var_ids[c_elem],
                                                       'emi',
-                                                      1e12,
-                                                      two_dim=True)
+                                                  1e12,
+                                                  two_dim=True)
         C_emi.append(emi)
 
     C_tot_emi = C_emi[0] + C_emi[1] + C_emi[2]

@@ -5,6 +5,7 @@ aer_dir_path = main_new+'ac3_arctic/ac3_arctic'
 inp_dir_path = root_dir+'echam_postproc/cloud_analysis_plots/immersed_droplets/INP/Marine/ac3_arctic'
 omf_dir_path = root_dir+"MOA_DATA_ECHAM/OMF_data/fesom_recon_oceanfilms_no_icemask/fesom_recon_oceanfilms_omf_*"
 ocean_dir_path = root_dir+"MOA_DATA_ECHAM/regular_grid_interp/"
+lat_north = 60
 lat_arctic_lim = 66
 thesis_plot=False
 

@@ -1,16 +1,16 @@
 import numpy as np
 import statsmodels.api as sm
 import pymannkendall as mk
-import read_data, utils
-import xarray as xr
-import pickle
-import warnings
-
+from Utils_functions import utils
 
 ftype = np.float64
-def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_reg, var_type, gboxarea, per_unit_sic=False, aer_conc=False):
+def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_reg, var_type, gboxarea,
+                       per_unit_sic=False, aer_conc=False):
+    """Selects subgrid representing an Arctic subregion and computes the trends for it.
+    :return None
+    """
     lon_360 = data_month_reg.lon.data
-    if var_type == 'AER':
+    if var_type == 'AER':  # convert lon values when ECHAM-HAM grid
         lon = ((lon_360 + 180) % 360) - 180
     else:
         lon = lon_360
@@ -19,16 +19,18 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
     decades_idx = [[0,14], [15,29], [0,29]]
     decades_na = ['1990-2004', '2005-2019', '1990-2019']
 
+    # define sub-dictionaries
     reg_data = utils.regions()
     for reg_na in list(reg_data.keys()):
         variables_info[var_na][reg_na] = {}
         for dec_na in decades_na:
             variables_info[var_na][reg_na][dec_na] = {}
 
+    # iterate through regions to compute trends
     for idx, reg_na in enumerate(list(reg_data.keys())):
         data_ds = utils.create_ds(data_month_reg, lon)
         conditions = utils.get_conds(data_ds.lat, data_ds.lon)
-        reg_sel_vals_whole = utils.get_var_reg(data_ds, conditions[idx])
+        reg_sel_vals_whole = utils.get_var_reg(data_ds, conditions[idx]) # select subregion
 
         for dec_na, dec in enumerate(decades):
             if var_type == 'AER': # exclude variables for accumulated emission flux
@@ -52,10 +54,10 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
                 ff = 1e-6 # from km2 to millions of km2
             elif var_na[-2:] == '_m' or var_na[:10] == 'AER_burden':
                 ff = 1
-            # print('REGION', reg_na)
 
             if (var_na == 'Sea_ice_area_px' or var_na=='AER_SIC_area_px'
-                    or var_na[-2:] == '_m' or var_na[:10] == 'AER_burden'): # exclude variables for accumulated emission flux:
+                    or var_na[-2:] == '_m' or var_na[:10] == 'AER_burden'): # exclude variables for accumulated emission
+                # flux, burden and sea ice and calculate the accumulated value instead of regional average
                 if var_na[:10] == 'AER_burden':
                     # convert from mg/m2 to mg
                     reg_sel_vals['data_region'] = reg_sel_vals['data_region'] * reg_sel_vals_gbx['data_region']
@@ -86,7 +88,7 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
             variables_info[var_na][reg_na][decades_na[dec_na]]['data_time_median'] = data_time_median
 
 
-            if per_unit_sic:
+            if per_unit_sic: # compute linear correlation of emission flux per unit of sea ice
                 data_ds = utils.create_ds(data_month_ice_reg, lon)
                 conditions = utils.get_conds(data_ds.lat, data_ds.lon)
                 reg_sel_vals_ice = utils.get_var_reg(data_ds, conditions[idx])
@@ -109,6 +111,7 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
                 X = data_month.time.values
                 Y = variables_info[var_na][reg_na][decades_na[dec_na]][data_type_mean_or_sum].values
 
+            # adapt variable type to compute trends
             X = X.astype(ftype)
             X = sm.add_constant(X)
             Y = Y.astype(ftype)
@@ -120,6 +123,7 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
             y_clean = y_arr[mask]
             x_clean = x_arr[mask]
 
+            # assume 10 as the minimum sample size require to compute the trend
             if n >= 10 and not np.allclose(y_clean, y_clean[0]):
                 result = mk.original_test(y_clean)
 
@@ -150,6 +154,7 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
                 tau = np.nan
                 signif = np.nan
 
+            # save data per subregion in dictionary
             variables_info[var_na][reg_na][decades_na[dec_na]]['slope_aver_reg'] = slope
             variables_info[var_na][reg_na][decades_na[dec_na]]['pval_aver_reg'] = p_value
             variables_info[var_na][reg_na][decades_na[dec_na]]['intercept_aver_reg'] = intercept

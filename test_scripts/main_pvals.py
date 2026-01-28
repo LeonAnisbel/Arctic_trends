@@ -1,13 +1,10 @@
 import numpy as np
 import xarray as xr
 import statsmodels.api as sm
-import math
-from process_statsmodels import process_array_slope
-import matplotlib as mpl
+from Compute_trends.process_statsmodels import process_array_slope
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
-import cartopy as cart 
 from cartopy.mpl.gridliner import LATITUDE_FORMATTER
 from matplotlib import ticker as mticker
 

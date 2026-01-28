@@ -1,12 +1,10 @@
 import os
 import pickle
 
-import global_vars
-import plots, utils
+from Utils_functions import utils, global_vars
+import plots
 import matplotlib.pyplot as plt
-from scipy import stats
-from global_vars import thesis_plot
-from utils import regions
+from Utils_functions.global_vars import thesis_plot
 
 if __name__ == '__main__':
     season = global_vars.season_to_analise
@@ -71,28 +69,28 @@ if __name__ == '__main__':
 
     for idx, reg in enumerate(list(region.keys())):
         plots.autocorrelation([seaice_lin[reg], flux[reg]],
-                        [reg, r'$\bf{(a)}$'],
-                         var_type)
+                              [reg, r'$\bf{(a)}$'],
+                              var_type)
         plots.create_histogram([seaice_lin[reg], flux[reg]],
-                        [reg, r'$\bf{(a)}$'],
-                         var_type)
+                               [reg, r'$\bf{(a)}$'],
+                               var_type)
         leg = plots.plot_fit_trends(axs[idx],
-                            [seaice_lin[reg], flux[reg], sst[reg]],
-                            [reg, region[reg]['label']],
-                            [f'Sea Ice Area \n (10$^{6}$ km$^{2}$)',
+                                    [seaice_lin[reg], flux[reg], sst[reg]],
+                                    [reg, region[reg]['label']],
+                                    [f'Sea Ice Area \n (10$^{6}$ km$^{2}$)',
                              f'PMOA emission \n anomalies {unit}', 'SST ($^{o}$C)'],
-                            # ['Sea ice \n Concentration ($million km^{2})$', 'Total biomolecule \n concentration'],
-                            # [[6, 10.5], [0.1, 0.1]],
-                            region[reg]['lims'],
-                            colors,
-                            ['Sea ice', 'PMOA', 'SST'],
-                            # ['Sea Ice', 'Biomolecules'],
-                            f'{season}_Ocean_Flux_PL',
-                            var_type,
-                            echam_data=True,
-                            seaice=True,
-                            multipanel=True,
-                            thesis_plot=True)
+                                    # ['Sea ice \n Concentration ($million km^{2})$', 'Total biomolecule \n concentration'],
+                                    # [[6, 10.5], [0.1, 0.1]],
+                                    region[reg]['lims'],
+                                    colors,
+                                    ['Sea ice', 'PMOA', 'SST'],
+                                    # ['Sea Ice', 'Biomolecules'],
+                                    f'{season}_Ocean_Flux_PL',
+                                    var_type,
+                                    echam_data=True,
+                                    seaice=True,
+                                    multipanel=True,
+                                    thesis_plot=True)
         if idx == 0:
             plt.legend(handles=[leg[0], leg[2][0], leg[1], leg[3][0]], ncol=2,
                        bbox_to_anchor=(0.1, 1.), loc='lower left', fontsize=15)
@@ -102,8 +100,8 @@ if __name__ == '__main__':
 
         if not thesis_plot:
             leg = plots.plot_fit_trends_sst(axs1[idx],
-                                        sst[reg],
-                                        [reg, region[reg]['label']],
+                                            sst[reg],
+                                            [reg, region[reg]['label']],
                                         'SST ($^{o}$C)',
                                         'gray')
 
@@ -149,21 +147,21 @@ if __name__ == '__main__':
 
     for idx, reg in enumerate(list(region.keys())):
         f_list = plots.correlation_plots(axs2[idx],
-                                    [seaice_lin[reg], sst[reg], u10[reg], omf[reg], flux[reg]],
-                                    [reg, region[reg]['label']],
-                                [f'PMOA emission anomalies \n {unit}',
+                                         [seaice_lin[reg], sst[reg], u10[reg], omf[reg], flux[reg]],
+                                         [reg, region[reg]['label']],
+                                         [f'PMOA emission anomalies \n {unit}',
                                  'Sea Ice Area \n (millions of km$^{2}$)',
                                  'SST ($^{o}$C)',
                                  '10m wind speed (m s$^{-1}$)'],
-                                    region[reg]['lims'],
-                                    colors,
-                                    [var, 'PMOA'],
-                                    # ['Sea Ice', 'Biomolecules'],
-                                    f'{season}_Ocean_Flux_{var}',
-                                    var_type,
-                                    echam_data=True,
-                                    seaice=True,
-                                    multipanel=True)
+                                         region[reg]['lims'],
+                                         colors,
+                                         [var, 'PMOA'],
+                                         # ['Sea Ice', 'Biomolecules'],
+                                         f'{season}_Ocean_Flux_{var}',
+                                         var_type,
+                                         echam_data=True,
+                                         seaice=True,
+                                         multipanel=True)
         plt.legend(handles=[f_list[0][0], f_list[1][0], f_list[2][0]], ncol=2,  # ncol=len(axs[0].lines),
                    bbox_to_anchor=(0.1, 1.),
                    loc='lower left', fontsize=8)

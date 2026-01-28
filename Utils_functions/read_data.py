@@ -1,11 +1,14 @@
 import xarray as xr
 import numpy as np
 import os
-import global_vars
-import utils
+from Utils_functions import utils, global_vars
 
 
 def read_files_data(path_dir):
+    """
+     This function reads (with dask) the data from a certain file type
+     :return: dataset
+     """
     data = xr.open_mfdataset(path_dir,
                              concat_dim='time',
                              combine='nested')
@@ -13,34 +16,41 @@ def read_files_data(path_dir):
 
 
 def read_ocean_data():
+    """
+     This function reads the data of FESOM-REcoM interpolated regular grid
+     """
     ocean_dir = global_vars.ocean_dir_path
 
-    C_ice_msk = read_files_data(ocean_dir + "mask_a_ice*")['VAR']
-
     C_ice = read_files_data(ocean_dir + "a_ice*")['VAR']
-    C_temp = read_files_data(ocean_dir + "temperature/sst*.nc")['sst'] - 273.16  # * C_ice_msk-273.16
+    C_temp = read_files_data(ocean_dir + "temperature/sst*.nc")['sst'] - 273.16
 
-    C_tep = read_files_data(ocean_dir + "TEP_files/TEP_regular_grid*.nc")['VAR']  # * C_ice_msk
+    C_tep = read_files_data(ocean_dir + "TEP_files/TEP_regular_grid*.nc")['VAR']
 
-    C_nppd = read_files_data(ocean_dir + 'NPPd*')['VAR']  # * C_ice_msk
-    C_nppn = read_files_data(ocean_dir + 'NPPn*')['VAR']  # * C_ice_msk
-    C_din = read_files_data(ocean_dir + 'DIN*')['VAR']  # * C_ice_msk
+    C_nppd = read_files_data(ocean_dir + 'NPPd*')['VAR']
+    C_nppn = read_files_data(ocean_dir + 'NPPn*')['VAR']
+    C_din = read_files_data(ocean_dir + 'DIN*')['VAR']
 
-    C_pcho = read_files_data(ocean_dir + 'PCHO_var*')['PCHO']  # * C_ice_msk
-    C_dcaa = read_files_data(ocean_dir + 'DAA_var*')['DAA']  # * C_ice_msk
-    C_pl = read_files_data(ocean_dir + "Lipids_var*")['LIPIDS']  # * C_ice_msk
-    C_conc_tot = C_pcho + C_dcaa + C_pl
+    C_pcho = read_files_data(ocean_dir + 'PCHO_var*')['PCHO']
+    C_dcaa = read_files_data(ocean_dir + 'DAA_var*')['DAA']
+    C_pl = read_files_data(ocean_dir + "Lipids_var*")['LIPIDS']
 
     return C_pcho, C_dcaa, C_pl, C_ice, C_temp, C_nppd + C_nppn, C_din
 
 
 def read_omf_data():
+    """
+     This function reads the OMF data computed based on biomolecules with the FESOM-REcoM interpolated regular grid
+     """
     omf_dir = global_vars.omf_dir_path
-    omf = read_files_data(omf_dir)  # omf in %
+    omf = read_files_data(omf_dir)
     return omf
 
 
 def read_model_spec_data(file):
+    """
+     This function reads (with dask) specific data
+     :return: dataset
+     """
     return xr.open_mfdataset(file,
                              concat_dim='time',
                              combine='nested',
@@ -48,58 +58,21 @@ def read_model_spec_data(file):
                              ds[['PRO_AS', 'POL_AS', 'LIP_AS', 'SS_AS']])
 
 
-def read_aerosol_data(months):
-    aer_dir = global_vars.aer_dir_path
-
-    v_month_lip = []
-    v_month_pol = []
-    v_month_pro = []
-    v_month_ss = []
-
-    for mo in months:
-        if mo < 10:
-            mo_str = f'0{mo}'
-        else:
-            mo_str = f'{mo}'
-
-        v_yr = []
-        for yr in np.arange(1990, 2020):
-            # print(mo_str)
-            files = f'{aer_dir}_{yr}{mo_str}.01_tracer.nc'
-            # file_ro = f'{data_dir}{exp}_{yr}{mo_str}.01_vphysc.nc'
-            # print(files)
-            v_yr.append(read_files_data(files).isel(lev=46).mean(dim='time'))
-
-            # data_ro = read_model_spec_data(file_ro)
-
-            # da_ro, da_ds = [], []
-            # for ti in ti_sel:
-            #     # da_ro.append(data_ro['rhoam1'].isel(time=ti).isel(lev=46))
-            #     da_ds.append(data.isel(time=ti).isel(lev=46))
-            # da_m_ro = xr.concat(da_ro, dim='time')
-            # da_m_ds = xr.concat(da_ds, dim='time')
-
-        v_yr_m = xr.concat(v_yr, dim='time') * 1e12
-        v_month_lip.append(v_yr_m['LIP_AS'].compute())
-        v_month_pol.append(v_yr_m['POL_AS'].compute())
-        v_month_pro.append(v_yr_m['PRO_AS'].compute())
-        v_month_ss.append(v_yr_m['SS_AS'].compute())
-
-    C_lip = utils.tri_month_mean(v_month_lip, months)
-    C_pol = utils.tri_month_mean(v_month_pol, months)
-    C_pro = utils.tri_month_mean(v_month_pro, months)
-    C_ss = utils.tri_month_mean(v_month_ss, months)
-
-    return C_pol, C_pro, C_lip, C_ss
-
-
 def concat_months_selvar(v_yr, unit_factor, var_id, v_month):
+    """
+     This function concatenates dataarrays and creates new dimension time
+     :return list of an specific variable var_id
+     """
     v_yr_m = xr.concat(v_yr, dim='time') * unit_factor
     v_month.append(v_yr_m[f'{var_id}'].compute())
     return v_month
 
 
 def read_each_aerosol_data(months, var_id, file_type, unit_factor, per_month=False, two_dim=False):
+    """
+     This function reads data of var_id type and returns either the 3-month sum or average value over 30 yr
+     :return: dataset
+     """
     aer_dir = global_vars.aer_dir_path
     if file_type == 'B24bend_poly_only_inp_marine_concentration':
         aer_dir = global_vars.inp_dir_path
@@ -124,39 +97,51 @@ def read_each_aerosol_data(months, var_id, file_type, unit_factor, per_month=Fal
                 if two_dim:
                     # calculate values per season without conversion from year to month
                     ds = read_files_data(files)
-                    v_yr.append(ds.mean(dim='time', skipna=True))
+                    v_yr.append(ds.mean(dim='time',
+                                        skipna=True))
                     if file_type == 'emi':
                         # calculate values as a conversion from yr to month
                         ds_gboxarea = ds.rename({'gboxarea': f'area_{var_id}'})
                         ds_emi = ds.rename({var_id: f'area_{var_id}'})
                         ds_emi_gboxarea = ds_gboxarea * ds_emi * 86400  # 86400 seconds in a day
                         var_id_new = f'area_{var_id}'
-                        v_m_yr.append(ds_emi_gboxarea.sum(dim='time', skipna=True))
+                        v_m_yr.append(ds_emi_gboxarea.sum(dim='time',
+                                                          skipna=True))
                 else:
                     files_dens = f'{aer_dir}_{yr}{mo_str}.01_vphysc.nc'
                     ds_dens = read_files_data(files_dens).isel(lev=46).rename({'rhoam1': f'{var_id}'})
                     ds_conc = read_files_data(files).isel(lev=46)
                     ds_conc_ng_m3 = ds_dens*ds_conc
-                    v_yr.append(ds_conc_ng_m3.mean(dim='time', skipna=True))
+                    v_yr.append(ds_conc_ng_m3.mean(dim='time',
+                                                   skipna=True))
             else:
                 pass
-        v_month = concat_months_selvar(v_yr, unit_factor, var_id, v_month)
+        v_month = concat_months_selvar(v_yr,
+                                       unit_factor,
+                                       var_id,
+                                       v_month)
         if two_dim and file_type == 'emi':
-            v_m_month = concat_months_selvar(v_m_yr, 1e-9, var_id_new, v_m_month)
+            v_m_month = concat_months_selvar(v_m_yr,
+                                             1e-9,
+                                             var_id_new,
+                                             v_m_month)
 
     if two_dim and file_type == 'emi':
-        C_m = utils.tri_month_mean(v_m_month, months, two_dim=two_dim, file_type=file_type)
-        # C_m_ds = xr.concat(v_m_month, dim='time')
-        # C_m = utils.season_aver(C_m_ds, months)
-
-    C = utils.tri_month_mean(v_month, months)
-    # C_ds = xr.concat(v_month, dim='time')
-    # C = utils.season_aver(C_ds, months)
+        C_m = utils.tri_month_mean_sum(v_m_month,
+                                       months,
+                                       two_dim=two_dim,
+                                       file_type=file_type)
+    C = utils.tri_month_mean_sum(v_month,
+                                 months)
 
     return C, C_m
 
 
 def read_daily_data(months, var_id, file_type, unit_factor, emi_gridbox=False, two_dim=False):
+    """
+     This function reads data as daily values and returns dataarray with daily values
+     :return: dataarray
+     """
     aer_dir = global_vars.aer_dir_path
     v_m_month = []
     v_m_yr = []
@@ -182,10 +167,8 @@ def read_daily_data(months, var_id, file_type, unit_factor, emi_gridbox=False, t
                     ds_var = ds_emi_gboxarea
                 ds_daily = ds_var.groupby('time.day').mean(skipna=True)
                 v_m_yr.append(ds_daily[var_id_new])
-                # print(var_id, ds_daily.sizes, ds_daily.dims)
 
     v_m_month = xr.concat(v_m_yr, dim='day') * unit_factor
-    print(var_id, v_m_month.sizes)
     lon_360 = ((v_m_month.lon.values + 180) % 360) - 180
 
     data_ds = xr.Dataset(

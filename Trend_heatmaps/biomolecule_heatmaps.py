@@ -1,27 +1,26 @@
 import numpy as np
-
-import global_vars
-from utils import get_var_reg, get_seaice_vals, get_min_seaice, regions, get_conds
+from Utils_functions import global_vars
+from Utils_functions.utils import get_var_reg, get_seaice_vals, get_min_seaice, regions, get_conds
 import pickle
 import xarray as xr
 import pandas as pd
 import seaborn as sns
+import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
-from matplotlib.colors import LogNorm
-
+from matplotlib import ticker as mticker
 
 def plot_test_map(reg_sel_vals, var_na, reg_na):
+    """ Creates map of a specific region. It is used for checking the region definition
+    :return None"""
     if var_na == 'PCHO' and reg_na == 'Greenland & Norwegian Sea':
-        import cartopy.crs as ccrs
-        import matplotlib.pyplot as plt
-        from matplotlib import ticker as mticker
         fig, ax = plt.subplots(nrows=1,
                                ncols=1,
                                sharex=True,
                                subplot_kw={'projection': ccrs.NorthPolarStereo()}, )
         ax.set_extent([-180, 180, 60, 90],
                       ccrs.PlateCarree())
-        cmap = plt.get_cmap('Blues', 15)
+        cmap = plt.get_cmap('Blues',
+                            15)
         cb = ax.pcolormesh(reg_sel_vals.lon,
                            reg_sel_vals.lat,
                            np.array(reg_sel_vals['slope']),
@@ -82,7 +81,9 @@ def create_df_plot_heatmap(col, col_name, return_colorbar=False):
         df_vals = df_vals[df_vals['Regions'] != 'Central Arctic']
     # if col_name == ' Emission mass flux \n (ng ${m^{-2}}$ ${s^{-1}}$ per unit SIC)':
     #     df_vals = df_vals[df_vals['Regions'] != 'Barents Sea']
-    df_vals_piv = df_vals.pivot(index="Regions", columns=col_name, values="Values")
+    df_vals_piv = df_vals.pivot(index="Regions",
+                                columns=col_name,
+                                values="Values")
 
     if return_colorbar:
         vmin_val = min(df_vals['Values'])
@@ -137,9 +138,11 @@ def reg_sel(lat, lon, data, var_na):
                 lat=("lat", lat.data),
             ),
         )
-        conditions = get_conds(data_ds.lat, data_ds.lon)
+        conditions = get_conds(data_ds.lat,
+                               data_ds.lon)
 
-        reg_sel_vals = get_var_reg(data_ds, conditions[idx])
+        reg_sel_vals = get_var_reg(data_ds,
+                                   conditions[idx])
 
         total_non_nan = np.sum(np.logical_not(np.isnan(reg_sel_vals.slope.values)))
         total_grid_size = len(reg_sel_vals['slope'].lat) * len(reg_sel_vals['slope'].lon)
@@ -163,9 +166,6 @@ def reg_sel(lat, lon, data, var_na):
             reg_data[reg_na]['fraction_grid_negat'] = np.sum(
                 np.logical_not(np.isnan(grid_negat_vals.values))) * 100 / total_non_nan
 
-            #print('\n', var_na, reg_na, reg_data[reg_na]['grid_signif'],
-            # reg_data[reg_na]['fraction_grid_posit'],
-            # reg_data[reg_na]['fraction_grid_negat'])
 
             if abs(min_val) > abs(max_val):
                 if reg_data[reg_na]['fraction_grid_negat'] > reg_data[reg_na]['fraction_grid_posit']:
@@ -379,7 +379,8 @@ if __name__=='__main__':
                                   font,
                                   percent=False)
     plt.tight_layout()
-    plt.savefig(f'./plots/{season}_heatmap_scatter_max_abs_biomolcules.png', dpi=300)
+    plt.savefig(f'./plots/{season}_heatmap_scatter_max_abs_biomolcules.png',
+                dpi=300)
     plt.close()
 
 #### plot figure of absolute maximum trends with grid fracions of increasing or decreasing trend
@@ -398,12 +399,15 @@ if __name__=='__main__':
                                   label,
                                   font)
     plt.tight_layout()
-    plt.savefig(f'./plots/{season}_heatmap_scatter_plots_grid_fraction_biomolcules.png', dpi=300)
+    plt.savefig(f'./plots/{season}_heatmap_scatter_plots_grid_fraction_biomolcules.png',
+                dpi=300)
     plt.close()
 
 #### plot figure of absolute maximum trends with grid fractions of increasing or decreasing trend for both ocean
 # concentration and OMF
-    fig, axs = plt.subplots(2, 6, figsize=(14, 8))#14, 10
+    fig, axs = plt.subplots(2,
+                            6,
+                            figsize=(14, 8))#14, 10
     plt.subplots_adjust(wspace=0.005)
     ax = axs.flatten()
     ax1 = ax[:6]
@@ -425,5 +429,6 @@ if __name__=='__main__':
                                   label2,
                                   font)
     plt.tight_layout()
-    plt.savefig(f'./plots/{season}_heatmap_scatter_plots_grid_fraction_biomolcules_OMF.png', dpi=300)
+    plt.savefig(f'./plots/{season}_heatmap_scatter_plots_grid_fraction_biomolcules_OMF.png',
+                dpi=300)
     plt.close()

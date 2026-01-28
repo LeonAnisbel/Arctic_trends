@@ -1,10 +1,13 @@
 import xarray as xr
 import numpy as np
-
-import global_vars
+from Utils_functions import global_vars
 
 
 def create_var_info_dict():
+    """
+     Defines the dictionary and variable metadata
+     :return: dictionary with variable names as keys
+     """
     npp_din_u = 'mmol C m${^{-2}}$ d${^{-1}}$ '
     flux_u = 'ng m${^{-2}}$ s${^{-1}}$'
     flux_mo_u = 'Tg month$^{-1}$'
@@ -39,11 +42,19 @@ def create_var_info_dict():
     return variables_info
 
 def get_month(da,m):
+    """
+    Pick specific month in dataset
+    :return:
+    """
     da_yr = da
     da_t = da_yr.where(da_yr.time.dt.month == m, drop=True)
     return da_t
 
-def tri_month_mean(v_month, months, two_dim=False, file_type=None):
+def tri_month_mean_sum(v_month, months, two_dim=False, file_type=None):
+    """
+    Computes the sum or average values over the months
+    :return:
+    """
     da_tri_mean = []
     if len(months) > 1:
         for yr in range(len(v_month[0]['time'])):
@@ -51,37 +62,44 @@ def tri_month_mean(v_month, months, two_dim=False, file_type=None):
                                             v_month[1].isel(time=yr),
                                             v_month[2].isel(time=yr)], dim='t')
             if two_dim and file_type == 'emi':
-                da_tri_mean.append(da_t_reg_m_list_yr.sum(dim='t', skipna=True)) # Tg/season
+                da_tri_mean.append(da_t_reg_m_list_yr.sum(dim='t',
+                                                          skipna=True)) # Tg/season
             else:
-                da_tri_mean.append(da_t_reg_m_list_yr.mean(dim='t', skipna=True))
-        da_tri_mean_yrs = xr.concat(da_tri_mean, dim='time')
+                da_tri_mean.append(da_t_reg_m_list_yr.mean(dim='t',
+                                                           skipna=True))
+        da_tri_mean_yrs = xr.concat(da_tri_mean,
+                                    dim='time')
 
     else:
         da_tri_mean_yrs = v_month[0]
 
-    #da_tri_mean_yrs = v_month.groupby((v_month.time.dt.year, v_month.time.dt.month)).mean('time', skipna=True)
-
     return da_tri_mean_yrs
 
 def season_aver(data, months):
-    # da_tri_mean_yrs = data.groupby((data.time.dt.year)).mean('time', skipna=True)
-    # print(da_tri_mean_yrs.time)
+    """
+    Pick the months across years and compute the average.
+    :return: dataset
+    """
     v_month = []
     for m in months:
         v_ti = get_month(data, m)
         v_ti['time'] = v_ti['time'].dt.year
         v_month.append(v_ti)
-#    v_month_da = xr.concat(v_month, dim='time')
-    v_tri_mo = tri_month_mean(v_month, months)
+    v_tri_mo = tri_month_mean_sum(v_month, months)
     return v_tri_mo
 
 def pick_month_var_reg(data, months, aer_conc=False):
-    if aer_conc:
+    """
+     Computes the seasonal average when the FESOM-REcoM interpolated regular grid is passed and returns the dataset for
+     the latitudes > 60 N
+     :return: dataset
+     """
+    if aer_conc: # # ECHAM-HAM grid
         data_month = data
-    else:
+    else: # FESOM-REcoM interpolated regular grid
         data_month = season_aver(data, months)
 
-    data_month_reg = data_month.where(data_month.lat > 60, drop=True)
+    data_month_reg = data_month.where(data_month.lat > global_vars.lat_north, drop=True)
     lat = data_month_reg.lat
     lon = data_month_reg.lon
 
@@ -130,7 +148,8 @@ def get_seaice_vals(variables_info, var_na, get_min_area=False):
     v_season = variables_info[var_na]['data_season_reg'].compute()
     if get_min_area:
         seaice_min = get_min_seaice(variables_info, var_na)
-        seaice_min_10 = seaice_min.where(seaice_min > 10, drop=True)
+        seaice_min_10 = seaice_min.where(seaice_min > 10,
+                                         drop=True)
     else:
         seaice_min = None
         seaice_min_10 = None
@@ -146,7 +165,8 @@ def get_min_seaice(variables_info, var_na):
     year_min = find_yr_min_ice(v_1month_area_tot)
     print(year_min)
     v_1month_conc = variables_info[f'{var_na}_1m']['data_season_reg'].compute()
-    seaice_min = v_1month_conc.where((v_1month_conc.time == year_min), drop=True).isel(time=0)
+    seaice_min = v_1month_conc.where((v_1month_conc.time == year_min),
+                                     drop=True).isel(time=0)
     return seaice_min
 
 def get_perc_increase(variables_info, panel_names):
@@ -165,14 +185,19 @@ def get_perc_increase(variables_info, panel_names):
 
 
 def get_weighted_mean(gboxarea_reg, data, aer_conc=False):
-    if aer_conc:
+    """
+    Computes the weighted mean
+     :return: dataset
+     """
+    if aer_conc: # ECHAM-HAM grid
         weights = gboxarea_reg / gboxarea_reg.sum(dim=('lat', 'lon'))
-    else:
+    else: # FESOM-REcoM interpolated regular grid
         weights = np.cos(np.deg2rad(data.lat))
         weights /= weights.sum()
 
     ds_weighted = data.weighted(weights)
-    ds_weighted_mean = ds_weighted.mean(dim=['lat', 'lon'], skipna=True)
+    ds_weighted_mean = ds_weighted.mean(dim=['lat', 'lon'],
+                                        skipna=True)
     return ds_weighted_mean
 
 
@@ -228,6 +253,10 @@ def get_var_reg(v, cond):
 
 
 def create_ds(data_month_reg, lon):
+    """
+     This function creates a new dataset given lat, lon, time coordinates
+     :return: dataset
+     """
     data_ds = xr.Dataset(
         data_vars=dict(
             data_region=(["time", "lat", "lon"], data_month_reg.data),
@@ -244,6 +273,10 @@ def create_ds(data_month_reg, lon):
 
 
 def create_ds2(data_array, data_month_reg):
+    """
+     This function creates a new dataset given lat, lon, time coordinates
+     :return: dataset
+     """
     data_ds = xr.Dataset(
         data_vars=dict(
             data_region=(["time", "lat", "lon"],data_array.data),
@@ -258,6 +291,10 @@ def create_ds2(data_array, data_month_reg):
 
 
 def compute_seaice_area_px(C_ice):
+    """
+     This function calculates sea ice area
+     :return: dataset
+     """
     bx_size = abs(C_ice.lat.values[1] - C_ice.lat.values[0])
     grid_bx_area = (bx_size * 110.574) * (
             bx_size * 111.320 * np.cos(np.deg2rad(C_ice.lat)))  # from % sea ice of grid to km2
@@ -265,6 +302,10 @@ def compute_seaice_area_px(C_ice):
     return C_ice_area_px
 
 def calculate_anomaly(conc):
+    """
+     This function computes emission anomaly
+     :return: dataset
+     """
     conc_climatology = conc.mean(dim='time',
                                  skipna=True)
     conc_anomaly = conc - conc_climatology

@@ -1,28 +1,12 @@
-from math import isnan
-
 import numpy as np
 import pandas as pd
-from scipy.stats import alpha
-
 import biomolecule_heatmaps
-import global_vars
-import utils
-from process_statsmodels import process_array_slope_per_ice
-from utils import regions
+from Utils_functions import utils, global_vars
+from Utils_functions.utils import regions
 import pickle
 import matplotlib.pyplot as plt
 import seaborn as sns
-import matplotlib.colors as mcolors
 import matplotlib.ticker as ticker
-
-def plot_heatmap(df_vals_piv, col_name, fig_title):
-    fig, ax = plt.subplots(1, 1,
-                           figsize=(7, 5), )
-    biomolecule_heatmaps.plot_each_heatmap(ax, df_vals_piv, col_name)
-    plt.tight_layout()
-    plt.savefig('./plots/heatmap_' + fig_title + '.png')
-    plt.close()
-
 
 def percent_icrease(variables_info_yr, vv, reg_na, decade, cond, tau_values=False):
     """ This function computes the percent of increase per year
@@ -85,9 +69,6 @@ def cols_df(variables_info_yr, panel_names, var_na_title, decade, type):
     return columns
 
 
-
-
-
 def plot_heatmap_multipanel(variables_info, panel_names, var_na_aer, right_label_show, no_ylabel_show, col_name,
                             decade, type, label_loc, panel, settitle=False):
     """ Creates multipanel figure of heatmap plots
@@ -107,22 +88,24 @@ def plot_heatmap_multipanel(variables_info, panel_names, var_na_aer, right_label
             columns_for_heatmap = [columns[0][0], columns[0][1], columns[0][-1]]
 
         df_vals_piv, cmap = biomolecule_heatmaps.create_df_plot_heatmap(columns_for_heatmap,
-                                                   col_name[idx],
-                                                   return_colorbar=True)
+                                                                        col_name[idx],
+                                                                        return_colorbar=True)
         biomolecule_heatmaps.plot_each_heatmap(ax[idx],
-                          df_vals_piv,
-                          col_name[idx],
-                          cmap,
-                          no_ylabel=no_ylabel_show[idx],
-                          right_label=right_label_show[idx])
+                                               df_vals_piv,
+                                               col_name[idx],
+                                               cmap,
+                                               no_ylabel=no_ylabel_show[idx],
+                                               right_label=right_label_show[idx])
 
         for l in range(len(label_loc[0])):
-            ax[label_loc[0][l]].set_title(label_loc[1][l], loc='left')
+            ax[label_loc[0][l]].set_title(label_loc[1][l],
+                                          loc='left')
 
     if settitle:
         ax[-3].set_title(col_name[0])
     plt.tight_layout()
-    plt.savefig(f'./plots/{season}_heatmap_Emission_SIC_SST_Wind_{type}_{decade}.png', dpi=300)
+    plt.savefig(f'./plots/{season}_heatmap_Emission_SIC_SST_Wind_{type}_{decade}.png',
+                dpi=300)
     plt.close()
     return None
 
@@ -165,7 +148,11 @@ def each_panel_fig(data, names_var, ax, title, lims, upper_panel = False, thesis
 
     for c, lab in zip(ax.containers, labels):
         # add the name annotation to the top of the bar
-        ax.bar_label(c, labels=lab, padding=3, fontsize=font-4, rotation=90)  #  if needed
+        ax.bar_label(c,
+                     labels=lab,
+                     padding=3,
+                     fontsize=font-4,
+                     rotation=90)  #  if needed
         ax.margins(y=0.1)
 
 
@@ -187,9 +174,12 @@ def each_panel_fig(data, names_var, ax, title, lims, upper_panel = False, thesis
         if val > 0.05:
             bar.set_alpha(0.1)
 
-    ax.tick_params(axis='x', labelsize=font, rotation=65)
+    ax.tick_params(axis='x',
+                   labelsize=font,
+                   rotation=65)
     ax.set(xlabel=None)
-    ax.set_ylim(lims[0], lims[1])
+    ax.set_ylim(lims[0],
+                lims[1])
     ax.yaxis.set_major_locator(ticker.MultipleLocator(lims[2]))
     ax.xaxis.get_label().set_fontsize(font)
     ax.yaxis.get_label().set_fontsize(font)
@@ -218,34 +208,13 @@ def each_panel_fig(data, names_var, ax, title, lims, upper_panel = False, thesis
 if __name__ == '__main__':
 
     season = global_vars.season_to_analise
+    # Read in data
     with open(f"TrendsDict_{season}_orig_data.pkl", "rb") as myFile:
         variables_info_yr = pickle.load(myFile)
 
-
-    print('Aerosols from ECHAM')
-    # panel_names = ['AER_F_POL_m', 'AER_F_PRO_m', 'AER_F_LIP_m', 'AER_F_SS_m']
-    # var_na_aer = ['PCHO$_{aer}$', 'DCAA$_{aer}$', 'PL$_{aer}$', 'SS$_{aer}$']
-    # lat = variables_info_yr[panel_names[0]]['lat']
-    # lon_360 = variables_info_yr[panel_names[0]]['lon']
-    # lon = ((lon_360 + 180) % 360) - 180
-    #
-    # decade = '1990-2019'
-    # columns_emi = cols_df(variables_info_yr, panel_names, var_na_aer, decade, 'slope')
-    #
-    # columns_sic = cols_df(variables_info_yr, ['AER_SIC'], [''], decade, 'slope')
-    # columns_sst = cols_df(variables_info_yr, ['AER_SST'], [''], decade, 'slope')
-    # columns_u10 = cols_df(variables_info_yr, ['AER_U10'], [''], decade, 'slope')
-
-    ###############################
     decades = ['1990-2019', '1990-2004', '2005-2019']
-
     names_var = [['SS', 'PCHO$_{aer}$', 'DCAA$_{aer}$', 'PL$_{aer}$']]
     fig_title = ['flux', 'concentration']
-
-
-
-    fig, axs = plt.subplots( 3, 1, figsize=(8, 9))
-    axs.flatten()
     limits = global_vars.seasons_info[global_vars.season_to_analise]['bar_plot_lims']
     var_list = [[['AER_F_SS_m'], ['AER_F_POL_m'], ['AER_F_PRO_m'], ['AER_F_LIP_m']],
                 [['AER_SS'], ['AER_POL'], ['AER_PRO'], ['AER_LIP']],
@@ -253,7 +222,12 @@ if __name__ == '__main__':
                 [['AER_INP_POL'], ['AER_INP_POL'], ['AER_INP_POL'], ['AER_INP_POL']]
                 ]
 
-    # for cond in ['not significant', 'significant']:
+    # Create figure for multi-panel heatmap
+    fig, axs = plt.subplots( 3,
+                             1,
+                             figsize=(8, 9))
+    axs.flatten()
+
     data_df_list = []
     title_list = []
     for a, ax in enumerate(axs):
@@ -319,11 +293,14 @@ if __name__ == '__main__':
     # plt.savefig(f'plots/bar_plot_inp_burden_{global_vars.season_to_analise}.png', dpi=300)
     # plt.close()
 ###############################
-
-    panel_names_var = [[['AER_SIC_area_px'], ['AER_SST'], ['AER_F_SS'], ['AER_F_POL'], ['AER_F_PRO'], ['AER_F_LIP']],
-                       [['AER_SIC_area_px'], ['AER_SST'], ['AER_SS'], ['AER_POL'], ['AER_PRO'], ['AER_LIP']]]
+    # Create heatmaps plots of slope and percent of increase for the list of species in panel_names_var
+    panel_names_var = [[['AER_SIC_area_px'], ['AER_SST'], ['AER_F_SS'],
+                        ['AER_F_POL'], ['AER_F_PRO'], ['AER_F_LIP']],
+                       [['AER_SIC_area_px'], ['AER_SST'], ['AER_SS'],
+                        ['AER_POL'], ['AER_PRO'], ['AER_LIP']]]
     for j, panel_names in enumerate(panel_names_var):
-        var_na_aer = [['Sea Ice \n area'], ['SST'], ['SS$_{aer}$'], ['PCHO$_{aer}$'], ['DCAA$_{aer}$'], ['PL$_{aer}$']]
+        var_na_aer = [['Sea Ice \n area'], ['SST'], ['SS$_{aer}$'],
+                      ['PCHO$_{aer}$'], ['DCAA$_{aer}$'], ['PL$_{aer}$']]
         right_label_show = [True, True, True, False, False, True]
         no_ylabel_show = [False, True, True, False, True, True]
         col_emi_name_sl = 4 * [' Emission mass flux \n (10$^{-2}$ ng m$^{-2}$ s$^{-1}$ yr$^{-1}$) \n']
@@ -345,21 +322,40 @@ if __name__ == '__main__':
                       r'$\bf{(d)}$']]
         for dec in decades:
             type = 'slope_'+fig_title[j]
-            plot_heatmap_multipanel(variables_info_yr, panel_names, var_na_aer, right_label_show, no_ylabel_show,
-                                    col_name_sl, dec, type, label_loc, [[2, 3], [8, 8]])
+            plot_heatmap_multipanel(variables_info_yr,
+                                    panel_names,
+                                    var_na_aer,
+                                    right_label_show,
+                                    no_ylabel_show,
+                                    col_name_sl,
+                                    dec,
+                                    type,
+                                    label_loc,
+                                    [[2, 3], [8, 8]])
 
             type = 'percent_'+fig_title[j]
-            plot_heatmap_multipanel(variables_info_yr, panel_names, var_na_aer, right_label_show, no_ylabel_show,
-                                    col_name_ic, dec, type, label_loc, [[2, 3], [8, 8]])
+            plot_heatmap_multipanel(variables_info_yr,
+                                    panel_names,
+                                    var_na_aer,
+                                    right_label_show,
+                                    no_ylabel_show,
+                                    col_name_ic,
+                                    dec,
+                                    type,
+                                    label_loc,
+                                    [[2, 3], [8, 8]])
 
 ###############################
     panel_names_var = [
-        [['AER_SIC'], ['AER_F_POL'], ['AER_F_PRO'], ['AER_F_LIP'], ['AER_F_SS']],
-        [['AER_SIC'], ['AER_POL'], ['AER_PRO'], ['AER_LIP'], ['AER_SS']]]
+        [['AER_SIC'], ['AER_F_POL'], ['AER_F_PRO'],
+         ['AER_F_LIP'], ['AER_F_SS']],
+        [['AER_SIC'], ['AER_POL'], ['AER_PRO'],
+         ['AER_LIP'], ['AER_SS']]]
     fig_title = ['flux', 'concentration']
 
     for j, panel_names in enumerate(panel_names_var):
-        var_na_aer = [['SIC'], ['PCHO$_{aer}$'], ['DCAA$_{aer}$'], ['PL$_{aer}$'], ['SS$_{aer}$']]
+        var_na_aer = [['SIC'], ['PCHO$_{aer}$'], ['DCAA$_{aer}$'],
+                      ['PL$_{aer}$'], ['SS$_{aer}$']]
         right_label_show = [True, False, False, False, True]
         no_ylabel_show = [False, True, True, True, True]
         col_name_sl = ['\n (% yr${^{-1}}$) \n']
@@ -378,17 +374,36 @@ if __name__ == '__main__':
         decades = ['1990-2019']
         for dec in decades:
             type = 'slope_emi_only_'+fig_title[j]
-            plot_heatmap_multipanel(variables_info_yr, panel_names, var_na_aer, right_label_show, no_ylabel_show,
-                                    col_name_sl, dec, type, label_loc, [[1, 5], [10, 4]])
+            plot_heatmap_multipanel(variables_info_yr,
+                                    panel_names,
+                                    var_na_aer,
+                                    right_label_show,
+                                    no_ylabel_show,
+                                    col_name_sl,
+                                    dec,
+                                    type,
+                                    label_loc,
+                                    [[1, 5], [10, 4]])
 
             type = 'percent_emiss_only_'+fig_title[j]
-            plot_heatmap_multipanel(variables_info_yr, panel_names, var_na_aer, right_label_show, no_ylabel_show,
-                                    col_name_ic, dec, type, label_loc, [[1, 5], [10, 4]], settitle=True)
+            plot_heatmap_multipanel(variables_info_yr,
+                                    panel_names,
+                                    var_na_aer,
+                                    right_label_show,
+                                    no_ylabel_show,
+                                    col_name_ic,
+                                    dec,
+                                    type,
+                                    label_loc,
+                                    [[1, 5], [10, 4]],
+                                    settitle=True)
     ###############################
-    panel_names_var = [['AER_F_POL_m'], ['AER_F_PRO_m'], ['AER_F_LIP_m'], ['AER_F_SS_m']]
+    panel_names_var = [['AER_F_POL_m'], ['AER_F_PRO_m'],
+                       ['AER_F_LIP_m'], ['AER_F_SS_m']]
     fig_title = ['flux', 'concentration']
 
-    var_na_aer = [['PCHO$_{aer}$'], ['DCAA$_{aer}$'], ['PL$_{aer}$'], ['SS$_{aer}$']]
+    var_na_aer = [['PCHO$_{aer}$'], ['DCAA$_{aer}$'],
+                  ['PL$_{aer}$'], ['SS$_{aer}$']]
     right_label_show = [False, False, False, True]
     no_ylabel_show = [False, True, True, True]
     col_emi_name_sl = 4 * [' Total emission mass flux \n (10$^{-3}$ Tg season$^{-1}$ yr$^{-1}$) \n']
@@ -403,6 +418,14 @@ if __name__ == '__main__':
     decades = ['1990-2019']
     for dec in decades:
         type = 'slope_tot_emi_only_'+fig_title[j]
-        plot_heatmap_multipanel(variables_info_yr, panel_names, var_na_aer, right_label_show, no_ylabel_show,
-                                col_emi_name_sl, dec, type, label_loc, [[1, 4], [9, 4]])
+        plot_heatmap_multipanel(variables_info_yr,
+                                panel_names,
+                                var_na_aer,
+                                right_label_show,
+                                no_ylabel_show,
+                                col_emi_name_sl,
+                                dec,
+                                type,
+                                label_loc,
+                                [[1, 4], [9, 4]])
 

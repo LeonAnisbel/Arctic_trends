@@ -1,3 +1,4 @@
+# This code was written in collaboration with Dr. Michael Weber (TROPOS)
 import pymannkendall as mk
 import numpy as np
 import statsmodels.api as sm

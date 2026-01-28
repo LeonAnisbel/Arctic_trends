@@ -1,10 +1,7 @@
 import pickle
 
-import global_vars
-import plot_biomolecule_trend
-import plots, utils
-import numpy as np
-import plot_aerosol_trend
+from Utils_functions import utils, global_vars
+from Trend_maps import plot_biomolecule_trend, plot_aerosol_trend
 
 if __name__ == '__main__':
     season = global_vars.season_to_analise

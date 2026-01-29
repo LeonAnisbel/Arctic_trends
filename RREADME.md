@@ -3,7 +3,7 @@
 > biomolecules and marine tracers from FESOM-REcoM regular interpolated grid that are stored on [Zenodo](https://doi.org/10.5281/zenodo.15172565). 
 > See more information and results in [Leon-Marcos et al. (2025a)](https://doi.org/10.5194/egusphere-2025-2829) and [Leon-Marcos et al. (2025b)](https://doi.org/10.5194/gmd-18-4183-2025). 
 > 
-> The conda environment for this project is contained in trends.yml file. Run "conda activate trends.yml" to set up the environment for this project.
+> The conda environment for this project is contained in trends.yml file. Run [start_env.py](start_env.py) to set up the environment for this project.
 
 
 * Adapt required directories with models outputs and Arctic region limits and season to compute trends in [global_vars.py](utils_functions/global_vars.py).

@@ -1,7 +1,7 @@
 import pickle
-from Utils_functions import read_data, utils, global_vars
+from utils_functions import read_data, utils, global_vars
 import numpy as np
-from Utils_functions.utils import calculate_anomaly
+from utils_functions.utils import calculate_anomaly
 import xarray as xr
 from scipy import stats
 
@@ -54,7 +54,7 @@ def compute_corr_matrix(emi_var, sic_aer, sst_aer, u10_aer, C_tot_omf_day):
         ),
     )
 
-    with open(f"Spearman_corr_emiss_drivers_{season}.pkl", "wb") as myFile:
+    with open(f"../outputs/Spearman_corr_emiss_drivers_{season}.pkl", "wb") as myFile:
         pickle.dump(data_ds, myFile)
 
 def get_reg_da(v, idx):
@@ -103,7 +103,7 @@ def compute_corr_per_reg(variables, var_names, emi):
         dict_var_regions['u10'][reg_na] = get_spearman(reg_sel_vals_emi, reg_sel_vals_u10)
         dict_var_regions['Open Ocean fraction'][reg_na] = get_spearman(reg_sel_vals_emi, reg_sel_vals_oof)
 
-    with open(f"Spearman_corr_emiss_drivers_reg_{season}.pkl", "wb") as myFile:
+    with open(f"../outputs/Spearman_corr_emiss_drivers_reg_{season}.pkl", "wb") as myFile:
         pickle.dump(dict_var_regions, myFile)
 
 

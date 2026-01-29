@@ -1,7 +1,7 @@
 import xarray as xr
 import numpy as np
 import os
-from Utils_functions import utils, global_vars
+from utils_functions import utils, global_vars
 
 
 def read_files_data(path_dir):

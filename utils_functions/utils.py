@@ -1,6 +1,6 @@
 import xarray as xr
 import numpy as np
-from Utils_functions import global_vars
+from utils_functions import global_vars
 
 
 def create_var_info_dict():

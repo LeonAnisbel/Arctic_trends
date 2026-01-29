@@ -8,9 +8,9 @@ from matplotlib import ticker as mticker
 
 
 if __name__ == '__main__':
-    with open(f"Spearman_corr_emiss_drivers_reg_AMJ.pkl", "rb") as myFile:
+    with open(f"../outputs/Spearman_corr_emiss_drivers_reg_AMJ.pkl", "rb") as myFile:
         sp_corr_AMJ = pickle.load(myFile)
-    with open(f"Spearman_corr_emiss_drivers_reg_JAS.pkl", "rb") as myFile:
+    with open(f"../outputs/Spearman_corr_emiss_drivers_reg_JAS.pkl", "rb") as myFile:
         sp_corr_JAS = pickle.load(myFile)
     print(sp_corr_AMJ)
     print(sp_corr_JAS)
@@ -23,11 +23,11 @@ if __name__ == '__main__':
     #               sp_corr_AMJ[var][reg], sp_corr_JAS[var][reg],)
 
 
-    with open(f"Spearman_corr_emiss_drivers_AMJ.pkl", "rb") as myFile:
+    with open(f"../outputs/Spearman_corr_emiss_drivers_AMJ.pkl", "rb") as myFile:
         sp_corr_AMJ = pickle.load(myFile)
 
 
-    with open(f"Spearman_corr_emiss_drivers_JAS.pkl", "rb") as myFile:
+    with open(f"../outputs/Spearman_corr_emiss_drivers_JAS.pkl", "rb") as myFile:
         sp_corr_JAS = pickle.load(myFile)
 
     fig, ax = plt.subplots(2,
@@ -113,7 +113,7 @@ if __name__ == '__main__':
     cbar.ax.tick_params(labelsize=14)
 
     # fig.tight_layout()
-    fig.savefig('./plots/Spearman_corr_emiss_drivers.png',
+    fig.savefig('../plots/spearman_corr_emiss_drivers.png',
                 # bbox_inches='tight',
                 dpi=300)
 

@@ -5,7 +5,6 @@
 > 
 > The conda environment for this project is contained in trends.yml file. Run [start_env.py](start_env.py) to set up the environment for this project.
 
-
 * Adapt required directories with models outputs and Arctic region limits and season to compute trends in [global_vars.py](utils_functions/global_vars.py).
 * Adapt Arctic subregions definition, variable metadata considered for trends in [utils.py](utils_functions/utils.py) 
 (the variables should be considered in alignment with those read in [main.py](compute_trends/main.py))

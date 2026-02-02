@@ -1,7 +1,6 @@
 import pickle
-
-from Trend_time_series import plots
-from Utils_functions import utils
+import plot_map_utils as plots
+from utils_functions import utils
 
 
 def plot_trend(variables_info_yr, seaice, season):
@@ -136,13 +135,13 @@ def plot_trend(variables_info_yr, seaice, season):
 def plot_dcaa_spring_summer():
     """ read data and plot map trends of marine DCAA
     :returns  None"""
-    with open(f"TrendsDict_JAS_orig_data.pkl", "rb") as myFile:
+    with open(f"../outputs/TrendsDict_JAS_orig_data.pkl", "rb") as myFile:
         variables_info_yr_JAS = pickle.load(myFile)
     seaice_JAS = utils.get_seaice_vals(variables_info_yr_JAS,
                                        'Sea_ice',
                                        get_min_area=True)
 
-    with open(f"TrendsDict_AMJ_orig_data.pkl", "rb") as myFile:
+    with open(f"../outputs/TrendsDict_AMJ_orig_data.pkl", "rb") as myFile:
         variables_info_yr_AMJ = pickle.load(myFile)
     seaice_AMJ = utils.get_seaice_vals(variables_info_yr_AMJ,
                                        'Sea_ice',

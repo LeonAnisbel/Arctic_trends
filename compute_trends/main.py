@@ -4,8 +4,8 @@ import statsmodels.api as sm
 import pickle
 import Trend_all_arctic
 from process_statsmodels import process_array_slope
-from Utils_functions import read_data, utils, global_vars
-from Utils_functions.utils import calculate_anomaly
+from utils_functions import read_data, utils, global_vars
+from utils_functions.utils import calculate_anomaly
 
 ftype = np.float64
 
@@ -246,5 +246,5 @@ if __name__ == '__main__':
             gc.collect()
 
 # save dictionary with all info
-    with open(f"TrendsDict_{season}_{file_name}.pkl", "wb") as myFile:
+    with open(f"../outputs/TrendsDict_{season}_{file_name}.pkl", "wb") as myFile:
         pickle.dump(variables_info, myFile)

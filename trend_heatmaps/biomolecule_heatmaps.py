@@ -1,6 +1,6 @@
 import numpy as np
-from Utils_functions import global_vars
-from Utils_functions.utils import get_var_reg, get_seaice_vals, get_min_seaice, regions, get_conds
+from utils_functions import global_vars
+from utils_functions.utils import get_var_reg, get_seaice_vals, get_min_seaice, regions, get_conds
 import pickle
 import xarray as xr
 import pandas as pd
@@ -31,7 +31,7 @@ def plot_test_map(reg_sel_vals, var_na, reg_na):
         plt.colorbar(cb)
         gl = ax.gridlines(draw_labels=True, )
         gl.ylocator = mticker.FixedLocator([65, 75, 85])
-        plt.savefig(f'TEST.png')
+        plt.savefig(f'../plots/TEST.png')
 
 
 def scatter_plot(fig, axs, df, col_name, title, vm, font, no_left_labels=False, no_colorbar=False):
@@ -314,7 +314,7 @@ def create_df_pivot(variables_info_yr, var_na_sw_aer, panel_names, col_name_oc):
 
 if __name__=='__main__':
     season = global_vars.season_to_analise
-    with open(f"TrendsDict_{season}_orig_data.pkl", "rb") as myFile:
+    with open(f"../outputs/TrendsDict_{season}_orig_data.pkl", "rb") as myFile:
         variables_info_yr = pickle.load(myFile)
 
     print('Biomolecules and OMF')
@@ -379,7 +379,7 @@ if __name__=='__main__':
                                   font,
                                   percent=False)
     plt.tight_layout()
-    plt.savefig(f'./plots/{season}_heatmap_scatter_max_abs_biomolcules.png',
+    plt.savefig(f'../plots/{season}_heatmap_scatter_max_abs_biomolcules.png',
                 dpi=300)
     plt.close()
 
@@ -399,7 +399,7 @@ if __name__=='__main__':
                                   label,
                                   font)
     plt.tight_layout()
-    plt.savefig(f'./plots/{season}_heatmap_scatter_plots_grid_fraction_biomolcules.png',
+    plt.savefig(f'../plots/{season}_heatmap_scatter_plots_grid_fraction_biomolcules.png',
                 dpi=300)
     plt.close()
 
@@ -429,6 +429,6 @@ if __name__=='__main__':
                                   label2,
                                   font)
     plt.tight_layout()
-    plt.savefig(f'./plots/{season}_heatmap_scatter_plots_grid_fraction_biomolcules_OMF.png',
+    plt.savefig(f'../plots/{season}_heatmap_scatter_plots_grid_fraction_biomolcules_OMF.png',
                 dpi=300)
     plt.close()

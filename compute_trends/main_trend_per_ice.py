@@ -1,7 +1,7 @@
 import numpy as np
 import pickle
 from process_statsmodels import process_array_slope_per_ice
-from Utils_functions import read_data, utils, global_vars
+from utils_functions import read_data, utils, global_vars
 
 ftype = np.float64
 # computes the trends of emissions per unit of sea ice
@@ -97,5 +97,5 @@ if __name__ == '__main__':
         variables_info[var_na]['intercept'] = intercept
 
 
-    with open(f"TrendsDict_per_ice_{season}.pkl", "wb") as myFile:
+    with open(f"../outputs/TrendsDict_per_ice_{season}.pkl", "wb") as myFile:
         pickle.dump(variables_info, myFile)

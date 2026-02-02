@@ -1,15 +1,15 @@
 import os
 import pickle
 
-from Utils_functions import utils, global_vars
-import plots
+from utils_functions import utils, global_vars
+import plots_series_utils as plots
 import matplotlib.pyplot as plt
-from Utils_functions.global_vars import thesis_plot
+from utils_functions.global_vars import thesis_plot
 
 if __name__ == '__main__':
     season = global_vars.season_to_analise
 
-    with open(f"TrendsDict_{season}_orig_data.pkl", "rb") as myFile:
+    with open(f"../outputs/TrendsDict_{season}_orig_data.pkl", "rb") as myFile:
         variables_info_yr = pickle.load(myFile)
 
     unit = '(Tg season${^{-1}}$)'
@@ -106,7 +106,7 @@ if __name__ == '__main__':
                                         'gray')
 
     # plt.tight_layout()
-    plt.savefig(f'./plots/{season}_multipanel_time_series.png',
+    plt.savefig(f'../plots/{season}_multipanel_time_series.png',
                 dpi=300)
     plt.close()
 
@@ -166,7 +166,7 @@ if __name__ == '__main__':
                    bbox_to_anchor=(0.1, 1.),
                    loc='lower left', fontsize=8)
     plt.tight_layout()
-    plt.savefig(f'./plots/{season}_multipanel_correlation_emiss.png', dpi=300)
+    plt.savefig(f'../plots/{season}_multipanel_correlation_emiss.png', dpi=300)
     plt.close()
 
     flux = variables_info_yr['AER_F_tot_m']  # AER_LIP #AER_F_tot_yr
@@ -174,11 +174,11 @@ if __name__ == '__main__':
     biom = variables_info_yr['Biom_tot']  # AER_LIP #AER_F_tot_yr
     conc = variables_info_yr['AER_tot']  # AER_LIP #AER_F_tot_yr
     region = utils.regions()
-    os.remove(f"Region_means_{season}.txt")
+    os.remove(f"../outputs/Region_means_{season}.txt")
     for reg, idx in region.items():
         decades = ['1990-2004', '2005-2019']
         for idx, dec in enumerate(decades):
-            with open(f"Region_means_{season}.txt", "a") as f:
+            with open(f"../outputs/Region_means_{season}.txt", "a") as f:
                 print(reg, dec,
                       'mean SIC',
                       seaice_lin[reg][dec]['data_sum_reg'].mean(skipna=True).values,

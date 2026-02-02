@@ -1,7 +1,7 @@
 import numpy as np
 import statsmodels.api as sm
 import pymannkendall as mk
-from Utils_functions import utils
+from utils_functions import utils
 
 ftype = np.float64
 def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_reg, var_type, gboxarea,
@@ -162,6 +162,6 @@ def trend_aver_per_reg(variables_info, var_na, data_month_reg, data_month_ice_re
             variables_info[var_na][reg_na][decades_na[dec_na]]['tau'] = tau
             variables_info[var_na][reg_na][decades_na[dec_na]]['significance'] = signif
 
-        # with open("TrendsDictWholeArctic.txt", "wb") as myFile:
+        # with open("../outputs/TrendsDictWholeArctic.txt", "wb") as myFile:
         #     pickle.dump(variables_info, myFile)
 

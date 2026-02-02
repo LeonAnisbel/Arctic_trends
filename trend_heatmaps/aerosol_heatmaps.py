@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 import biomolecule_heatmaps
-from Utils_functions import utils, global_vars
-from Utils_functions.utils import regions
+from utils_functions import utils, global_vars
+from utils_functions.utils import regions
 import pickle
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -104,7 +104,7 @@ def plot_heatmap_multipanel(variables_info, panel_names, var_na_aer, right_label
     if settitle:
         ax[-3].set_title(col_name[0])
     plt.tight_layout()
-    plt.savefig(f'./plots/{season}_heatmap_Emission_SIC_SST_Wind_{type}_{decade}.png',
+    plt.savefig(f'../plots/{season}_heatmap_Emission_SIC_SST_Wind_{type}_{decade}.png',
                 dpi=300)
     plt.close()
     return None
@@ -209,7 +209,7 @@ if __name__ == '__main__':
 
     season = global_vars.season_to_analise
     # Read in data
-    with open(f"TrendsDict_{season}_orig_data.pkl", "rb") as myFile:
+    with open(f"../outputs/TrendsDict_{season}_orig_data.pkl", "rb") as myFile:
         variables_info_yr = pickle.load(myFile)
 
     decades = ['1990-2019', '1990-2004', '2005-2019']
@@ -262,7 +262,7 @@ if __name__ == '__main__':
         title_list.append(title)
         # each_panel_fig(data_df, names_var[0], ax, title, limits[a], upper_panel=panel)
         # plt.tight_layout()
-        # plt.savefig(f'plots/bar_plot_{global_vars.season_to_analise}.png', dpi=300)
+        # plt.savefig(f'../plots/bar_plot_{global_vars.season_to_analise}.png', dpi=300)
     plt.close()
 
 ###############################
@@ -270,27 +270,27 @@ if __name__ == '__main__':
     fig, axs = plt.subplots( 1, 1, figsize=(8, 7))
     each_panel_fig(data_df_list[0], names_var[0], axs, title_list[0], limits[0], upper_panel=True, thesis_plot=True)
     plt.tight_layout()
-    plt.savefig(f'plots/bar_plot_emiss_{global_vars.season_to_analise}.png', dpi=300)
+    plt.savefig(f'../plots/bar_plot_emiss_{global_vars.season_to_analise}.png', dpi=300)
     plt.close()
 
     fig, axs = plt.subplots( 1, 1, figsize=(8, 7))
     each_panel_fig(data_df_list[1], names_var[0], axs, title_list[1], limits[1], upper_panel=True, thesis_plot=True)
     plt.tight_layout()
-    plt.savefig(f'plots/bar_plot_conc_{global_vars.season_to_analise}.png', dpi=300)
+    plt.savefig(f'../plots/bar_plot_conc_{global_vars.season_to_analise}.png', dpi=300)
     plt.close()
 
     fig, axs = plt.subplots( 1, 1, figsize=(8, 7))
     each_panel_fig(data_df_list[2], names_var[0], axs, 'Accumulated atmospheric burden',
                    limits[2], upper_panel=True, thesis_plot=True)
     plt.tight_layout()
-    plt.savefig(f'plots/bar_plot_burden_{global_vars.season_to_analise}.png', dpi=300)
+    plt.savefig(f'../plots/bar_plot_burden_{global_vars.season_to_analise}.png', dpi=300)
     plt.close()
 
     # fig, axs = plt.subplots( 1, 1, figsize=(8, 7))
     # each_panel_fig(data_df_list[3], names_var[0], axs, 'Average INP burden',
     #                limits[2], upper_panel=True, thesis_plot=True)
     # plt.tight_layout()
-    # plt.savefig(f'plots/bar_plot_inp_burden_{global_vars.season_to_analise}.png', dpi=300)
+    # plt.savefig(f'../plots/bar_plot_inp_burden_{global_vars.season_to_analise}.png', dpi=300)
     # plt.close()
 ###############################
     # Create heatmaps plots of slope and percent of increase for the list of species in panel_names_var

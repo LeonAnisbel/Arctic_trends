@@ -18,6 +18,9 @@ with a dictionary with the trends results for each variable.
 * Run [main_trend_per_ice.py](compute_trends/main_trend_per_ice.py) or uncomment line 22 and execute sbatch [run_main.sh](compute_trends/run_main.sh) 
 (on levante) to start the trend calculation of emissions per unit of sea ice
 
+#### Contributions
+- Michael Weger Dr. (TROPOS) assisted in the implementation and optimization of the trend computation.
+
 ### Create maps of trends, time series and heatmap plots 
 * Run [plot_trend_maps.py](trend_maps/plot_trend_maps.py) to create maps of trends over the Arctic shown in 
 [Leon-Marcos et al. (2025a)](https://doi.org/10.5194/egusphere-2025-2829) and doctoral thesis at the University of Leipzig.
@@ -31,3 +34,4 @@ and Doctoral thesis of Anisbel Leon Marcos at Leipzig University.
 * Run [compute_spearman_corr.py](spearman_corr_emiss_drivers/compute_spearman_corr.py) or [run_main_corr.sh](spearman_corr_emiss_drivers/run_main_corr.sh) (on levante) to 
 compute the Spearman correlation over the Arctic and for predefined Arctic subregions
 * Run [compute_spearman_corr.py](spearman_corr_emiss_drivers/compute_spearman_corr.py) to plot Arctic maps of the Spearman correlation between emission and emission drivers
+
